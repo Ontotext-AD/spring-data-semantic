@@ -3,7 +3,7 @@ package org.springframework.data.semantic.model;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,10 +21,10 @@ public class TestSemanticRepository {
 	private TestEntityRepository repository;
 
 	@Autowired
-	private static SemanticDatabase sdb;
+	private SemanticDatabase sdb;
 	
-	@BeforeClass
-	public static void initRepo() {
+	@Before
+	public void initRepo() {
 		Utils.populateTestRepository(sdb);
 	}
 	

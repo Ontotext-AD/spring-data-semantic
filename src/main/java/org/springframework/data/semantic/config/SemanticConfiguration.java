@@ -7,7 +7,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.core.convert.support.ConversionServiceFactory;
 import org.springframework.core.convert.support.GenericConversionService;
+import org.springframework.dao.support.PersistenceExceptionTranslator;
 import org.springframework.data.semantic.core.SemanticDatabase;
+import org.springframework.data.semantic.core.SemanticExceptionTranslator;
 import org.springframework.data.semantic.support.SemanticTemplateCRUD;
 import org.springframework.data.semantic.support.SemanticTemplateObjectCreator;
 import org.springframework.data.semantic.support.SemanticTemplateStatementsCollector;
@@ -57,4 +59,8 @@ public class SemanticConfiguration {
 		return conversionService;
 	}
 	
+	@Bean
+    public PersistenceExceptionTranslator persistenceExceptionTranslator() {
+		return new SemanticExceptionTranslator();
+	}
 }
