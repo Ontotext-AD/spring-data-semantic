@@ -1,8 +1,8 @@
 package org.springframework.data.semantic.convert;
 
+import org.openrdf.model.Model;
 import org.openrdf.model.Statement;
 import org.openrdf.query.GraphQueryResult;
-import org.springframework.data.semantic.core.StatementsIterator;
 import org.springframework.data.semantic.mapping.MappingPolicy;
 
 
@@ -20,5 +20,5 @@ public interface SemanticEntityPersister {
 	 * @param mappingPolicy
 	 * @return
 	 */
-	public <T> T createEntityFromState(StatementsIterator statements, Class<T> type, MappingPolicy mappingPolicy);
+	public <T> T createEntityFromState(Model statements, Class<T> type, MappingPolicy mappingPolicy);
 }

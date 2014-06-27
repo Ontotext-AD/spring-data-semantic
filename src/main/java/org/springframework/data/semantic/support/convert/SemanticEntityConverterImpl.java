@@ -1,11 +1,11 @@
 package org.springframework.data.semantic.support.convert;
 
+import org.openrdf.model.Model;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.data.mapping.context.MappingContext;
 import org.springframework.data.mapping.model.BeanWrapper;
 import org.springframework.data.semantic.convert.SemanticEntityConverter;
 import org.springframework.data.semantic.convert.SemanticEntityInstantiator;
-import org.springframework.data.semantic.core.StatementsIterator;
 import org.springframework.data.semantic.mapping.MappingPolicy;
 import org.springframework.data.semantic.mapping.SemanticPersistentEntity;
 import org.springframework.data.semantic.mapping.SemanticPersistentProperty;
@@ -41,7 +41,7 @@ public class SemanticEntityConverterImpl implements SemanticEntityConverter {
 	}
 
 	@Override
-	public <R> R read(Class<R> type, StatementsIterator source) {
+	public <R> R read(Class<R> type, Model source) {
 		//final TypeInformation<R> requestedTypeInformation = ClassTypeInformation.from(type);
 		
 		@SuppressWarnings("unchecked")
@@ -52,7 +52,7 @@ public class SemanticEntityConverterImpl implements SemanticEntityConverter {
 	}
 	
 	@Override
-	public <R> R read(Class<R> type, StatementsIterator source, MappingPolicy mappingPolicy) {
+	public <R> R read(Class<R> type, Model source, MappingPolicy mappingPolicy) {
 		//final TypeInformation<R> requestedTypeInformation = ClassTypeInformation.from(type);
 		
 		@SuppressWarnings("unchecked")
@@ -63,13 +63,13 @@ public class SemanticEntityConverterImpl implements SemanticEntityConverter {
 	}
 
 	@Override
-	public void write(Object source, StatementsIterator sink) {
+	public void write(Object source, Model sink) {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	public <R> R loadEntity(R entity, StatementsIterator source,
+	public <R> R loadEntity(R entity, Model source,
 			MappingPolicy mappingPolicy,
 			SemanticPersistentEntity<R> persistentEntity) {
 		if (mappingPolicy.eagerLoad()) {

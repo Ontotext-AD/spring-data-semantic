@@ -6,22 +6,21 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.openrdf.model.Model;
 import org.openrdf.model.Statement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.semantic.convert.fieldaccess.FieldAccessor;
 import org.springframework.data.semantic.convert.fieldaccess.FieldAccessorProvider;
 import org.springframework.data.semantic.convert.state.EntityState;
-import org.springframework.data.semantic.core.StatementsIterator;
 import org.springframework.data.semantic.mapping.MappingPolicy;
 import org.springframework.data.semantic.mapping.SemanticPersistentEntity;
 import org.springframework.data.semantic.mapping.SemanticPersistentProperty;
-import org.springframework.data.semantic.support.SemanticTemplateCRUD;
 import org.springframework.data.semantic.support.convert.access.DelegatingFieldAccessorFactory;
 import org.springframework.data.semantic.support.convert.access.DelegatingFieldAccessorProvider;
 
 public class SemanticEntityState<T> implements
-		EntityState<T, StatementsIterator> {
+		EntityState<T, Model> {
 
 	private final T entity;
 	private final Class<? extends T> type;
@@ -29,13 +28,13 @@ public class SemanticEntityState<T> implements
 	// private final Map<Neo4jPersistentProperty,List<FieldAccessListener>>
 	// fieldAccessorListeners = new HashMap<Neo4jPersistentProperty,
 	// List<FieldAccessListener>>();
-	private StatementsIterator state;
+	private Model state;
 	private final static Logger log = LoggerFactory.getLogger(SemanticEntityState.class);
 	private final FieldAccessorProvider fieldAccessorProvider;
 	private final SemanticPersistentEntity<T> persistentEntity;
 
 	public SemanticEntityState(
-			final StatementsIterator underlyingState,
+			final Model underlyingState,
 			final T entity,
 			final Class<? extends T> type,
 			final DelegatingFieldAccessorFactory nodeDelegatingFieldAccessorFactory,
@@ -56,7 +55,7 @@ public class SemanticEntityState<T> implements
 	}
 
 	@Override
-	public void setPersistentState(StatementsIterator state) {
+	public void setPersistentState(Model state) {
 		this.state = state;
 	}
 
@@ -135,7 +134,7 @@ public class SemanticEntityState<T> implements
 	}
 
 	@Override
-	public StatementsIterator getPersistentState() {
+	public Model getPersistentState() {
 		return state;
 	}
 

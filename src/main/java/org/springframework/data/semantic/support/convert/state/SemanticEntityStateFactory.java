@@ -1,14 +1,13 @@
 package org.springframework.data.semantic.support.convert.state;
 
+import org.openrdf.model.Model;
 import org.springframework.data.semantic.convert.state.EntityState;
 import org.springframework.data.semantic.convert.state.EntityStateFactory;
-import org.springframework.data.semantic.core.StatementsIterator;
 import org.springframework.data.semantic.mapping.SemanticPersistentEntity;
-import org.springframework.data.semantic.support.SemanticTemplateCRUD;
 import org.springframework.data.semantic.support.convert.access.DelegatingFieldAccessorFactory;
 import org.springframework.data.semantic.support.mapping.SemanticMappingContext;
 
-public class SemanticEntityStateFactory implements EntityStateFactory<StatementsIterator>{
+public class SemanticEntityStateFactory implements EntityStateFactory<Model>{
 	
 	private SemanticMappingContext mappingContext;
 	private DelegatingFieldAccessorFactory delegatingFieldAccessorFactory;
@@ -20,7 +19,7 @@ public class SemanticEntityStateFactory implements EntityStateFactory<Statements
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <R> EntityState<R, StatementsIterator> getEntityState(R entity,
+	public <R> EntityState<R, Model> getEntityState(R entity,
 			boolean detachable) {
 		final Class<?> entityType = entity.getClass();
 		SemanticPersistentEntity<?> persistentEntity = mappingContext.getPersistentEntity(entityType);

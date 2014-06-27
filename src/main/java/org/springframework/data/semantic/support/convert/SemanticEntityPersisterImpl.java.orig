@@ -17,8 +17,13 @@ public class SemanticEntityPersisterImpl implements SemanticEntityPersister{
 	@Override
 	public <T> T createEntityFromState(Model statements,
 			Class<T> type, MappingPolicy mappingPolicy) {
+<<<<<<< HEAD
 		if (statements == null || statements.isEmpty()) {
+            throw new IllegalArgumentException("State has to be either a Node or Relationship, but is null");
+=======
+		if (statements == null || !statements.hasNext()) {
             return null;
+>>>>>>> master
         }
 		//TODO what is the purpose of the mappingPolicy object?
 		return entityConverter.read(type, statements); 

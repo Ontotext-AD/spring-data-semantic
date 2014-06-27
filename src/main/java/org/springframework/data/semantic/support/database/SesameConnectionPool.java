@@ -108,7 +108,7 @@ public final class SesameConnectionPool {
 		ExtendedRepositoryConnection connection  = availableList.poll();
 		if(connection == null){
 			if (openConnections.get() < maxConnections) {
-				connection = new ExtendedRepositoryConnection(this, repo.getConnection());
+				connection = new ExtendedRepositoryConnection(this, repo, repo.getConnection());
 				openConnections.getAndIncrement();
 				if(openConnections.get() == maxConnections-1) {
 					logger.info("Reached maximum number of opened connections: "+maxConnections);

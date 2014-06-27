@@ -1,16 +1,13 @@
 package org.springframework.data.semantic.support.convert.access;
 
-import java.util.Iterator;
 import java.util.List;
 
-import org.openrdf.model.Statement;
+import org.openrdf.model.Model;
 import org.openrdf.model.URI;
 import org.springframework.data.semantic.convert.fieldaccess.FieldAccessor;
 import org.springframework.data.semantic.convert.fieldaccess.FieldAccessorFactory;
-import org.springframework.data.semantic.core.StatementsIterator;
 import org.springframework.data.semantic.mapping.MappingPolicy;
 import org.springframework.data.semantic.mapping.SemanticPersistentProperty;
-import org.springframework.data.semantic.support.SemanticTemplateCRUD;
 import org.springframework.data.semantic.support.SemanticTemplateStatementsCollector;
 
 public class PropertyFieldAccessorFactory implements FieldAccessorFactory {
@@ -62,10 +59,10 @@ public class PropertyFieldAccessorFactory implements FieldAccessorFactory {
 		@Override
 		public String getValue(Object entity, MappingPolicy mappingPolicy) {
 			//TODO multiple values
-			StatementsIterator stIterator = template.getStatementsForResourceProperty(entity, property);
-			Iterator<Statement> statements = stIterator.iterator();
-			if(statements.hasNext()) {
-				return statements.next().getObject().stringValue();
+			Model stIterator = template.getStatementsForResourceProperty(entity, property);
+			
+			if(!stIterator.isEmpty()) {
+				return stIterator.objects().iterator().next().stringValue();
 			}
 			return null;
 		}

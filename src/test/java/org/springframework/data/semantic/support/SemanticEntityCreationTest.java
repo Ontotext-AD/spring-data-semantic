@@ -1,18 +1,17 @@
 package org.springframework.data.semantic.support;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.openrdf.model.Model;
 import org.openrdf.model.Namespace;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
@@ -29,18 +28,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.core.convert.support.DefaultConversionService;
 import org.springframework.data.repository.query.QueryCreationException;
-import org.springframework.data.semantic.convert.SemanticEntityConverter;
-import org.springframework.data.semantic.convert.SemanticEntityInstantiator;
-import org.springframework.data.semantic.convert.state.EntityStateFactory;
 import org.springframework.data.semantic.core.SemanticDatabase;
-import org.springframework.data.semantic.core.StatementsIterator;
 import org.springframework.data.semantic.mapping.SemanticPersistentEntity;
 import org.springframework.data.semantic.model.Merlot;
-import org.springframework.data.semantic.support.convert.SemanticEntityConverterImpl;
-import org.springframework.data.semantic.support.convert.SemanticEntityInstantiatorImpl;
-import org.springframework.data.semantic.support.convert.SemanticSourceStateTransmitter;
-import org.springframework.data.semantic.support.convert.access.DelegatingFieldAccessorFactory;
-import org.springframework.data.semantic.support.convert.state.SemanticEntityStateFactory;
 import org.springframework.data.semantic.support.mapping.SemanticMappingContext;
 import org.springframework.data.semantic.testutils.Utils;
 import org.springframework.data.util.ClassTypeInformation;
@@ -154,7 +144,7 @@ public class SemanticEntityCreationTest {
 
 	@Test
 	public void testReadEntity() throws QueryInterruptedException, RepositoryException, QueryCreationException, QueryEvaluationException, MalformedQueryException { 
-		StatementsIterator iterator = getTestStatements();
+		Model iterator = getTestStatements();
 		
 		Merlot res = objectCreator.createObjectFromStatements(iterator, Merlot.class, null);
 		
@@ -166,13 +156,13 @@ public class SemanticEntityCreationTest {
 		assertEquals(expYear, res.getYear());
 	}
 
-	private StatementsIterator getTestStatements() throws QueryInterruptedException, RepositoryException, QueryCreationException, QueryEvaluationException, MalformedQueryException {
+	private Model getTestStatements() throws QueryInterruptedException, RepositoryException, QueryCreationException, QueryEvaluationException, MalformedQueryException {
 		
 		URI resource = new URIImpl("http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#LongridgeMerlot");
 		String queryStr = EntityToGraphQueryConverter.getGraphQueryForResource(resource, testEntityType);
 
 		GraphQueryResult result = sdb.getStatementsForGraphQuery(queryStr);
-		StatementsIterator statements =  statementsCollector.getStatementsForResourceClass(resource, Merlot.class);
+		Model statements =  statementsCollector.getStatementsForResourceClass(resource, Merlot.class);
 		return statements;
 		
 		

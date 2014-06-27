@@ -1,5 +1,6 @@
 package org.springframework.data.semantic.support.convert;
 
+import org.openrdf.model.Model;
 import org.springframework.data.mapping.Association;
 import org.springframework.data.mapping.AssociationHandler;
 import org.springframework.data.mapping.PropertyHandler;
@@ -7,7 +8,6 @@ import org.springframework.data.mapping.model.BeanWrapper;
 import org.springframework.data.mapping.model.MappingException;
 import org.springframework.data.semantic.convert.state.EntityState;
 import org.springframework.data.semantic.convert.state.EntityStateFactory;
-import org.springframework.data.semantic.core.StatementsIterator;
 import org.springframework.data.semantic.mapping.MappingPolicy;
 import org.springframework.data.semantic.mapping.SemanticPersistentEntity;
 import org.springframework.data.semantic.mapping.SemanticPersistentProperty;
@@ -21,10 +21,10 @@ import org.springframework.data.semantic.mapping.SemanticPersistentProperty;
  */
 public class SemanticSourceStateTransmitter {
 
-	private EntityStateFactory<StatementsIterator> entityStateFactory;
+	private EntityStateFactory<Model> entityStateFactory;
 
 	public SemanticSourceStateTransmitter(
-			EntityStateFactory<StatementsIterator> entityStateFactory) {
+			EntityStateFactory<Model> entityStateFactory) {
 		this.entityStateFactory = entityStateFactory;
 	}
 
@@ -37,11 +37,11 @@ public class SemanticSourceStateTransmitter {
 	 */
 	public <R> void copyPropertiesFrom(
 			final BeanWrapper<SemanticPersistentEntity<R>, R> wrapper,
-			StatementsIterator source,
+			Model source,
 			SemanticPersistentEntity<R> persistentEntity,
 			final MappingPolicy mappingPolicy) {
 		final R entity = wrapper.getBean();
-		final EntityState<R, StatementsIterator> entityState = entityStateFactory.getEntityState(entity, false);
+		final EntityState<R, Model> entityState = entityStateFactory.getEntityState(entity, false);
 		entityState.setPersistentState(source);
 		persistentEntity.doWithProperties(new PropertyHandler<SemanticPersistentProperty>() {					
 			@Override
@@ -64,7 +64,7 @@ public class SemanticSourceStateTransmitter {
 		// return entity;
 	}
 
-	private <R> Object copyEntityStatePropertyValue(SemanticPersistentProperty property, EntityState<R, StatementsIterator> state, 	BeanWrapper<SemanticPersistentEntity<R>, R> wrapper,
+	private <R> Object copyEntityStatePropertyValue(SemanticPersistentProperty property, EntityState<R, Model> state, 	BeanWrapper<SemanticPersistentEntity<R>, R> wrapper,
 			final MappingPolicy mappingPolicy) {
 		final Object value = state.getValue(property, mappingPolicy);
 		setProperty(wrapper, property, value);

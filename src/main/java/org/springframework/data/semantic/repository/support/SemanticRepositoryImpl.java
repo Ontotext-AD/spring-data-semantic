@@ -1,5 +1,6 @@
 package org.springframework.data.semantic.repository.support;
 
+import org.openrdf.model.Model;
 import org.openrdf.model.URI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,9 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.PagingAndSortingRepository;
-import org.springframework.data.semantic.core.StatementsIterator;
 import org.springframework.data.semantic.repository.SemanticRepository;
-import org.springframework.data.semantic.support.SemanticTemplateCRUD;
 import org.springframework.data.semantic.support.SemanticTemplateObjectCreator;
 import org.springframework.data.semantic.support.SemanticTemplateStatementsCollector;
 
@@ -116,7 +115,7 @@ public class SemanticRepositoryImpl<T> implements SemanticRepository<T> {
 		
 	}
 	
-	protected T createEntity(StatementsIterator statements) {
+	protected T createEntity(Model statements) {
         return objectCreator.createObjectFromStatements(statements, clazz, statementsCollector.getMappingPolicy(clazz));
     }
 
