@@ -18,7 +18,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 public class TestSemanticRepository {
 
 	@Autowired
-	private TestEntityRepository repository;
+	private WineBodyRepository repository;
 
 	@Autowired
 	private SemanticDatabase sdb;
@@ -30,7 +30,7 @@ public class TestSemanticRepository {
 	
 	@Test
 	public void testFindOne() {
-		TestEntity entity = repository.findOne(WINE.LIGHT);
+		WineBody entity = repository.findOne(WINE.LIGHT);
 		assertNotNull(entity);
 		assertEquals(WINE.LIGHT, entity.getUri());
 	}

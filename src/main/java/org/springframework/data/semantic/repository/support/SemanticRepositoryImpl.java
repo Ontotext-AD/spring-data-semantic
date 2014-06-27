@@ -2,6 +2,9 @@ package org.springframework.data.semantic.repository.support;
 
 import org.openrdf.model.Model;
 import org.openrdf.model.URI;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -21,6 +24,8 @@ public class SemanticRepositoryImpl<T> implements SemanticRepository<T> {
 	protected SemanticTemplateStatementsCollector statementsCollector;
 	protected SemanticTemplateObjectCreator objectCreator;
 	protected Class<T> clazz;
+	
+	private Logger logger = LoggerFactory.getLogger(SemanticRepositoryImpl.class);
 	
 	public SemanticRepositoryImpl(SemanticTemplateStatementsCollector statementsCollector, SemanticTemplateObjectCreator objectCreator, Class<T> clazz) {
 		this.statementsCollector = statementsCollector;
@@ -54,7 +59,12 @@ public class SemanticRepositoryImpl<T> implements SemanticRepository<T> {
 
 	@Override
 	public T findOne(URI id) {
-		return createEntity(statementsCollector.getStatementsForResourceClass(id, clazz));
+		try{
+			return createEntity(statementsCollector.getStatementsForResourceClass(id, clazz));
+		} catch (DataAccessException e){
+			logger.debug(e.getMessage(), e);
+		}
+		return null;
 	}
 
 	@Override
