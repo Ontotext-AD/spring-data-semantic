@@ -1,0 +1,2703 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix : <http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#> .
+@prefix food: <http://www.w3.org/TR/2003/PR-owl-guide-20031209/food#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine>
+    a owl:Ontology ;
+    rdfs:comment "An example OWL ontology", """Derived from the DAML Wine ontology at 
+      http://ontolingua.stanford.edu/doc/chimaera/ontologies/wines.daml
+      Substantially changed, in particular the Region based relations.
+    """ ;
+    rdfs:label "Wine Ontology" ;
+    owl:imports <http://www.w3.org/TR/2003/PR-owl-guide-20031209/food> ;
+    owl:priorVersion <http://www.w3.org/TR/2003/CR-owl-guide-20030818/wine> .
+
+<http://www.w3.org/TR/2003/CR-owl-guide-20030818/wine>
+    a owl:Ontology .
+
+:Wine
+    a owl:Class ;
+    rdfs:label "vin"@fr, "wine"@en ;
+    rdfs:subClassOf food:PotableLiquid, [
+        a owl:Restriction ;
+        owl:cardinality "1"^^xsd:nonNegativeInteger ;
+        owl:onProperty :hasMaker
+    ], [
+        a owl:Restriction ;
+        owl:allValuesFrom :Winery ;
+        owl:onProperty :hasMaker
+    ], [
+        a owl:Restriction ;
+        owl:minCardinality "1"^^xsd:nonNegativeInteger ;
+        owl:onProperty :madeFromGrape
+    ], [
+        a owl:Restriction ;
+        owl:cardinality "1"^^xsd:nonNegativeInteger ;
+        owl:onProperty :hasSugar
+    ], [
+        a owl:Restriction ;
+        owl:cardinality "1"^^xsd:nonNegativeInteger ;
+        owl:onProperty :hasFlavor
+    ], [
+        a owl:Restriction ;
+        owl:cardinality "1"^^xsd:nonNegativeInteger ;
+        owl:onProperty :hasBody
+    ], [
+        a owl:Restriction ;
+        owl:cardinality "1"^^xsd:nonNegativeInteger ;
+        owl:onProperty :hasColor
+    ], [
+        a owl:Restriction ;
+        owl:onProperty :locatedIn ;
+        owl:someValuesFrom :Region
+    ] .
+
+:Vintage
+    a owl:Class ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:cardinality "1"^^xsd:nonNegativeInteger ;
+        owl:onProperty :hasVintageYear
+    ] .
+
+:WineGrape
+    a owl:Class ;
+    rdfs:subClassOf food:Grape .
+
+:WhiteWine
+    a owl:Class ;
+    owl:intersectionOf [
+        rdf:first :Wine ;
+        rdf:rest [
+            rdf:first [
+                a owl:Restriction ;
+                owl:hasValue :White ;
+                owl:onProperty :hasColor
+            ] ;
+            rdf:rest rdf:nil
+        ]
+    ] .
+
+:WhiteTableWine
+    a owl:Class ;
+    owl:intersectionOf [
+        rdf:first :TableWine ;
+        rdf:rest [
+            rdf:first [
+                a owl:Restriction ;
+                owl:hasValue :White ;
+                owl:onProperty :hasColor
+            ] ;
+            rdf:rest rdf:nil
+        ]
+    ] .
+
+:TableWine
+    a owl:Class ;
+    owl:intersectionOf [
+        rdf:first :Wine ;
+        rdf:rest [
+            rdf:first [
+                a owl:Restriction ;
+                owl:hasValue :Dry ;
+                owl:onProperty :hasSugar
+            ] ;
+            rdf:rest rdf:nil
+        ]
+    ] .
+
+:WhiteNonSweetWine
+    a owl:Class ;
+    owl:intersectionOf [
+        rdf:first :WhiteWine ;
+        rdf:rest [
+            rdf:first [
+                a owl:Restriction ;
+                owl:allValuesFrom [
+                    a owl:Class ;
+                    owl:oneOf [
+                        rdf:first :Dry ;
+                        rdf:rest [
+                            rdf:first :OffDry ;
+                            rdf:rest rdf:nil
+                        ]
+                    ]
+                ] ;
+                owl:onProperty :hasSugar
+            ] ;
+            rdf:rest rdf:nil
+        ]
+    ] .
+
+:Dry
+    a owl:Thing, :WineSugar .
+
+:OffDry
+    a owl:Thing, :WineSugar ;
+    owl:differentFrom :Dry, :Sweet .
+
+:WhiteLoire
+    a owl:Class ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:allValuesFrom [
+            a owl:Class ;
+            owl:oneOf [
+                rdf:first :CheninBlancGrape ;
+                rdf:rest [
+                    rdf:first :PinotBlancGrape ;
+                    rdf:rest [
+                        rdf:first :SauvignonBlancGrape ;
+                        rdf:rest rdf:nil
+                    ]
+                ]
+            ]
+        ] ;
+        owl:onProperty :madeFromGrape
+    ] ;
+    owl:intersectionOf [
+        rdf:first :Loire ;
+        rdf:rest [
+            rdf:first :WhiteWine ;
+            rdf:rest rdf:nil
+        ]
+    ] .
+
+:Loire
+    a owl:Class ;
+    owl:intersectionOf [
+        rdf:first :Wine ;
+        rdf:rest [
+            rdf:first [
+                a owl:Restriction ;
+                owl:hasValue :LoireRegion ;
+                owl:onProperty :locatedIn
+            ] ;
+            rdf:rest rdf:nil
+        ]
+    ] .
+
+:CheninBlancGrape
+    a owl:Thing, :WineGrape .
+
+:PinotBlancGrape
+    a owl:Thing, :WineGrape .
+
+:SauvignonBlancGrape
+    a owl:Thing, :WineGrape .
+
+:WhiteBurgundy
+    a owl:Class ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:hasValue :ChardonnayGrape ;
+        owl:onProperty :madeFromGrape
+    ], [
+        a owl:Restriction ;
+        owl:maxCardinality "1"^^xsd:nonNegativeInteger ;
+        owl:onProperty :madeFromGrape
+    ] ;
+    owl:intersectionOf [
+        rdf:first :Burgundy ;
+        rdf:rest [
+            rdf:first :WhiteWine ;
+            rdf:rest rdf:nil
+        ]
+    ] .
+
+:Burgundy
+    a owl:Class ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:hasValue :Dry ;
+        owl:onProperty :hasSugar
+    ] ;
+    owl:intersectionOf [
+        rdf:first :Wine ;
+        rdf:rest [
+            rdf:first [
+                a owl:Restriction ;
+                owl:hasValue :BourgogneRegion ;
+                owl:onProperty :locatedIn
+            ] ;
+            rdf:rest rdf:nil
+        ]
+    ] .
+
+:WhiteBordeaux
+    a owl:Class ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:allValuesFrom [
+            a owl:Class ;
+            owl:oneOf [
+                rdf:first :SemillonGrape ;
+                rdf:rest [
+                    rdf:first :SauvignonBlancGrape ;
+                    rdf:rest rdf:nil
+                ]
+            ]
+        ] ;
+        owl:onProperty :madeFromGrape
+    ] ;
+    owl:intersectionOf [
+        rdf:first :Bordeaux ;
+        rdf:rest [
+            rdf:first :WhiteWine ;
+            rdf:rest rdf:nil
+        ]
+    ] .
+
+:Bordeaux
+    a owl:Class ;
+    owl:intersectionOf [
+        rdf:first :Wine ;
+        rdf:rest [
+            rdf:first [
+                a owl:Restriction ;
+                owl:hasValue :BordeauxRegion ;
+                owl:onProperty :locatedIn
+            ] ;
+            rdf:rest rdf:nil
+        ]
+    ] .
+
+:SemillonGrape
+    a owl:Thing, :WineGrape .
+
+:Region
+    a owl:Class .
+
+:locatedIn
+    a owl:ObjectProperty, owl:TransitiveProperty ;
+    rdfs:domain owl:Thing ;
+    rdfs:range :Region .
+
+:adjacentRegion
+    a owl:ObjectProperty, owl:SymmetricProperty ;
+    rdfs:domain :Region ;
+    rdfs:range :Region .
+
+:VintageYear
+    a owl:Class .
+
+:yearValue
+    a owl:DatatypeProperty ;
+    rdfs:domain :VintageYear ;
+    rdfs:range xsd:positiveInteger .
+
+:Year1998
+    a :VintageYear ;
+    :yearValue "1998"^^xsd:positiveInteger .
+
+:hasVintageYear
+    a owl:FunctionalProperty, owl:ObjectProperty ;
+    rdfs:domain :Vintage ;
+    rdfs:range :VintageYear .
+
+:madeFromGrape
+    a owl:ObjectProperty ;
+    rdfs:domain :Wine ;
+    rdfs:range :WineGrape ;
+    rdfs:subPropertyOf food:madeFromFruit .
+
+:madeIntoWine
+    a owl:ObjectProperty ;
+    owl:inverseOf :madeFromGrape .
+
+:hasWineDescriptor
+    a owl:ObjectProperty ;
+    rdfs:domain :Wine ;
+    rdfs:range :WineDescriptor .
+
+:hasSugar
+    a owl:FunctionalProperty, owl:ObjectProperty ;
+    rdfs:range :WineSugar ;
+    rdfs:subPropertyOf :hasWineDescriptor .
+
+:hasBody
+    a owl:FunctionalProperty, owl:ObjectProperty ;
+    rdfs:range :WineBody ;
+    rdfs:subPropertyOf :hasWineDescriptor .
+
+:hasFlavor
+    a owl:FunctionalProperty, owl:ObjectProperty ;
+    rdfs:range :WineFlavor ;
+    rdfs:subPropertyOf :hasWineDescriptor .
+
+:hasColor
+    a owl:FunctionalProperty, owl:ObjectProperty ;
+    rdfs:domain :Wine ;
+    rdfs:range :WineColor ;
+    rdfs:subPropertyOf :hasWineDescriptor .
+
+:hasMaker
+    a owl:FunctionalProperty, owl:ObjectProperty .
+
+:producesWine
+    a owl:ObjectProperty ;
+    owl:inverseOf :hasMaker .
+
+:Zinfandel
+    a owl:Class ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:hasValue :Red ;
+        owl:onProperty :hasColor
+    ], [
+        a owl:Restriction ;
+        owl:hasValue :Dry ;
+        owl:onProperty :hasSugar
+    ], [
+        a owl:Restriction ;
+        owl:allValuesFrom [
+            a owl:Class ;
+            owl:oneOf [
+                rdf:first :Full ;
+                rdf:rest [
+                    rdf:first :Medium ;
+                    rdf:rest rdf:nil
+                ]
+            ]
+        ] ;
+        owl:onProperty :hasBody
+    ], [
+        a owl:Restriction ;
+        owl:allValuesFrom [
+            a owl:Class ;
+            owl:oneOf [
+                rdf:first :Moderate ;
+                rdf:rest [
+                    rdf:first :Strong ;
+                    rdf:rest rdf:nil
+                ]
+            ]
+        ] ;
+        owl:onProperty :hasFlavor
+    ] ;
+    owl:intersectionOf [
+        rdf:first :Wine ;
+        rdf:rest [
+            rdf:first [
+                a owl:Restriction ;
+                owl:hasValue :ZinfandelGrape ;
+                owl:onProperty :madeFromGrape
+            ] ;
+            rdf:rest [
+                rdf:first [
+                    a owl:Restriction ;
+                    owl:maxCardinality "1"^^xsd:nonNegativeInteger ;
+                    owl:onProperty :madeFromGrape
+                ] ;
+                rdf:rest rdf:nil
+            ]
+        ]
+    ] .
+
+:Full
+    a owl:Thing, :WineBody .
+
+:Medium
+    a owl:Thing, :WineBody .
+
+:Moderate
+    a owl:Thing, :WineFlavor .
+
+:Strong
+    a owl:Thing, :WineFlavor .
+
+:Winery
+    a owl:Class .
+
+:WineDescriptor
+    a owl:Class ;
+    rdfs:comment "Made WineDescriptor unionType of tastes and color" ;
+    owl:unionOf [
+        rdf:first :WineTaste ;
+        rdf:rest [
+            rdf:first :WineColor ;
+            rdf:rest rdf:nil
+        ]
+    ] .
+
+:WineTaste
+    a owl:Class ;
+    rdfs:subClassOf :WineDescriptor .
+
+:WineColor
+    a owl:Class ;
+    rdfs:subClassOf :WineDescriptor ;
+    owl:oneOf [
+        rdf:first :White ;
+        rdf:rest [
+            rdf:first :Rose ;
+            rdf:rest [
+                rdf:first :Red ;
+                rdf:rest rdf:nil
+            ]
+        ]
+    ] .
+
+:White
+    a owl:Thing, :WineColor .
+
+:Rose
+    a owl:Thing, :WineColor .
+
+:Red
+    a owl:Thing, :WineColor .
+
+:WineSugar
+    a owl:Class ;
+    rdfs:subClassOf :WineTaste ;
+    owl:oneOf [
+        rdf:first :Sweet ;
+        rdf:rest [
+            rdf:first :OffDry ;
+            rdf:rest [
+                rdf:first :Dry ;
+                rdf:rest rdf:nil
+            ]
+        ]
+    ] .
+
+:Sweet
+    a owl:Thing, :WineSugar ;
+    owl:differentFrom :Dry .
+
+:WineFlavor
+    a owl:Class ;
+    rdfs:subClassOf :WineTaste ;
+    owl:oneOf [
+        rdf:first :Delicate ;
+        rdf:rest [
+            rdf:first :Moderate ;
+            rdf:rest [
+                rdf:first :Strong ;
+                rdf:rest rdf:nil
+            ]
+        ]
+    ] .
+
+:Delicate
+    a owl:Thing, :WineFlavor .
+
+:WineBody
+    a owl:Class ;
+    rdfs:subClassOf :WineTaste ;
+    owl:oneOf [
+        rdf:first :Light ;
+        rdf:rest [
+            rdf:first :Medium ;
+            rdf:rest [
+                rdf:first :Full ;
+                rdf:rest rdf:nil
+            ]
+        ]
+    ] .
+
+:Light
+    a owl:Thing, :WineBody .
+
+:USRegion
+    a :Region .
+
+:Tours
+    a owl:Class ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:hasValue :CheninBlancGrape ;
+        owl:onProperty :madeFromGrape
+    ], [
+        a owl:Restriction ;
+        owl:maxCardinality "1"^^xsd:nonNegativeInteger ;
+        owl:onProperty :madeFromGrape
+    ] ;
+    owl:intersectionOf [
+        rdf:first :Loire ;
+        rdf:rest [
+            rdf:first [
+                a owl:Restriction ;
+                owl:hasValue :ToursRegion ;
+                owl:onProperty :locatedIn
+            ] ;
+            rdf:rest rdf:nil
+        ]
+    ] .
+
+:SweetWine
+    a owl:Class ;
+    owl:intersectionOf [
+        rdf:first :Wine ;
+        rdf:rest [
+            rdf:first [
+                a owl:Restriction ;
+                owl:hasValue :Sweet ;
+                owl:onProperty :hasSugar
+            ] ;
+            rdf:rest rdf:nil
+        ]
+    ] .
+
+:SweetRiesling
+    a owl:Class ;
+    rdfs:subClassOf :DessertWine, [
+        a owl:Restriction ;
+        owl:hasValue :Full ;
+        owl:onProperty :hasBody
+    ], [
+        a owl:Restriction ;
+        owl:allValuesFrom [
+            a owl:Class ;
+            owl:oneOf [
+                rdf:first :Moderate ;
+                rdf:rest [
+                    rdf:first :Strong ;
+                    rdf:rest rdf:nil
+                ]
+            ]
+        ] ;
+        owl:onProperty :hasFlavor
+    ] ;
+    owl:intersectionOf [
+        rdf:first :Riesling ;
+        rdf:rest [
+            rdf:first [
+                a owl:Restriction ;
+                owl:hasValue :Sweet ;
+                owl:onProperty :hasSugar
+            ] ;
+            rdf:rest rdf:nil
+        ]
+    ] .
+
+:Riesling
+    a owl:Class ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:hasValue :White ;
+        owl:onProperty :hasColor
+    ] ;
+    owl:intersectionOf [
+        rdf:first :Wine ;
+        rdf:rest [
+            rdf:first [
+                a owl:Restriction ;
+                owl:hasValue :RieslingGrape ;
+                owl:onProperty :madeFromGrape
+            ] ;
+            rdf:rest [
+                rdf:first [
+                    a owl:Restriction ;
+                    owl:maxCardinality "1"^^xsd:nonNegativeInteger ;
+                    owl:onProperty :madeFromGrape
+                ] ;
+                rdf:rest rdf:nil
+            ]
+        ]
+    ] .
+
+:StEmilion
+    a owl:Class ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:hasValue :Red ;
+        owl:onProperty :hasColor
+    ], [
+        a owl:Restriction ;
+        owl:hasValue :Strong ;
+        owl:onProperty :hasFlavor
+    ], [
+        a owl:Restriction ;
+        owl:hasValue :CabernetSauvignonGrape ;
+        owl:onProperty :madeFromGrape
+    ], [
+        a owl:Restriction ;
+        owl:maxCardinality "1"^^xsd:nonNegativeInteger ;
+        owl:onProperty :madeFromGrape
+    ] ;
+    owl:intersectionOf [
+        rdf:first :Bordeaux ;
+        rdf:rest [
+            rdf:first [
+                a owl:Restriction ;
+                owl:hasValue :StEmilionRegion ;
+                owl:onProperty :locatedIn
+            ] ;
+            rdf:rest rdf:nil
+        ]
+    ] .
+
+:SemillonOrSauvignonBlanc
+    a owl:Class ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:hasValue :White ;
+        owl:onProperty :hasColor
+    ], [
+        a owl:Restriction ;
+        owl:allValuesFrom [
+            a owl:Class ;
+            owl:oneOf [
+                rdf:first :Medium ;
+                rdf:rest [
+                    rdf:first :Full ;
+                    rdf:rest rdf:nil
+                ]
+            ]
+        ] ;
+        owl:onProperty :hasBody
+    ] ;
+    owl:intersectionOf [
+        rdf:first :Wine ;
+        rdf:rest [
+            rdf:first [
+                a owl:Restriction ;
+                owl:allValuesFrom [
+                    a owl:Class ;
+                    owl:oneOf [
+                        rdf:first :SemillonGrape ;
+                        rdf:rest [
+                            rdf:first :SauvignonBlancGrape ;
+                            rdf:rest rdf:nil
+                        ]
+                    ]
+                ] ;
+                owl:onProperty :madeFromGrape
+            ] ;
+            rdf:rest rdf:nil
+        ]
+    ] .
+
+:Semillon
+    a owl:Class ;
+    owl:intersectionOf [
+        rdf:first :SemillonOrSauvignonBlanc ;
+        rdf:rest [
+            rdf:first [
+                a owl:Restriction ;
+                owl:hasValue :SemillonGrape ;
+                owl:onProperty :madeFromGrape
+            ] ;
+            rdf:rest [
+                rdf:first [
+                    a owl:Restriction ;
+                    owl:maxCardinality "1"^^xsd:nonNegativeInteger ;
+                    owl:onProperty :madeFromGrape
+                ] ;
+                rdf:rest rdf:nil
+            ]
+        ]
+    ] .
+
+:SauvignonBlanc
+    a owl:Class ;
+    owl:intersectionOf [
+        rdf:first :SemillonOrSauvignonBlanc ;
+        rdf:rest [
+            rdf:first [
+                a owl:Restriction ;
+                owl:hasValue :SauvignonBlancGrape ;
+                owl:onProperty :madeFromGrape
+            ] ;
+            rdf:rest [
+                rdf:first [
+                    a owl:Restriction ;
+                    owl:maxCardinality "1"^^xsd:nonNegativeInteger ;
+                    owl:onProperty :madeFromGrape
+                ] ;
+                rdf:rest rdf:nil
+            ]
+        ]
+    ] .
+
+:Sauternes
+    a owl:Class ;
+    rdfs:subClassOf :Bordeaux, :LateHarvest, [
+        a owl:Restriction ;
+        owl:hasValue :SauterneRegion ;
+        owl:onProperty :locatedIn
+    ], [
+        a owl:Restriction ;
+        owl:hasValue :Medium ;
+        owl:onProperty :hasBody
+    ], [
+        a owl:Restriction ;
+        owl:hasValue :White ;
+        owl:onProperty :hasColor
+    ] .
+
+:Sancerre
+    a owl:Class ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:hasValue :Medium ;
+        owl:onProperty :hasBody
+    ], [
+        a owl:Restriction ;
+        owl:hasValue :OffDry ;
+        owl:onProperty :hasSugar
+    ], [
+        a owl:Restriction ;
+        owl:hasValue :Delicate ;
+        owl:onProperty :hasFlavor
+    ], [
+        a owl:Restriction ;
+        owl:hasValue :SauvignonBlancGrape ;
+        owl:onProperty :madeFromGrape
+    ], [
+        a owl:Restriction ;
+        owl:maxCardinality "1"^^xsd:nonNegativeInteger ;
+        owl:onProperty :madeFromGrape
+    ] ;
+    owl:intersectionOf [
+        rdf:first :Loire ;
+        rdf:rest [
+            rdf:first [
+                a owl:Restriction ;
+                owl:hasValue :SancerreRegion ;
+                owl:onProperty :locatedIn
+            ] ;
+            rdf:rest rdf:nil
+        ]
+    ] .
+
+:RoseWine
+    a owl:Class ;
+    owl:intersectionOf [
+        rdf:first :Wine ;
+        rdf:rest [
+            rdf:first [
+                a owl:Restriction ;
+                owl:hasValue :Rose ;
+                owl:onProperty :hasColor
+            ] ;
+            rdf:rest rdf:nil
+        ]
+    ] .
+
+:RedWine
+    a owl:Class ;
+    owl:intersectionOf [
+        rdf:first :Wine ;
+        rdf:rest [
+            rdf:first [
+                a owl:Restriction ;
+                owl:hasValue :Red ;
+                owl:onProperty :hasColor
+            ] ;
+            rdf:rest rdf:nil
+        ]
+    ] .
+
+:RedTableWine
+    a owl:Class ;
+    owl:intersectionOf [
+        rdf:first :TableWine ;
+        rdf:rest [
+            rdf:first [
+                a owl:Restriction ;
+                owl:hasValue :Red ;
+                owl:onProperty :hasColor
+            ] ;
+            rdf:rest rdf:nil
+        ]
+    ] .
+
+:RedBurgundy
+    a owl:Class ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:hasValue :PinotNoirGrape ;
+        owl:onProperty :madeFromGrape
+    ], [
+        a owl:Restriction ;
+        owl:maxCardinality "1"^^xsd:nonNegativeInteger ;
+        owl:onProperty :madeFromGrape
+    ] ;
+    owl:intersectionOf [
+        rdf:first :Burgundy ;
+        rdf:rest [
+            rdf:first :RedWine ;
+            rdf:rest rdf:nil
+        ]
+    ] .
+
+:RedBordeaux
+    a owl:Class ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:allValuesFrom [
+            a owl:Class ;
+            owl:oneOf [
+                rdf:first :CabernetSauvignonGrape ;
+                rdf:rest [
+                    rdf:first :MerlotGrape ;
+                    rdf:rest rdf:nil
+                ]
+            ]
+        ] ;
+        owl:onProperty :madeFromGrape
+    ] ;
+    owl:intersectionOf [
+        rdf:first :Bordeaux ;
+        rdf:rest [
+            rdf:first :RedWine ;
+            rdf:rest rdf:nil
+        ]
+    ] .
+
+:CabernetSauvignonGrape
+    a owl:Thing, :WineGrape .
+
+:MerlotGrape
+    a owl:Thing, :WineGrape .
+
+:Port
+    a owl:Class ;
+    rdfs:subClassOf :RedWine, [
+        a owl:Restriction ;
+        owl:hasValue :PortugalRegion ;
+        owl:onProperty :locatedIn
+    ], [
+        a owl:Restriction ;
+        owl:hasValue :Full ;
+        owl:onProperty :hasBody
+    ], [
+        a owl:Restriction ;
+        owl:hasValue :Strong ;
+        owl:onProperty :hasFlavor
+    ], [
+        a owl:Restriction ;
+        owl:hasValue :Sweet ;
+        owl:onProperty :hasSugar
+    ] .
+
+:PinotNoir
+    a owl:Class ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:hasValue :Red ;
+        owl:onProperty :hasColor
+    ] ;
+    owl:intersectionOf [
+        rdf:first :Wine ;
+        rdf:rest [
+            rdf:first [
+                a owl:Restriction ;
+                owl:hasValue :PinotNoirGrape ;
+                owl:onProperty :madeFromGrape
+            ] ;
+            rdf:rest [
+                rdf:first [
+                    a owl:Restriction ;
+                    owl:maxCardinality "1"^^xsd:nonNegativeInteger ;
+                    owl:onProperty :madeFromGrape
+                ] ;
+                rdf:rest rdf:nil
+            ]
+        ]
+    ] .
+
+:PinotBlanc
+    a owl:Class ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:hasValue :White ;
+        owl:onProperty :hasColor
+    ] ;
+    owl:intersectionOf [
+        rdf:first :Wine ;
+        rdf:rest [
+            rdf:first [
+                a owl:Restriction ;
+                owl:hasValue :PinotBlancGrape ;
+                owl:onProperty :madeFromGrape
+            ] ;
+            rdf:rest [
+                rdf:first [
+                    a owl:Restriction ;
+                    owl:maxCardinality "1"^^xsd:nonNegativeInteger ;
+                    owl:onProperty :madeFromGrape
+                ] ;
+                rdf:rest rdf:nil
+            ]
+        ]
+    ] .
+
+:PetiteSyrah
+    a owl:Class ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:hasValue :Red ;
+        owl:onProperty :hasColor
+    ], [
+        a owl:Restriction ;
+        owl:hasValue :Dry ;
+        owl:onProperty :hasSugar
+    ], [
+        a owl:Restriction ;
+        owl:allValuesFrom [
+            a owl:Class ;
+            owl:oneOf [
+                rdf:first :Moderate ;
+                rdf:rest [
+                    rdf:first :Strong ;
+                    rdf:rest rdf:nil
+                ]
+            ]
+        ] ;
+        owl:onProperty :hasFlavor
+    ], [
+        a owl:Restriction ;
+        owl:allValuesFrom [
+            a owl:Class ;
+            owl:oneOf [
+                rdf:first :Medium ;
+                rdf:rest [
+                    rdf:first :Full ;
+                    rdf:rest rdf:nil
+                ]
+            ]
+        ] ;
+        owl:onProperty :hasBody
+    ] ;
+    owl:intersectionOf [
+        rdf:first :Wine ;
+        rdf:rest [
+            rdf:first [
+                a owl:Restriction ;
+                owl:hasValue :PetiteSyrahGrape ;
+                owl:onProperty :madeFromGrape
+            ] ;
+            rdf:rest [
+                rdf:first [
+                    a owl:Restriction ;
+                    owl:maxCardinality "1"^^xsd:nonNegativeInteger ;
+                    owl:onProperty :madeFromGrape
+                ] ;
+                rdf:rest rdf:nil
+            ]
+        ]
+    ] .
+
+:Pauillac
+    a owl:Class ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:hasValue :Full ;
+        owl:onProperty :hasBody
+    ], [
+        a owl:Restriction ;
+        owl:hasValue :Strong ;
+        owl:onProperty :hasFlavor
+    ], [
+        a owl:Restriction ;
+        owl:hasValue :CabernetSauvignonGrape ;
+        owl:onProperty :madeFromGrape
+    ], [
+        a owl:Restriction ;
+        owl:maxCardinality "1"^^xsd:nonNegativeInteger ;
+        owl:onProperty :madeFromGrape
+    ] ;
+    owl:intersectionOf [
+        rdf:first :Medoc ;
+        rdf:rest [
+            rdf:first [
+                a owl:Restriction ;
+                owl:hasValue :PauillacRegion ;
+                owl:onProperty :locatedIn
+            ] ;
+            rdf:rest rdf:nil
+        ]
+    ] .
+
+:Medoc
+    a owl:Class ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:hasValue :Red ;
+        owl:onProperty :hasColor
+    ], [
+        a owl:Restriction ;
+        owl:hasValue :Dry ;
+        owl:onProperty :hasSugar
+    ] ;
+    owl:intersectionOf [
+        rdf:first :Bordeaux ;
+        rdf:rest [
+            rdf:first [
+                a owl:Restriction ;
+                owl:hasValue :MedocRegion ;
+                owl:onProperty :locatedIn
+            ] ;
+            rdf:rest rdf:nil
+        ]
+    ] .
+
+:Muscadet
+    a owl:Class ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:hasValue :Light ;
+        owl:onProperty :hasBody
+    ], [
+        a owl:Restriction ;
+        owl:hasValue :Delicate ;
+        owl:onProperty :hasFlavor
+    ], [
+        a owl:Restriction ;
+        owl:hasValue :Dry ;
+        owl:onProperty :hasSugar
+    ], [
+        a owl:Restriction ;
+        owl:hasValue :PinotBlancGrape ;
+        owl:onProperty :madeFromGrape
+    ], [
+        a owl:Restriction ;
+        owl:maxCardinality "1"^^xsd:nonNegativeInteger ;
+        owl:onProperty :madeFromGrape
+    ] ;
+    owl:intersectionOf [
+        rdf:first :Loire ;
+        rdf:rest [
+            rdf:first [
+                a owl:Restriction ;
+                owl:hasValue :MuscadetRegion ;
+                owl:onProperty :locatedIn
+            ] ;
+            rdf:rest rdf:nil
+        ]
+    ] .
+
+:Meursault
+    a owl:Class ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:hasValue :Full ;
+        owl:onProperty :hasBody
+    ] ;
+    owl:intersectionOf [
+        rdf:first :WhiteBurgundy ;
+        rdf:rest [
+            rdf:first [
+                a owl:Restriction ;
+                owl:hasValue :MeursaultRegion ;
+                owl:onProperty :locatedIn
+            ] ;
+            rdf:rest rdf:nil
+        ]
+    ] .
+
+:Merlot
+    a owl:Class ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:hasValue :Red ;
+        owl:onProperty :hasColor
+    ], [
+        a owl:Restriction ;
+        owl:hasValue :Dry ;
+        owl:onProperty :hasSugar
+    ], [
+        a owl:Restriction ;
+        owl:allValuesFrom [
+            a owl:Class ;
+            owl:oneOf [
+                rdf:first :Moderate ;
+                rdf:rest [
+                    rdf:first :Delicate ;
+                    rdf:rest rdf:nil
+                ]
+            ]
+        ] ;
+        owl:onProperty :hasFlavor
+    ], [
+        a owl:Restriction ;
+        owl:allValuesFrom [
+            a owl:Class ;
+            owl:oneOf [
+                rdf:first :Light ;
+                rdf:rest [
+                    rdf:first :Medium ;
+                    rdf:rest rdf:nil
+                ]
+            ]
+        ] ;
+        owl:onProperty :hasBody
+    ] ;
+    owl:intersectionOf [
+        rdf:first :Wine ;
+        rdf:rest [
+            rdf:first [
+                a owl:Restriction ;
+                owl:hasValue :MerlotGrape ;
+                owl:onProperty :madeFromGrape
+            ] ;
+            rdf:rest [
+                rdf:first [
+                    a owl:Restriction ;
+                    owl:maxCardinality "1"^^xsd:nonNegativeInteger ;
+                    owl:onProperty :madeFromGrape
+                ] ;
+                rdf:rest rdf:nil
+            ]
+        ]
+    ] .
+
+:Meritage
+    a owl:Class ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:hasValue :Red ;
+        owl:onProperty :hasColor
+    ] ;
+    owl:intersectionOf [
+        rdf:first :Wine ;
+        rdf:rest [
+            rdf:first [
+                a owl:Restriction ;
+                owl:allValuesFrom [
+                    a owl:Class ;
+                    owl:oneOf [
+                        rdf:first :CabernetSauvignonGrape ;
+                        rdf:rest [
+                            rdf:first :CabernetFrancGrape ;
+                            rdf:rest [
+                                rdf:first :MalbecGrape ;
+                                rdf:rest [
+                                    rdf:first :PetiteVerdotGrape ;
+                                    rdf:rest [
+                                        rdf:first :MerlotGrape ;
+                                        rdf:rest rdf:nil
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ] ;
+                owl:onProperty :madeFromGrape
+            ] ;
+            rdf:rest [
+                rdf:first [
+                    a owl:Restriction ;
+                    owl:minCardinality "2"^^xsd:nonNegativeInteger ;
+                    owl:onProperty :madeFromGrape
+                ] ;
+                rdf:rest rdf:nil
+            ]
+        ]
+    ] .
+
+:CabernetFrancGrape
+    a owl:Thing, :WineGrape .
+
+:MalbecGrape
+    a owl:Thing, :WineGrape .
+
+:PetiteVerdotGrape
+    a owl:Thing, :WineGrape .
+
+:MedocRegion
+    a :Region ;
+    :locatedIn :BordeauxRegion .
+
+:Margaux
+    a owl:Class ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:hasValue :Delicate ;
+        owl:onProperty :hasFlavor
+    ], [
+        a owl:Restriction ;
+        owl:hasValue :MerlotGrape ;
+        owl:onProperty :madeFromGrape
+    ], [
+        a owl:Restriction ;
+        owl:maxCardinality "1"^^xsd:nonNegativeInteger ;
+        owl:onProperty :madeFromGrape
+    ] ;
+    owl:intersectionOf [
+        rdf:first :Medoc ;
+        rdf:rest [
+            rdf:first [
+                a owl:Restriction ;
+                owl:hasValue :MargauxRegion ;
+                owl:onProperty :locatedIn
+            ] ;
+            rdf:rest rdf:nil
+        ]
+    ] .
+
+:LoireRegion
+    a :Region ;
+    :locatedIn :FrenchRegion .
+
+:LateHarvest
+    a owl:Class ;
+    rdfs:subClassOf :Wine, [
+        a owl:Restriction ;
+        owl:hasValue :Sweet ;
+        owl:onProperty :hasSugar
+    ], [
+        a owl:Restriction ;
+        owl:allValuesFrom [
+            a owl:Class ;
+            owl:oneOf [
+                rdf:first :Moderate ;
+                rdf:rest [
+                    rdf:first :Strong ;
+                    rdf:rest rdf:nil
+                ]
+            ]
+        ] ;
+        owl:onProperty :hasFlavor
+    ] ;
+    owl:disjointWith :EarlyHarvest .
+
+:ItalianWine
+    a owl:Class ;
+    owl:intersectionOf [
+        rdf:first :Wine ;
+        rdf:rest [
+            rdf:first [
+                a owl:Restriction ;
+                owl:hasValue :ItalianRegion ;
+                owl:onProperty :locatedIn
+            ] ;
+            rdf:rest rdf:nil
+        ]
+    ] .
+
+:ItalianRegion
+    a :Region .
+
+:IceWine
+    a owl:Class ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:allValuesFrom [
+            a owl:Class ;
+            owl:oneOf [
+                rdf:first :Medium ;
+                rdf:rest [
+                    rdf:first :Full ;
+                    rdf:rest rdf:nil
+                ]
+            ]
+        ] ;
+        owl:onProperty :hasBody
+    ], [
+        a owl:Restriction ;
+        owl:allValuesFrom [
+            a owl:Class ;
+            owl:oneOf [
+                rdf:first :Moderate ;
+                rdf:rest [
+                    rdf:first :Strong ;
+                    rdf:rest rdf:nil
+                ]
+            ]
+        ] ;
+        owl:onProperty :hasFlavor
+    ] ;
+    owl:intersectionOf [
+        rdf:first :LateHarvest ;
+        rdf:rest [
+            rdf:first :DessertWine ;
+            rdf:rest [
+                rdf:first [
+                    a owl:Restriction ;
+                    owl:hasValue :White ;
+                    owl:onProperty :hasColor
+                ] ;
+                rdf:rest rdf:nil
+            ]
+        ]
+    ] .
+
+:DessertWine
+    a owl:Class ;
+    rdfs:subClassOf :Wine, [
+        a owl:Restriction ;
+        owl:allValuesFrom [
+            a owl:Class ;
+            owl:oneOf [
+                rdf:first :OffDry ;
+                rdf:rest [
+                    rdf:first :Sweet ;
+                    rdf:rest rdf:nil
+                ]
+            ]
+        ] ;
+        owl:onProperty :hasSugar
+    ] .
+
+:GermanWine
+    a owl:Class ;
+    owl:intersectionOf [
+        rdf:first :Wine ;
+        rdf:rest [
+            rdf:first [
+                a owl:Restriction ;
+                owl:hasValue :GermanyRegion ;
+                owl:onProperty :locatedIn
+            ] ;
+            rdf:rest rdf:nil
+        ]
+    ] .
+
+:Gamay
+    a owl:Class ;
+    owl:intersectionOf [
+        rdf:first :Wine ;
+        rdf:rest [
+            rdf:first [
+                a owl:Restriction ;
+                owl:hasValue :GamayGrape ;
+                owl:onProperty :madeFromGrape
+            ] ;
+            rdf:rest [
+                rdf:first [
+                    a owl:Restriction ;
+                    owl:maxCardinality "1"^^xsd:nonNegativeInteger ;
+                    owl:onProperty :madeFromGrape
+                ] ;
+                rdf:rest rdf:nil
+            ]
+        ]
+    ] .
+
+:FullBodiedWine
+    a owl:Class ;
+    owl:intersectionOf [
+        rdf:first :Wine ;
+        rdf:rest [
+            rdf:first [
+                a owl:Restriction ;
+                owl:hasValue :Full ;
+                owl:onProperty :hasBody
+            ] ;
+            rdf:rest rdf:nil
+        ]
+    ] .
+
+:FrenchRegion
+    a :Region .
+
+:FrenchWine
+    a owl:Class ;
+    owl:intersectionOf [
+        rdf:first :Wine ;
+        rdf:rest [
+            rdf:first [
+                a owl:Restriction ;
+                owl:hasValue :FrenchRegion ;
+                owl:onProperty :locatedIn
+            ] ;
+            rdf:rest rdf:nil
+        ]
+    ] .
+
+:EarlyHarvest
+    a owl:Class ;
+    rdfs:subClassOf :Wine, [
+        a owl:Restriction ;
+        owl:allValuesFrom [
+            a owl:Class ;
+            owl:oneOf [
+                rdf:first :Dry ;
+                rdf:rest [
+                    rdf:first :OffDry ;
+                    rdf:rest rdf:nil
+                ]
+            ]
+        ] ;
+        owl:onProperty :hasSugar
+    ] .
+
+:DryWine
+    a owl:Class ;
+    owl:intersectionOf [
+        rdf:first :Wine ;
+        rdf:rest [
+            rdf:first [
+                a owl:Restriction ;
+                owl:hasValue :Dry ;
+                owl:onProperty :hasSugar
+            ] ;
+            rdf:rest rdf:nil
+        ]
+    ] .
+
+:DryWhiteWine
+    a owl:Class ;
+    owl:intersectionOf [
+        rdf:first :DryWine ;
+        rdf:rest [
+            rdf:first :WhiteWine ;
+            rdf:rest rdf:nil
+        ]
+    ] .
+
+:DryRiesling
+    a owl:Class ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:hasValue :White ;
+        owl:onProperty :hasColor
+    ], [
+        a owl:Restriction ;
+        owl:hasValue :Delicate ;
+        owl:onProperty :hasFlavor
+    ], [
+        a owl:Restriction ;
+        owl:allValuesFrom [
+            a owl:Class ;
+            owl:oneOf [
+                rdf:first :Light ;
+                rdf:rest [
+                    rdf:first :Medium ;
+                    rdf:rest rdf:nil
+                ]
+            ]
+        ] ;
+        owl:onProperty :hasBody
+    ] ;
+    owl:intersectionOf [
+        rdf:first :Riesling ;
+        rdf:rest [
+            rdf:first [
+                a owl:Restriction ;
+                owl:hasValue :Dry ;
+                owl:onProperty :hasSugar
+            ] ;
+            rdf:rest rdf:nil
+        ]
+    ] .
+
+:DryRedWine
+    a owl:Class ;
+    owl:intersectionOf [
+        rdf:first :DryWine ;
+        rdf:rest [
+            rdf:first :RedWine ;
+            rdf:rest rdf:nil
+        ]
+    ] .
+
+:CotesDOr
+    a owl:Class ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:hasValue :Moderate ;
+        owl:onProperty :hasFlavor
+    ] ;
+    owl:intersectionOf [
+        rdf:first :RedBurgundy ;
+        rdf:rest [
+            rdf:first [
+                a owl:Restriction ;
+                owl:hasValue :CotesDOrRegion ;
+                owl:onProperty :locatedIn
+            ] ;
+            rdf:rest rdf:nil
+        ]
+    ] .
+
+:Chianti
+    a owl:Class ;
+    rdfs:subClassOf :ItalianWine, [
+        a owl:Restriction ;
+        owl:hasValue :ChiantiRegion ;
+        owl:onProperty :locatedIn
+    ], [
+        a owl:Restriction ;
+        owl:hasValue :Red ;
+        owl:onProperty :hasColor
+    ], [
+        a owl:Restriction ;
+        owl:hasValue :SangioveseGrape ;
+        owl:onProperty :madeFromGrape
+    ], [
+        a owl:Restriction ;
+        owl:hasValue :Moderate ;
+        owl:onProperty :hasFlavor
+    ], [
+        a owl:Restriction ;
+        owl:hasValue :Dry ;
+        owl:onProperty :hasSugar
+    ], [
+        a owl:Restriction ;
+        owl:allValuesFrom [
+            a owl:Class ;
+            owl:oneOf [
+                rdf:first :Light ;
+                rdf:rest [
+                    rdf:first :Medium ;
+                    rdf:rest rdf:nil
+                ]
+            ]
+        ] ;
+        owl:onProperty :hasBody
+    ] .
+
+:CheninBlanc
+    a owl:Class ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:hasValue :White ;
+        owl:onProperty :hasColor
+    ], [
+        a owl:Restriction ;
+        owl:hasValue :Moderate ;
+        owl:onProperty :hasFlavor
+    ], [
+        a owl:Restriction ;
+        owl:allValuesFrom [
+            a owl:Class ;
+            owl:oneOf [
+                rdf:first :Full ;
+                rdf:rest [
+                    rdf:first :Medium ;
+                    rdf:rest rdf:nil
+                ]
+            ]
+        ] ;
+        owl:onProperty :hasBody
+    ], [
+        a owl:Restriction ;
+        owl:allValuesFrom [
+            a owl:Class ;
+            owl:oneOf [
+                rdf:first :Dry ;
+                rdf:rest [
+                    rdf:first :OffDry ;
+                    rdf:rest rdf:nil
+                ]
+            ]
+        ] ;
+        owl:onProperty :hasSugar
+    ] ;
+    owl:intersectionOf [
+        rdf:first :Wine ;
+        rdf:rest [
+            rdf:first [
+                a owl:Restriction ;
+                owl:hasValue :CheninBlancGrape ;
+                owl:onProperty :madeFromGrape
+            ] ;
+            rdf:rest [
+                rdf:first [
+                    a owl:Restriction ;
+                    owl:maxCardinality "1"^^xsd:nonNegativeInteger ;
+                    owl:onProperty :madeFromGrape
+                ] ;
+                rdf:rest rdf:nil
+            ]
+        ]
+    ] .
+
+:Chardonnay
+    a owl:Class ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:hasValue :White ;
+        owl:onProperty :hasColor
+    ], [
+        a owl:Restriction ;
+        owl:allValuesFrom [
+            a owl:Class ;
+            owl:oneOf [
+                rdf:first :Full ;
+                rdf:rest [
+                    rdf:first :Medium ;
+                    rdf:rest rdf:nil
+                ]
+            ]
+        ] ;
+        owl:onProperty :hasBody
+    ], [
+        a owl:Restriction ;
+        owl:allValuesFrom [
+            a owl:Class ;
+            owl:oneOf [
+                rdf:first :Strong ;
+                rdf:rest [
+                    rdf:first :Moderate ;
+                    rdf:rest rdf:nil
+                ]
+            ]
+        ] ;
+        owl:onProperty :hasFlavor
+    ] ;
+    owl:intersectionOf [
+        rdf:first :Wine ;
+        rdf:rest [
+            rdf:first [
+                a owl:Restriction ;
+                owl:hasValue :ChardonnayGrape ;
+                owl:onProperty :madeFromGrape
+            ] ;
+            rdf:rest [
+                rdf:first [
+                    a owl:Restriction ;
+                    owl:maxCardinality "1"^^xsd:nonNegativeInteger ;
+                    owl:onProperty :madeFromGrape
+                ] ;
+                rdf:rest rdf:nil
+            ]
+        ]
+    ] .
+
+:CaliforniaRegion
+    a :Region ;
+    :locatedIn :USRegion .
+
+:TexasRegion
+    a :Region ;
+    :locatedIn :USRegion .
+
+:CaliforniaWine
+    a owl:Class ;
+    owl:intersectionOf [
+        rdf:first :Wine ;
+        rdf:rest [
+            rdf:first [
+                a owl:Restriction ;
+                owl:hasValue :CaliforniaRegion ;
+                owl:onProperty :locatedIn
+            ] ;
+            rdf:rest rdf:nil
+        ]
+    ] .
+
+:TexasWine
+    a owl:Class ;
+    owl:intersectionOf [
+        rdf:first :Wine ;
+        rdf:rest [
+            rdf:first [
+                a owl:Restriction ;
+                owl:hasValue :TexasRegion ;
+                owl:onProperty :locatedIn
+            ] ;
+            rdf:rest rdf:nil
+        ]
+    ] .
+
+:CabernetSauvignon
+    a owl:Class ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:hasValue :Red ;
+        owl:onProperty :hasColor
+    ], [
+        a owl:Restriction ;
+        owl:hasValue :Dry ;
+        owl:onProperty :hasSugar
+    ], [
+        a owl:Restriction ;
+        owl:allValuesFrom [
+            a owl:Class ;
+            owl:oneOf [
+                rdf:first :Moderate ;
+                rdf:rest [
+                    rdf:first :Strong ;
+                    rdf:rest rdf:nil
+                ]
+            ]
+        ] ;
+        owl:onProperty :hasFlavor
+    ], [
+        a owl:Restriction ;
+        owl:allValuesFrom [
+            a owl:Class ;
+            owl:oneOf [
+                rdf:first :Medium ;
+                rdf:rest [
+                    rdf:first :Full ;
+                    rdf:rest rdf:nil
+                ]
+            ]
+        ] ;
+        owl:onProperty :hasBody
+    ] ;
+    owl:intersectionOf [
+        rdf:first :Wine ;
+        rdf:rest [
+            rdf:first [
+                a owl:Restriction ;
+                owl:hasValue :CabernetSauvignonGrape ;
+                owl:onProperty :madeFromGrape
+            ] ;
+            rdf:rest [
+                rdf:first [
+                    a owl:Restriction ;
+                    owl:maxCardinality "1"^^xsd:nonNegativeInteger ;
+                    owl:onProperty :madeFromGrape
+                ] ;
+                rdf:rest rdf:nil
+            ]
+        ]
+    ] .
+
+:CabernetFranc
+    a owl:Class ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:hasValue :Red ;
+        owl:onProperty :hasColor
+    ], [
+        a owl:Restriction ;
+        owl:hasValue :Moderate ;
+        owl:onProperty :hasFlavor
+    ], [
+        a owl:Restriction ;
+        owl:hasValue :Medium ;
+        owl:onProperty :hasBody
+    ], [
+        a owl:Restriction ;
+        owl:hasValue :Dry ;
+        owl:onProperty :hasSugar
+    ] ;
+    owl:intersectionOf [
+        rdf:first :Wine ;
+        rdf:rest [
+            rdf:first [
+                a owl:Restriction ;
+                owl:hasValue :CabernetFrancGrape ;
+                owl:onProperty :madeFromGrape
+            ] ;
+            rdf:rest [
+                rdf:first [
+                    a owl:Restriction ;
+                    owl:maxCardinality "1"^^xsd:nonNegativeInteger ;
+                    owl:onProperty :madeFromGrape
+                ] ;
+                rdf:rest rdf:nil
+            ]
+        ]
+    ] .
+
+:BourgogneRegion
+    a :Region ;
+    :locatedIn :FrenchRegion .
+
+:BordeauxRegion
+    a :Region ;
+    :locatedIn :FrenchRegion .
+
+:Beaujolais
+    a owl:Class ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:hasValue :Red ;
+        owl:onProperty :hasColor
+    ], [
+        a owl:Restriction ;
+        owl:hasValue :Light ;
+        owl:onProperty :hasBody
+    ], [
+        a owl:Restriction ;
+        owl:hasValue :Dry ;
+        owl:onProperty :hasSugar
+    ], [
+        a owl:Restriction ;
+        owl:hasValue :Delicate ;
+        owl:onProperty :hasFlavor
+    ], [
+        a owl:Restriction ;
+        owl:hasValue :GamayGrape ;
+        owl:onProperty :madeFromGrape
+    ], [
+        a owl:Restriction ;
+        owl:maxCardinality "1"^^xsd:nonNegativeInteger ;
+        owl:onProperty :madeFromGrape
+    ] ;
+    owl:intersectionOf [
+        rdf:first :Wine ;
+        rdf:rest [
+            rdf:first [
+                a owl:Restriction ;
+                owl:hasValue :BeaujolaisRegion ;
+                owl:onProperty :locatedIn
+            ] ;
+            rdf:rest rdf:nil
+        ]
+    ] .
+
+:AustralianRegion
+    a :Region .
+
+:Anjou
+    a owl:Class ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:hasValue :Rose ;
+        owl:onProperty :hasColor
+    ], [
+        a owl:Restriction ;
+        owl:hasValue :Light ;
+        owl:onProperty :hasBody
+    ], [
+        a owl:Restriction ;
+        owl:hasValue :Delicate ;
+        owl:onProperty :hasFlavor
+    ], [
+        a owl:Restriction ;
+        owl:hasValue :OffDry ;
+        owl:onProperty :hasSugar
+    ] ;
+    owl:intersectionOf [
+        rdf:first :Loire ;
+        rdf:rest [
+            rdf:first [
+                a owl:Restriction ;
+                owl:hasValue :AnjouRegion ;
+                owl:onProperty :locatedIn
+            ] ;
+            rdf:rest rdf:nil
+        ]
+    ] .
+
+:AmericanWine
+    a owl:Class ;
+    owl:intersectionOf [
+        rdf:first :Wine ;
+        rdf:rest [
+            rdf:first [
+                a owl:Restriction ;
+                owl:hasValue :USRegion ;
+                owl:onProperty :locatedIn
+            ] ;
+            rdf:rest rdf:nil
+        ]
+    ] .
+
+:AlsatianWine
+    a owl:Class ;
+    owl:intersectionOf [
+        rdf:first :Wine ;
+        rdf:rest [
+            rdf:first [
+                a owl:Restriction ;
+                owl:hasValue :AlsaceRegion ;
+                owl:onProperty :locatedIn
+            ] ;
+            rdf:rest rdf:nil
+        ]
+    ] .
+
+:AlsaceRegion
+    a :Region ;
+    :locatedIn :FrenchRegion .
+
+:AnjouRegion
+    a :Region ;
+    :locatedIn :LoireRegion .
+
+:ArroyoGrandeRegion
+    a :Region ;
+    :locatedIn :CaliforniaRegion .
+
+:Beringer
+    a :Winery .
+
+:Bancroft
+    a :Winery .
+
+:BancroftChardonnay
+    a :Chardonnay ;
+    :hasBody :Medium ;
+    :hasFlavor :Moderate ;
+    :hasMaker :Bancroft ;
+    :hasSugar :Dry ;
+    :locatedIn :NapaRegion .
+
+:BeaujolaisRegion
+    a :Region ;
+    :locatedIn :FrenchRegion .
+
+:CentralCoastRegion
+    a :Region ;
+    :locatedIn :CaliforniaRegion .
+
+:ChardonnayGrape
+    a :WineGrape .
+
+:ChateauChevalBlanc
+    a :Winery .
+
+:ChateauChevalBlancStEmilion
+    a :StEmilion ;
+    :hasMaker :ChateauChevalBlanc .
+
+:ChateauDYchem
+    a :Winery .
+
+:ChateauDYchemSauterne
+    a :Sauternes ;
+    :hasFlavor :Strong ;
+    :hasMaker :ChateauDYchem ;
+    :madeFromGrape :SauvignonBlancGrape, :SemillonGrape .
+
+:ChateauDeMeursault
+    a :Winery .
+
+:ChateauDeMeursaultMeursault
+    a :Meursault ;
+    :hasFlavor :Moderate ;
+    :hasMaker :ChateauDeMeursault .
+
+:ChateauLafiteRothschild
+    a :Winery .
+
+:ChateauLafiteRothschildPauillac
+    a :Pauillac ;
+    :hasMaker :ChateauLafiteRothschild .
+
+:ChateauMargaux
+    a :Margaux ;
+    :hasMaker :ChateauMargauxWinery .
+
+:ChateauMargauxWinery
+    a :Winery .
+
+:ChateauMorgon
+    a :Winery .
+
+:ChateauMorgonBeaujolais
+    a :Beaujolais ;
+    :hasMaker :ChateauMorgon .
+
+:ZinfandelGrape
+    a :WineGrape .
+
+:ChiantiClassico
+    a :Chianti ;
+    :hasBody :Medium ;
+    :hasMaker :McGuinnesso .
+
+:ChiantiRegion
+    a :Region ;
+    :locatedIn :ItalianRegion .
+
+:ClosDeLaPoussie
+    a :Winery .
+
+:ClosDeLaPoussieSancerre
+    a :Sancerre ;
+    :hasMaker :ClosDeLaPoussie .
+
+:ClosDeVougeot
+    a :Winery .
+
+:ClosDeVougeotCotesDOr
+    a :CotesDOr ;
+    :hasMaker :ClosDeVougeot .
+
+:CongressSprings
+    a :Winery .
+
+:CongressSpringsSemillon
+    a :Semillon ;
+    :hasBody :Medium ;
+    :hasFlavor :Moderate ;
+    :hasMaker :CongressSprings ;
+    :hasSugar :Dry .
+
+:Corbans
+    a :Winery .
+
+:CorbansDryWhiteRiesling
+    a :Riesling ;
+    :hasBody :Medium ;
+    :hasFlavor :Moderate ;
+    :hasMaker :Corbans ;
+    :hasSugar :OffDry ;
+    :locatedIn :NewZealandRegion .
+
+:CorbansPrivateBinSauvignonBlanc
+    a :SauvignonBlanc ;
+    :hasBody :Full ;
+    :hasFlavor :Strong ;
+    :hasMaker :Corbans ;
+    :hasSugar :Dry ;
+    :locatedIn :NewZealandRegion .
+
+:CorbansSauvignonBlanc
+    a :SauvignonBlanc ;
+    :hasBody :Medium ;
+    :hasFlavor :Strong ;
+    :hasMaker :Corbans ;
+    :hasSugar :Dry ;
+    :locatedIn :NewZealandRegion .
+
+:CortonMontrachet
+    a :Winery .
+
+:CortonMontrachetWhiteBurgundy
+    a :WhiteBurgundy ;
+    :hasBody :Full ;
+    :hasFlavor :Strong ;
+    :hasMaker :CortonMontrachet ;
+    :hasSugar :Dry .
+
+:CotesDOrRegion
+    a :Region ;
+    :locatedIn :BourgogneRegion .
+
+:Cotturi
+    a :Winery .
+
+:CotturiZinfandel
+    a :Zinfandel ;
+    :hasBody :Full ;
+    :hasFlavor :Strong ;
+    :hasMaker :Cotturi ;
+    :hasSugar :Dry ;
+    :locatedIn :SonomaRegion .
+
+:DAnjou
+    a :Winery .
+
+:EdnaValleyRegion
+    a :Region ;
+    :locatedIn :CaliforniaRegion .
+
+:Elyse
+    a :Winery .
+
+:ElyseZinfandel
+    a :Zinfandel ;
+    :hasBody :Full ;
+    :hasFlavor :Moderate ;
+    :hasMaker :Elyse ;
+    :hasSugar :Dry ;
+    :locatedIn :NapaRegion .
+
+:Forman
+    a :Winery .
+
+:FormanCabernetSauvignon
+    a :CabernetSauvignon ;
+    :hasBody :Medium ;
+    :hasFlavor :Strong ;
+    :hasMaker :Forman ;
+    :hasSugar :Dry ;
+    :locatedIn :NapaRegion .
+
+:FormanChardonnay
+    a :Chardonnay ;
+    :hasBody :Full ;
+    :hasFlavor :Moderate ;
+    :hasMaker :Forman ;
+    :hasSugar :Dry ;
+    :locatedIn :NapaRegion .
+
+:Foxen
+    a :Winery .
+
+:FoxenCheninBlanc
+    a :CheninBlanc ;
+    :hasBody :Full ;
+    :hasFlavor :Moderate ;
+    :hasMaker :Foxen ;
+    :hasSugar :Dry ;
+    :locatedIn :SantaBarbaraRegion .
+
+:GamayGrape
+    a :WineGrape .
+
+:GaryFarrell
+    a :Winery .
+
+:GaryFarrellMerlot
+    a :Merlot ;
+    :hasBody :Medium ;
+    :hasFlavor :Moderate ;
+    :hasMaker :GaryFarrell ;
+    :hasSugar :Dry ;
+    :locatedIn :SonomaRegion .
+
+:GermanyRegion
+    a :Region .
+
+:Handley
+    a :Winery .
+
+:KalinCellars
+    a :Winery .
+
+:KalinCellarsSemillon
+    a :Semillon ;
+    :hasBody :Full ;
+    :hasFlavor :Strong ;
+    :hasMaker :KalinCellars ;
+    :hasSugar :Dry .
+
+:KathrynKennedy
+    a :Winery .
+
+:KathrynKennedyLateral
+    a :Meritage ;
+    :hasBody :Medium ;
+    :hasFlavor :Delicate ;
+    :hasMaker :KathrynKennedy ;
+    :hasSugar :Dry .
+
+:LaneTanner
+    a :Winery .
+
+:LaneTannerPinotNoir
+    a :PinotNoir ;
+    :hasBody :Light ;
+    :hasFlavor :Delicate ;
+    :hasMaker :LaneTanner ;
+    :hasSugar :Dry ;
+    :locatedIn :SantaBarbaraRegion .
+
+:Longridge
+    a :Winery .
+
+:LongridgeMerlot
+    a :Merlot ;
+    :hasBody :Light ;
+    :hasFlavor :Moderate ;
+    :hasMaker :Longridge ;
+    :hasSugar :Dry ;
+    :locatedIn :NewZealandRegion ;
+	:hasYear "1998"^^xsd:positiveInteger .
+
+:Light
+	a :WineBody;
+	:label "Light".
+	
+:MargauxRegion
+    a :Region ;
+    :locatedIn :MedocRegion .
+
+:Marietta
+    a :Winery .
+
+:MariettaCabernetSauvignon
+    a :CabernetSauvignon ;
+    :hasBody :Medium ;
+    :hasFlavor :Moderate ;
+    :hasMaker :Marietta ;
+    :hasSugar :Dry ;
+    :locatedIn :SonomaRegion .
+
+:MariettaOldVinesRed
+    a :RedTableWine ;
+    :hasBody :Medium ;
+    :hasFlavor :Moderate ;
+    :hasMaker :Marietta ;
+    :hasSugar :Dry ;
+    :locatedIn :SonomaRegion .
+
+:MariettaPetiteSyrah
+    a :PetiteSyrah ;
+    :hasBody :Medium ;
+    :hasFlavor :Moderate ;
+    :hasMaker :Marietta ;
+    :hasSugar :Dry ;
+    :locatedIn :SonomaRegion .
+
+:MariettaZinfandel
+    a :Zinfandel ;
+    :hasBody :Medium ;
+    :hasFlavor :Moderate ;
+    :hasMaker :Marietta ;
+    :hasSugar :Dry ;
+    :locatedIn :SonomaRegion .
+
+:McGuinnesso
+    a :Winery .
+
+:MendocinoRegion
+    a :Region ;
+    :adjacentRegion :SonomaRegion ;
+    :locatedIn :CaliforniaRegion .
+
+:MeursaultRegion
+    a :Region ;
+    :locatedIn :BourgogneRegion .
+
+:MountEdenVineyard
+    a :Winery .
+
+:MountEdenVineyardEdnaValleyChardonnay
+    a :Chardonnay ;
+    :hasBody :Medium ;
+    :hasFlavor :Moderate ;
+    :hasMaker :MountEdenVineyard ;
+    :hasSugar :Dry ;
+    :locatedIn :EdnaValleyRegion .
+
+:MountEdenVineyardEstatePinotNoir
+    a :PinotNoir ;
+    :hasBody :Full ;
+    :hasFlavor :Strong ;
+    :hasMaker :MountEdenVineyard ;
+    :hasSugar :Dry ;
+    :locatedIn :EdnaValleyRegion .
+
+:Mountadam
+    a :Winery .
+
+:MountadamChardonnay
+    a :Chardonnay ;
+    :hasBody :Full ;
+    :hasFlavor :Strong ;
+    :hasMaker :Mountadam ;
+    :hasSugar :Dry ;
+    :locatedIn :SouthAustraliaRegion .
+
+:MountadamPinotNoir
+    a :PinotNoir ;
+    :hasBody :Medium ;
+    :hasFlavor :Moderate ;
+    :hasMaker :Mountadam ;
+    :hasSugar :Dry ;
+    :locatedIn :SouthAustraliaRegion .
+
+:MountadamRiesling
+    a :DryRiesling ;
+    :hasBody :Medium ;
+    :hasFlavor :Delicate ;
+    :hasMaker :Mountadam ;
+    :hasSugar :Dry ;
+    :locatedIn :SouthAustraliaRegion .
+
+:MuscadetRegion
+    a :Region ;
+    :locatedIn :LoireRegion .
+
+:NapaRegion
+    a :Region ;
+    :locatedIn :CaliforniaRegion .
+
+:NewZealandRegion
+    a :Region .
+
+:PageMillWinery
+    a :Winery .
+
+:PageMillWineryCabernetSauvignon
+    a :CabernetSauvignon ;
+    :hasBody :Medium ;
+    :hasFlavor :Moderate ;
+    :hasMaker :PageMillWinery ;
+    :hasSugar :Dry ;
+    :locatedIn :NapaRegion .
+
+:PauillacRegion
+    a :Region ;
+    :locatedIn :MedocRegion .
+
+:PeterMccoy
+    a :Winery .
+
+:PeterMccoyChardonnay
+    a :Chardonnay ;
+    :hasBody :Medium ;
+    :hasFlavor :Moderate ;
+    :hasMaker :PeterMccoy ;
+    :hasSugar :Dry ;
+    :locatedIn :SonomaRegion .
+
+:PetiteSyrahGrape
+    a :WineGrape .
+
+:PinotNoirGrape
+    a :WineGrape .
+
+:PortugalRegion
+    a :Region .
+
+:PulignyMontrachet
+    a :Winery .
+
+:PulignyMontrachetWhiteBurgundy
+    a :WhiteBurgundy ;
+    :hasBody :Medium ;
+    :hasFlavor :Moderate ;
+    :hasMaker :PulignyMontrachet ;
+    :hasSugar :Dry .
+
+:RieslingGrape
+    a :WineGrape .
+
+:RoseDAnjou
+    a :Anjou ;
+    :hasMaker :DAnjou .
+
+:SancerreRegion
+    a :Region ;
+    :locatedIn :LoireRegion .
+
+:SangioveseGrape
+    a :WineGrape .
+
+:SantaBarbaraRegion
+    a :Region ;
+    :locatedIn :CaliforniaRegion .
+
+:SantaCruzMountainVineyard
+    a :Winery .
+
+:SantaCruzMountainVineyardCabernetSauvignon
+    a :CabernetSauvignon ;
+    :hasBody :Full ;
+    :hasFlavor :Strong ;
+    :hasMaker :SantaCruzMountainVineyard ;
+    :hasSugar :Dry ;
+    :locatedIn :SantaCruzMountainsRegion .
+
+:CentralTexasRegion
+    a :Region ;
+    :locatedIn :TexasRegion .
+
+:StGenevieve
+    a :Winery .
+
+:StGenevieveTexasWhite
+    a :WhiteWine ;
+    :hasFlavor :Moderate ;
+    :hasMaker :StGenevieve ;
+    :hasSugar :Dry ;
+    :locatedIn :CentralTexasRegion .
+
+:SantaCruzMountainsRegion
+    a :Region ;
+    :locatedIn :CaliforniaRegion .
+
+:SaucelitoCanyon
+    a :Winery .
+
+:SaucelitoCanyonZinfandel
+    a :Zinfandel ;
+    :hasBody :Medium ;
+    :hasFlavor :Moderate ;
+    :hasMaker :SaucelitoCanyon ;
+    :hasSugar :Dry ;
+    :locatedIn :ArroyoGrandeRegion .
+
+:SaucelitoCanyonZinfandel1998
+    a :Zinfandel ;
+    :hasBody :Medium ;
+    :hasFlavor :Moderate ;
+    :hasMaker :SaucelitoCanyon ;
+    :hasSugar :Dry ;
+    :hasVintageYear :Year1998 ;
+    :locatedIn :ArroyoGrandeRegion .
+
+:SauterneRegion
+    a :Region ;
+    :locatedIn :BordeauxRegion .
+
+:SchlossRothermel
+    a :Winery .
+
+:SchlossRothermelTrochenbierenausleseRiesling
+    a :SweetRiesling ;
+    :hasBody :Full ;
+    :hasFlavor :Strong ;
+    :hasMaker :SchlossRothermel ;
+    :hasSugar :Sweet ;
+    :locatedIn :GermanyRegion .
+
+:SchlossVolrad
+    a :Winery .
+
+:SchlossVolradTrochenbierenausleseRiesling
+    a :SweetRiesling ;
+    :hasBody :Full ;
+    :hasFlavor :Moderate ;
+    :hasMaker :SchlossVolrad ;
+    :hasSugar :Sweet ;
+    :locatedIn :GermanyRegion .
+
+:SeanThackrey
+    a :Winery .
+
+:SeanThackreySiriusPetiteSyrah
+    a :PetiteSyrah ;
+    :hasBody :Full ;
+    :hasFlavor :Strong ;
+    :hasMaker :SeanThackrey ;
+    :hasSugar :Dry ;
+    :locatedIn :NapaRegion .
+
+:Selaks
+    a :Winery .
+
+:SelaksIceWine
+    a :IceWine ;
+    :hasBody :Medium ;
+    :hasColor :White ;
+    :hasFlavor :Moderate ;
+    :hasMaker :Selaks ;
+    :locatedIn :NewZealandRegion .
+
+:SelaksSauvignonBlanc
+    a :SauvignonBlanc ;
+    :hasBody :Medium ;
+    :hasFlavor :Moderate ;
+    :hasMaker :Selaks ;
+    :hasSugar :Dry ;
+    :locatedIn :NewZealandRegion .
+
+:SevreEtMaine
+    a :Winery .
+
+:SevreEtMaineMuscadet
+    a :Muscadet ;
+    :hasMaker :SevreEtMaine .
+
+:SonomaRegion
+    a :Region ;
+    :locatedIn :CaliforniaRegion .
+
+:SouthAustraliaRegion
+    a :Region ;
+    :locatedIn :AustralianRegion .
+
+:StEmilionRegion
+    a :Region ;
+    :locatedIn :BordeauxRegion .
+
+:Stonleigh
+    a :Winery .
+
+:StonleighSauvignonBlanc
+    a :SauvignonBlanc ;
+    :hasBody :Medium ;
+    :hasFlavor :Delicate ;
+    :hasMaker :Stonleigh ;
+    :hasSugar :Dry ;
+    :locatedIn :NewZealandRegion .
+
+:Taylor
+    a :Winery .
+
+:TaylorPort
+    a :Port ;
+    :hasMaker :Taylor .
+
+:ToursRegion
+    a :Region ;
+    :locatedIn :LoireRegion .
+
+:Ventana
+    a :Winery .
+
+:VentanaCheninBlanc
+    a :CheninBlanc ;
+    :hasBody :Medium ;
+    :hasFlavor :Moderate ;
+    :hasMaker :Ventana ;
+    :hasSugar :OffDry ;
+    :locatedIn :CentralCoastRegion .
+
+:WhitehallLane
+    a :Winery .
+
+:WhitehallLaneCabernetFranc
+    a :CabernetFranc ;
+    :hasBody :Medium ;
+    :hasFlavor :Moderate ;
+    :hasMaker :WhitehallLane ;
+    :hasSugar :Dry ;
+    :locatedIn :NapaRegion .
+
+:WhitehallLanePrimavera
+    a :DessertWine ;
+    :hasBody :Light ;
+    :hasFlavor :Delicate ;
+    :hasSugar :Sweet ;
+    :locatedIn :NapaRegion .
+
+[]
+    a owl:AllDifferent ;
+    owl:distinctMembers [
+        rdf:first :Red ;
+        rdf:rest [
+            rdf:first :White ;
+            rdf:rest [
+                rdf:first :Rose ;
+                rdf:rest rdf:nil
+            ]
+        ]
+    ] .
+
+[]
+    a owl:AllDifferent ;
+    owl:distinctMembers [
+        rdf:first :Light ;
+        rdf:rest [
+            rdf:first :Medium ;
+            rdf:rest [
+                rdf:first :Full ;
+                rdf:rest rdf:nil
+            ]
+        ]
+    ] .
+
+[]
+    a owl:AllDifferent ;
+    owl:distinctMembers [
+        rdf:first :Delicate ;
+        rdf:rest [
+            rdf:first :Moderate ;
+            rdf:rest [
+                rdf:first :Strong ;
+                rdf:rest rdf:nil
+            ]
+        ]
+    ] .
+
+[]
+    a owl:AllDifferent ;
+    owl:distinctMembers [
+        rdf:first :Sweet ;
+        rdf:rest [
+            rdf:first :OffDry ;
+            rdf:rest [
+                rdf:first :Dry ;
+                rdf:rest rdf:nil
+            ]
+        ]
+    ] .
+
+[]
+    a owl:AllDifferent ;
+    owl:distinctMembers [
+        rdf:first :Bancroft ;
+        rdf:rest [
+            rdf:first :ChateauChevalBlanc ;
+            rdf:rest [
+                rdf:first :ChateauDYchem ;
+                rdf:rest [
+                    rdf:first :ChateauDeMeursault ;
+                    rdf:rest [
+                        rdf:first :ChateauLafiteRothschild ;
+                        rdf:rest [
+                            rdf:first :ChateauMargauxWinery ;
+                            rdf:rest [
+                                rdf:first :ChateauMorgon ;
+                                rdf:rest [
+                                    rdf:first :ClosDeLaPoussie ;
+                                    rdf:rest [
+                                        rdf:first :ClosDeVougeot ;
+                                        rdf:rest [
+                                            rdf:first :CongressSprings ;
+                                            rdf:rest [
+                                                rdf:first :Corbans ;
+                                                rdf:rest [
+                                                    rdf:first :CortonMontrachet ;
+                                                    rdf:rest [
+                                                        rdf:first :Cotturi ;
+                                                        rdf:rest [
+                                                            rdf:first :DAnjou ;
+                                                            rdf:rest [
+                                                                rdf:first :Elyse ;
+                                                                rdf:rest [
+                                                                    rdf:first :Forman ;
+                                                                    rdf:rest [
+                                                                        rdf:first :Foxen ;
+                                                                        rdf:rest [
+                                                                            rdf:first :GaryFarrell ;
+                                                                            rdf:rest [
+                                                                                rdf:first :KalinCellars ;
+                                                                                rdf:rest [
+                                                                                    rdf:first :KathrynKennedy ;
+                                                                                    rdf:rest [
+                                                                                        rdf:first :LaneTanner ;
+                                                                                        rdf:rest [
+                                                                                            rdf:first :Longridge ;
+                                                                                            rdf:rest [
+                                                                                                rdf:first :Marietta ;
+                                                                                                rdf:rest [
+                                                                                                    rdf:first :McGuinnesso ;
+                                                                                                    rdf:rest [
+                                                                                                        rdf:first :MountEdenVineyard ;
+                                                                                                        rdf:rest [
+                                                                                                            rdf:first :Mountadam ;
+                                                                                                            rdf:rest [
+                                                                                                                rdf:first :PageMillWinery ;
+                                                                                                                rdf:rest [
+                                                                                                                    rdf:first :PeterMccoy ;
+                                                                                                                    rdf:rest [
+                                                                                                                        rdf:first :PulignyMontrachet ;
+                                                                                                                        rdf:rest [
+                                                                                                                            rdf:first :SantaCruzMountainVineyard ;
+                                                                                                                            rdf:rest [
+                                                                                                                                rdf:first :SaucelitoCanyon ;
+                                                                                                                                rdf:rest [
+                                                                                                                                    rdf:first :SchlossRothermel ;
+                                                                                                                                    rdf:rest [
+                                                                                                                                        rdf:first :SchlossVolrad ;
+                                                                                                                                        rdf:rest [
+                                                                                                                                            rdf:first :SeanThackrey ;
+                                                                                                                                            rdf:rest [
+                                                                                                                                                rdf:first :Selaks ;
+                                                                                                                                                rdf:rest [
+                                                                                                                                                    rdf:first :SevreEtMaine ;
+                                                                                                                                                    rdf:rest [
+                                                                                                                                                        rdf:first :StGenevieve ;
+                                                                                                                                                        rdf:rest [
+                                                                                                                                                            rdf:first :Stonleigh ;
+                                                                                                                                                            rdf:rest [
+                                                                                                                                                                rdf:first :Taylor ;
+                                                                                                                                                                rdf:rest [
+                                                                                                                                                                    rdf:first :Ventana ;
+                                                                                                                                                                    rdf:rest [
+                                                                                                                                                                        rdf:first :WhitehallLane ;
+                                                                                                                                                                        rdf:rest rdf:nil
+                                                                                                                                                                    ]
+                                                                                                                                                                ]
+                                                                                                                                                            ]
+                                                                                                                                                        ]
+                                                                                                                                                    ]
+                                                                                                                                                ]
+                                                                                                                                            ]
+                                                                                                                                        ]
+                                                                                                                                    ]
+                                                                                                                                ]
+                                                                                                                            ]
+                                                                                                                        ]
+                                                                                                                    ]
+                                                                                                                ]
+                                                                                                            ]
+                                                                                                        ]
+                                                                                                    ]
+                                                                                                ]
+                                                                                            ]
+                                                                                        ]
+                                                                                    ]
+                                                                                ]
+                                                                            ]
+                                                                        ]
+                                                                    ]
+                                                                ]
+                                                            ]
+                                                        ]
+                                                    ]
+                                                ]
+                                            ]
+                                        ]
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+        ]
+    ] .

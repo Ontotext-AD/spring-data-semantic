@@ -1,0 +1,4 @@
+# Tooling related information for the Solr namespace
+http\://www.springframework.org/schema/data/semantic@name=Semantic Namespace
+http\://www.springframework.org/schema/data/semantic@prefix=semantic
+http\://www.springframework.org/schema/data/semantic@icon=org/springframework/jdbc/config/spring-jdbc.gif

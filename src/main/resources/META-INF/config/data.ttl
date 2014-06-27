@@ -1,0 +1,27 @@
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.
+@prefix rep: <http://www.openrdf.org/config/repository#>.
+@prefix sr: <http://www.openrdf.org/config/repository/sail#>.
+@prefix sail: <http://www.openrdf.org/config/sail#>.
+@prefix owlim: <http://www.ontotext.com/trree/owlim#>.
+
+[] a rep:Repository ;
+rep:repositoryID "data" ;
+rdfs:label "Forest Data Repository" ;
+rep:repositoryImpl [
+	rep:repositoryType "openrdf:SailRepository" ;
+	sr:sailImpl [
+		sail:sailType "owlim:Sail" ; 
+		owlim:ftsIndexPolicy "onStartup" ;
+		owlim:tokenIndexCacheSize "1000" ;
+		owlim:ftsLiteralsOnly "false" ;
+		owlim:ruleset "empty" ;
+		owlim:entity-index-size "5000000" ;
+		owlim:cache-size "3000" ; 
+		owlim:partialRDFS  "rdfs-optimized" ;
+		owlim:noPersist "false" ;
+		owlim:storage-folder "storage" ;
+		owlim:base-URL "urn:ontotext.com:forest" ;
+		owlim:repository-type "file-repository" ;
+		owlim:console-thread "false"
+	]
+].

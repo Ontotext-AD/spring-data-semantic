@@ -1,0 +1,2 @@
+http\://www.springframework.org/schema/data/semantic/spring-semantic-1.0.xsd=org/springframework/data/semantic/config/spring-semantic-1.0.xsd
+http\://www.springframework.org/schema/data/semantic/spring-semantic.xsd=org/springframework/data/semantic/config/spring-semantic-1.0.xsd
