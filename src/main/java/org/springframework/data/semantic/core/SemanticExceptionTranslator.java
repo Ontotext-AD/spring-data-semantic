@@ -24,7 +24,7 @@ public class SemanticExceptionTranslator implements PersistenceExceptionTranslat
 			Throwable e = ex.getCause();
 			return new InvalidDataAccessApiUsageException(e.getMessage(), e);
 		}
-		return null;
+		return new UncategorizedSemanticDataAccessException(ex.getMessage(), ex);
 	}
 
 }

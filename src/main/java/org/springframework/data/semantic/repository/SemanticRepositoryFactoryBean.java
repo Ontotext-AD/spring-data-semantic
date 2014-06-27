@@ -2,6 +2,7 @@ package org.springframework.data.semantic.repository;
 
 import java.io.Serializable;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.Repository;
 import org.springframework.data.repository.core.support.RepositoryFactorySupport;
 import org.springframework.data.repository.core.support.TransactionalRepositoryFactoryBeanSupport;
@@ -11,9 +12,13 @@ import org.springframework.data.semantic.support.SemanticTemplateStatementsColle
 
 public class SemanticRepositoryFactoryBean<T extends Repository<S, ID>, S, ID extends Serializable> extends TransactionalRepositoryFactoryBeanSupport<T, S, ID>{
 	
+	@Autowired
 	private SemanticTemplateStatementsCollector statementsCollector;
 	
+	@Autowired
 	private SemanticTemplateObjectCreator objectCreator;
+	
+	
 
 	@Override
 	protected RepositoryFactorySupport doCreateRepositoryFactory() {
@@ -33,6 +38,7 @@ public class SemanticRepositoryFactoryBean<T extends Repository<S, ID>, S, ID ex
 	public void setObjectCreator(SemanticTemplateObjectCreator objectCreator) {
 		this.objectCreator = objectCreator;
 	}
+	
 	
 	
 
