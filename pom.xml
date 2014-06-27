@@ -93,7 +93,7 @@
 		</dependency>
 	</dependencies>
 	<properties>
-		<sesame.version>2.6.10</sesame.version>
+		<sesame.version>2.7.12</sesame.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 	
