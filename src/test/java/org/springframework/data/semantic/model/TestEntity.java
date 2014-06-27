@@ -21,7 +21,7 @@ public class TestEntity {
 	
 	//@Datatype(XSDDatatype.)
 	@Language({Languages.en, Languages.de})
-	@Predicate({"skos:prefLabel"})
+	@Predicate({"http://www.w3.org/2004/02/skos/core#prefLabel"})
 	private String name;
 	
 	@Context
