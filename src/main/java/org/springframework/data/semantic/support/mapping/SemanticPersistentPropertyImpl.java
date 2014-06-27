@@ -193,4 +193,9 @@ public class SemanticPersistentPropertyImpl extends
             return MappingPolicy.LAZY_LOAD_POLICY;
         }
 	}
+	
+	@Override
+	public boolean shallBePersisted() {
+		return super.shallBePersisted() && (getPredicate().size() == 1);
+	}
 }

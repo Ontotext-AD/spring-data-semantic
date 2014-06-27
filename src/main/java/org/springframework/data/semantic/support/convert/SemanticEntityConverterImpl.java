@@ -1,6 +1,7 @@
 package org.springframework.data.semantic.support.convert;
 
 import org.openrdf.model.Model;
+import org.openrdf.model.URI;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.data.mapping.context.MappingContext;
 import org.springframework.data.mapping.model.BeanWrapper;
@@ -64,7 +65,9 @@ public class SemanticEntityConverterImpl implements SemanticEntityConverter {
 
 	@Override
 	public void write(Object source, Model sink) {
-		// TODO Auto-generated method stub
+		final SemanticPersistentEntityImpl<?> persistentEntity = mappingContext.getPersistentEntity(source.getClass());
+		final URI resourceId = persistentEntity.getResourceId(source);
+		
 
 	}
 
