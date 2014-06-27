@@ -1,16 +1,13 @@
 package org.springframework.data.semantic.support.convert.access;
 
-import java.util.Iterator;
 import java.util.List;
 
-import org.openrdf.model.Statement;
+import org.openrdf.model.Model;
 import org.openrdf.model.URI;
 import org.springframework.data.semantic.convert.fieldaccess.FieldAccessor;
 import org.springframework.data.semantic.convert.fieldaccess.FieldAccessorFactory;
-import org.springframework.data.semantic.core.StatementsIterator;
 import org.springframework.data.semantic.mapping.MappingPolicy;
 import org.springframework.data.semantic.mapping.SemanticPersistentProperty;
-import org.springframework.data.semantic.support.SemanticTemplateCRUD;
 import org.springframework.data.semantic.support.SemanticTemplateObjectCreator;
 import org.springframework.data.semantic.support.SemanticTemplateStatementsCollector;
 import org.springframework.data.semantic.support.mapping.SemanticMappingContext;
@@ -79,12 +76,11 @@ public class AssociationFieldAccessorFactory implements FieldAccessorFactory {
 		@Override
 		public Object getValue(Object entity, MappingPolicy mappingPolicy) {
 			//TODO multiple values
-			StatementsIterator stIterator = statementsCollector.getStatementsForResourceProperty(entity, property);
-			Iterator<Statement> statements = stIterator.iterator();
-			if(statements.hasNext()) {
+			Model stIterator = statementsCollector.getStatementsForResourceProperty(entity, property);
+			if(!stIterator.isEmpty()) {
 				
-				URI resource = (URI)statements.next().getObject();
-				StatementsIterator iterator = statementsCollector.getStatementsForResourceClass(resource, fieldType);
+				URI resource = (URI) stIterator.objects().iterator().next();
+				Model iterator = statementsCollector.getStatementsForResourceClass(resource, fieldType);
 				
 				return objectCreator.createObjectFromStatements(iterator, fieldType, mappingPolicy);
 			}

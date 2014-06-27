@@ -1,8 +1,8 @@
 package org.springframework.data.semantic.support.convert;
 
+import org.openrdf.model.Model;
 import org.springframework.data.semantic.convert.SemanticEntityConverter;
 import org.springframework.data.semantic.convert.SemanticEntityPersister;
-import org.springframework.data.semantic.core.StatementsIterator;
 import org.springframework.data.semantic.mapping.MappingPolicy;
 
 public class SemanticEntityPersisterImpl implements SemanticEntityPersister{
@@ -15,9 +15,9 @@ public class SemanticEntityPersisterImpl implements SemanticEntityPersister{
 	
 
 	@Override
-	public <T> T createEntityFromState(StatementsIterator statements,
+	public <T> T createEntityFromState(Model statements,
 			Class<T> type, MappingPolicy mappingPolicy) {
-		if (statements == null || !statements.hasNext()) {
+		if (statements == null || statements.isEmpty()) {
             throw new IllegalArgumentException("State has to be either a Node or Relationship, but is null");
         }
 		//TODO what is the purpose of the mappingPolicy object?

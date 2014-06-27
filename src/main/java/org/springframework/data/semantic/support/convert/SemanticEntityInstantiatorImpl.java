@@ -1,9 +1,9 @@
 package org.springframework.data.semantic.support.convert;
 
+import org.openrdf.model.Model;
 import org.springframework.data.convert.EntityInstantiator;
 import org.springframework.data.convert.ReflectionEntityInstantiator;
 import org.springframework.data.semantic.convert.SemanticEntityInstantiator;
-import org.springframework.data.semantic.core.StatementsIterator;
 import org.springframework.data.semantic.mapping.SemanticPersistentEntity;
 
 public class SemanticEntityInstantiatorImpl implements SemanticEntityInstantiator{
@@ -12,7 +12,7 @@ public class SemanticEntityInstantiatorImpl implements SemanticEntityInstantiato
 
 	@Override
 	public <T> T createInstanceFromState(SemanticPersistentEntity<T> entity,
-			StatementsIterator statements) {
+			Model statements) {
 		T instance = instantiator.createInstance(entity, null);
 		entity.setPersistentState(instance, statements);
 		return instance;

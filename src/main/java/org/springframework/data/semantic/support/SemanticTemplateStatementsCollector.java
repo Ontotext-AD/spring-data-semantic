@@ -1,15 +1,12 @@
 package org.springframework.data.semantic.support;
 
+import org.openrdf.model.Model;
 import org.openrdf.model.URI;
+import org.openrdf.query.QueryResults;
 import org.openrdf.repository.RepositoryException;
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.data.semantic.core.SemanticDatabase;
 import org.springframework.data.semantic.core.SemanticOperationsStatementsCollector;
-import org.springframework.data.semantic.core.StatementsIterator;
 import org.springframework.data.semantic.mapping.MappingPolicy;
 import org.springframework.data.semantic.mapping.SemanticPersistentEntity;
 import org.springframework.data.semantic.mapping.SemanticPersistentProperty;
@@ -39,11 +36,11 @@ public class SemanticTemplateStatementsCollector implements SemanticOperationsSt
 	}	
 		
 	@Override
-	public StatementsIterator getStatementsForResourceProperty(Object entity, SemanticPersistentProperty property){
+	public Model getStatementsForResourceProperty(Object entity, SemanticPersistentProperty property){
 		SemanticPersistentEntity<?> persistentEntity = getPersistentEntity(entity.getClass());
 		URI uri = persistentEntity.getResourceId(entity);
 		try {
-			return new StatementsIterator(semanticDB.getStatementsForGraphQuery(
+			return QueryResults.asModel(semanticDB.getStatementsForGraphQuery(
 					EntityToGraphQueryConverter.getGraphQueryForResourceProperty(uri, persistentEntity, property)));
 		} catch (Exception e) {
 			throw ExceptionTranslator.translateExceptionIfPossible(e);
@@ -51,9 +48,9 @@ public class SemanticTemplateStatementsCollector implements SemanticOperationsSt
 	}	
 
 	@Override
-	public StatementsIterator getStatementsForResourceClass(URI resource, Class<?> clazz) {
+	public Model getStatementsForResourceClass(URI resource, Class<?> clazz) {
 		try {
-			return new StatementsIterator(semanticDB.getStatementsForGraphQuery(
+			return QueryResults.asModel(semanticDB.getStatementsForGraphQuery(
 					EntityToGraphQueryConverter.getGraphQueryForResource(resource, getPersistentEntity(clazz))));
 		} catch (Exception e) {
 			throw ExceptionTranslator.translateExceptionIfPossible(e);

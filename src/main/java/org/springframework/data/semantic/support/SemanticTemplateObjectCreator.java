@@ -1,5 +1,6 @@
 package org.springframework.data.semantic.support;
 
+import org.openrdf.model.Model;
 import org.openrdf.repository.RepositoryException;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.data.semantic.convert.SemanticEntityConverter;
@@ -7,7 +8,6 @@ import org.springframework.data.semantic.convert.SemanticEntityInstantiator;
 import org.springframework.data.semantic.convert.SemanticEntityPersister;
 import org.springframework.data.semantic.core.SemanticDatabase;
 import org.springframework.data.semantic.core.SemanticOperationsObjectCreator;
-import org.springframework.data.semantic.core.StatementsIterator;
 import org.springframework.data.semantic.mapping.MappingPolicy;
 import org.springframework.data.semantic.support.convert.SemanticEntityConverterImpl;
 import org.springframework.data.semantic.support.convert.SemanticEntityInstantiatorImpl;
@@ -40,7 +40,7 @@ private SemanticEntityPersister entityPersister;
 	}	
 	
 	@Override
-	public <T> T createObjectFromStatements(StatementsIterator stIterator, 
+	public <T> T createObjectFromStatements(Model stIterator, 
 			Class<T> clazz, MappingPolicy mappingPolicy) {
 		return entityPersister.createEntityFromState(stIterator, clazz, mappingPolicy);
 	}	

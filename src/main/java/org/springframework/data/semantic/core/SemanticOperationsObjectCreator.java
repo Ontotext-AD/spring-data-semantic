@@ -1,5 +1,6 @@
 package org.springframework.data.semantic.core;
 
+import org.openrdf.model.Model;
 import org.openrdf.query.GraphQueryResult;
 import org.springframework.data.semantic.mapping.MappingPolicy;
 
@@ -12,5 +13,5 @@ public interface SemanticOperationsObjectCreator {
 	 * @return
 	 */
 	<T> T createObjectFromStatements(
-			StatementsIterator rdfGraph, Class<T> targetClazz, MappingPolicy mappingPolicy);
+			Model rdfGraph, Class<T> targetClazz, MappingPolicy mappingPolicy);
 }

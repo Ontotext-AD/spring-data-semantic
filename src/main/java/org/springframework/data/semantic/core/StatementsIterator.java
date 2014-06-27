@@ -14,38 +14,38 @@ import org.openrdf.query.QueryEvaluationException;
  * @author konstantin.pentchev
  *
  */
-public final class StatementsIterator implements Iterable<Statement>{
-	
-	private Iterable<Statement> delegate;
-	
-	public StatementsIterator(Iterable<? extends Statement> statements){
-		List<Statement> collector = new LinkedList<Statement>();
-		Iterator<? extends Statement> it = statements.iterator();
-		while(it.hasNext()){
-			collector.add(it.next());
-		}
-		this.delegate = collector;
-	}
-	
-	public StatementsIterator(GraphQueryResult statements) throws QueryEvaluationException  {
-		List<Statement> collector = new LinkedList<Statement>();
-		try {
-			while(statements.hasNext()){
-				collector.add(statements.next());
-			}
-			delegate = collector;
-		} finally {
-			statements.close();
-		}
-	}
-
-	@Override
-	public Iterator<Statement> iterator() {
-		return delegate.iterator();
-	}
-	
-	public boolean hasNext(){
-		return delegate.iterator().hasNext();
-	}
-
-}
+//public final class StatementsIterator implements Iterable<Statement>{
+//	
+//	private Iterable<Statement> delegate;
+//	
+//	public StatementsIterator(Iterable<? extends Statement> statements){
+//		List<Statement> collector = new LinkedList<Statement>();
+//		Iterator<? extends Statement> it = statements.iterator();
+//		while(it.hasNext()){
+//			collector.add(it.next());
+//		}
+//		this.delegate = collector;
+//	}
+//	
+//	public StatementsIterator(GraphQueryResult statements) throws QueryEvaluationException  {
+//		List<Statement> collector = new LinkedList<Statement>();
+//		try {
+//			while(statements.hasNext()){
+//				collector.add(statements.next());
+//			}
+//			delegate = collector;
+//		} finally {
+//			statements.close();
+//		}
+//	}
+//
+//	@Override
+//	public Iterator<Statement> iterator() {
+//		return delegate.iterator();
+//	}
+//	
+//	public boolean hasNext(){
+//		return delegate.iterator().hasNext();
+//	}
+//
+//}
