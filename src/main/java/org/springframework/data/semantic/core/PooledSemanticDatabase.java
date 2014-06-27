@@ -319,7 +319,10 @@ public class PooledSemanticDatabase implements SemanticDatabase{
 	public Namespace getDefaultNamespace() throws RepositoryException {		
 		RepositoryConnection con = connectionPool.getConnection();
 		try {
-			String defaultNSName = con.getNamespace("");	
+			String defaultNSName = con.getNamespace("");
+			if(defaultNSName == null){
+				return new NamespaceImpl("", "urn:sprind-data-semantic:");
+			}
 			return new NamespaceImpl("", defaultNSName);
 		} finally {
 			con.close();
