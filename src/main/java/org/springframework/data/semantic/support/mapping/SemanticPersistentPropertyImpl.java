@@ -137,12 +137,7 @@ public class SemanticPersistentPropertyImpl extends
 	@Override
 	public Object getValue(final Object entity,
 			final MappingPolicy mappingPolicy) {
-		if (isIdProperty) {
-			return getValueFromEntity(entity, mappingPolicy);
-		} else {
-			// TODO
-			return null;
-		}
+		return getValueFromEntity(entity, mappingPolicy);
 	}
 
 	private Object getValueFromEntity(Object entity, MappingPolicy mappingPolicy) {

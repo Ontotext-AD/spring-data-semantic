@@ -1,6 +1,6 @@
 package org.springframework.data.semantic.convert;
 
-import org.openrdf.model.Model;
+import org.springframework.data.semantic.core.RDFState;
 import org.springframework.data.semantic.mapping.SemanticPersistentEntity;
 
 /**
@@ -16,6 +16,6 @@ public interface SemanticEntityInstantiator {
 	 * @param statements - the given state.
 	 * @return
 	 */
-	public <T> T createInstanceFromState(SemanticPersistentEntity<T> entity, Model statements); 
+	public <T> T createInstanceFromState(SemanticPersistentEntity<T> entity, RDFState statements); 
 	
 }

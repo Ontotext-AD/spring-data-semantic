@@ -16,6 +16,8 @@ import org.openrdf.repository.RepositoryException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+
+
 /**
  * A connection pool implementation for Sesame semantic repositories.
  * 
@@ -24,11 +26,11 @@ import org.slf4j.LoggerFactory;
 public final class SesameConnectionPool {
 	private BlockingQueue<ExtendedRepositoryConnection> availableList;
 	private Map<ExtendedRepositoryConnection, Long> inUseList;
-	private AtomicInteger openConnections = new AtomicInteger(0);
-	private int maxConnections;
+	private volatile AtomicInteger openConnections = new AtomicInteger(0);
+	private final int maxConnections;
+	private final int timeOutToCollect;
 	private Repository repo;
 	private Logger logger = LoggerFactory.getLogger(getClass());
-	//private String config;
 	private Thread unusedConnectionsCollectorThread;
 
 	/**
@@ -42,14 +44,13 @@ public final class SesameConnectionPool {
 	 *            maximum number of connections to the repository
 	 */
 	public SesameConnectionPool(Repository repository,
-			int maxConnections) {
+			int maxConnections, int timeoutToCollect) {
 		this.maxConnections = maxConnections;
 		this.availableList = new ArrayBlockingQueue<ExtendedRepositoryConnection>(
 				maxConnections, true);
-		//this.config = config;
 		this.repo = repository;
 		this.inUseList = new ConcurrentHashMap<ExtendedRepositoryConnection, Long>();
-		
+		this.timeOutToCollect = timeoutToCollect;
 		unusedConnectionsCollectorThread = new Thread(new UnusedConnectionsCollector(), "UnusedConnectionsCollector");
 		unusedConnectionsCollectorThread.start();
 	}
@@ -68,12 +69,15 @@ public final class SesameConnectionPool {
 	 *         ExtendedRepositoryConnection
 	 * @throws RepositoryException 
 	 */
-	public RepositoryConnection getConnection() throws RepositoryException {
-		return getConnectionFromPool();
+	public RepositoryConnection getConnection() {
+		try{
+			return getConnectionFromPool();
+		} catch(Exception e){
+			logger.error(e.getMessage(), e);
+		}
+		return null;
 	}
 	
-	
-
 	/**
 	 * Adds the repository connection back to the queue of available
 	 * connections. All statements are committed before making the connection
@@ -86,8 +90,13 @@ public final class SesameConnectionPool {
 	 */
 	public void closeConnection(ExtendedRepositoryConnection connection)
 			throws RepositoryException {
-		inUseList.remove(connection);
-		availableList.add(connection);
+		if(connection.isActive()){
+			connection.rollback();
+		}
+		Long val = inUseList.remove(connection);
+		if(val != null){
+			availableList.add(connection);
+		}
 	}
 
 	/**
@@ -104,29 +113,29 @@ public final class SesameConnectionPool {
 		return !availableList.contains(connection);
 	}
 	
-	private RepositoryConnection getConnectionFromPool() throws RepositoryException {
+	private RepositoryConnection getConnectionFromPool() throws RepositoryException, InterruptedException{
 		ExtendedRepositoryConnection connection  = availableList.poll();
 		if(connection == null){
 			if (openConnections.get() < maxConnections) {
-				connection = new ExtendedRepositoryConnection(this, repo, repo.getConnection());
-				openConnections.getAndIncrement();
-				if(openConnections.get() == maxConnections-1) {
-					logger.info("Reached maximum number of opened connections: "+maxConnections);
+				synchronized(openConnections){
+					if (openConnections.get() < maxConnections) {
+						connection = new ExtendedRepositoryConnection(this, repo, repo.getConnection());
+						if(openConnections.incrementAndGet() == maxConnections-1) {
+							logger.info("Reached maximum number of opened connections: "+maxConnections);
+						}
+					}
 				}
-			}
-			else {
-				try {
+			} 
+			if (connection == null){
 					connection = availableList.take();
-				} catch (InterruptedException e) {
-					logger.error(e.getMessage(), e);
-				}
 			}
 		}
+		connection.setCause(Thread.currentThread().getStackTrace());
 		inUseList.put(connection, System.currentTimeMillis());
 		return connection;
 	}
 	
-	public void shutdown(){
+	public void shutDown(){
 		while(!availableList.isEmpty()){
 			availableList.poll().destroy();
 		}
@@ -147,12 +156,12 @@ public final class SesameConnectionPool {
 			try {
 				while(true){
 					for(Entry<ExtendedRepositoryConnection, Long> entry : inUseList.entrySet()){
-						if(System.currentTimeMillis() - entry.getValue() > 900000){
-							try {
+						try {
+							if((System.currentTimeMillis() - entry.getValue() > timeOutToCollect) && !entry.getKey().isActive()){
 								entry.getKey().close();
-							} catch (RepositoryException e) {
-								logger.error(e.getMessage(),e);
 							}
+						} catch (RepositoryException e) {
+							logger.error(e.getMessage(),e);
 						}
 					}
 				

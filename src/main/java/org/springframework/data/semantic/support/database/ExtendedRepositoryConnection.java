@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 public class ExtendedRepositoryConnection extends RepositoryConnectionWrapper {
 	private SesameConnectionPool connectionPool;
 	private Logger logger = LoggerFactory.getLogger(getClass());
+	private StackTraceElement[] cause;
 	
 	public ExtendedRepositoryConnection(SesameConnectionPool connectionPool, Repository repository, RepositoryConnection connection){
 		super(repository, connection);
@@ -35,6 +36,15 @@ public class ExtendedRepositoryConnection extends RepositoryConnectionWrapper {
 	
 	@Override
 	public void close() throws RepositoryException {
+		cause = null;
 		connectionPool.closeConnection(this);
+	}
+	
+	public void setCause(StackTraceElement[] cause){
+		this.cause = cause;
+	}
+	
+	public StackTraceElement[] getCause(){
+		return cause;
 	}
 }

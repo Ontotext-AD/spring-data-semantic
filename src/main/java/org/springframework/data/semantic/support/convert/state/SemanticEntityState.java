@@ -6,13 +6,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.openrdf.model.Model;
 import org.openrdf.model.Statement;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.semantic.convert.fieldaccess.FieldAccessor;
 import org.springframework.data.semantic.convert.fieldaccess.FieldAccessorProvider;
 import org.springframework.data.semantic.convert.state.EntityState;
+import org.springframework.data.semantic.core.RDFState;
+import org.springframework.data.semantic.core.SemanticDatabase;
 import org.springframework.data.semantic.mapping.MappingPolicy;
 import org.springframework.data.semantic.mapping.SemanticPersistentEntity;
 import org.springframework.data.semantic.mapping.SemanticPersistentProperty;
@@ -20,28 +19,29 @@ import org.springframework.data.semantic.support.convert.access.DelegatingFieldA
 import org.springframework.data.semantic.support.convert.access.DelegatingFieldAccessorProvider;
 
 public class SemanticEntityState<T> implements
-		EntityState<T, Model> {
+		EntityState<T, RDFState> {
 
 	private final T entity;
-	private final Class<? extends T> type;
+	//private final Class<? extends T> type;
 	private final Map<SemanticPersistentProperty, FieldAccessor> fieldAccessors;
-	// private final Map<Neo4jPersistentProperty,List<FieldAccessListener>>
-	// fieldAccessorListeners = new HashMap<Neo4jPersistentProperty,
-	// List<FieldAccessListener>>();
-	private Model state;
-	private final static Logger log = LoggerFactory.getLogger(SemanticEntityState.class);
+	private RDFState state;
+	private final SemanticDatabase semanticDb;
+	//private final static Logger log = LoggerFactory.getLogger(SemanticEntityState.class);
 	private final FieldAccessorProvider fieldAccessorProvider;
 	private final SemanticPersistentEntity<T> persistentEntity;
+	
 
 	public SemanticEntityState(
-			final Model underlyingState,
+			final RDFState underlyingState,
+			final SemanticDatabase semanticDatabase,
 			final T entity,
 			final Class<? extends T> type,
 			final DelegatingFieldAccessorFactory nodeDelegatingFieldAccessorFactory,
 			SemanticPersistentEntity<T> persistentEntity) {
 		this.entity = entity;
-		this.type = type;
+		//this.type = type;
 		this.state = underlyingState;
+		this.semanticDb = semanticDatabase;
 		this.fieldAccessorProvider = new DelegatingFieldAccessorProvider(
 				nodeDelegatingFieldAccessorFactory);
 		this.fieldAccessors = fieldAccessorProvider
@@ -55,7 +55,7 @@ public class SemanticEntityState<T> implements
 	}
 
 	@Override
-	public void setPersistentState(Model state) {
+	public void setPersistentState(RDFState state) {
 		this.state = state;
 	}
 
@@ -87,7 +87,7 @@ public class SemanticEntityState<T> implements
 	}
 	
 	private Object getValueFromState(String alias){
-		Iterator<Statement> stIterator = state.iterator();
+		Iterator<Statement> stIterator = state.getCurrentStatements().iterator();
 		List<Object> values = new LinkedList<Object>();
 		//TODO optimize: do not iterate through all the statements each time a value is needed
 		while(stIterator.hasNext()){
@@ -134,14 +134,16 @@ public class SemanticEntityState<T> implements
 	}
 
 	@Override
-	public Model getPersistentState() {
+	public RDFState getPersistentState() {
 		return state;
 	}
 
 	@Override
 	public T persist() {
-		// TODO Auto-generated method stub
-		return null;
+		semanticDb.removeStatement(state.getDeleteStatements());
+		state.getDeleteStatements().clear();
+		semanticDb.addStatements(state.getCurrentStatements());
+		return entity;
 	}
 
 	@Override

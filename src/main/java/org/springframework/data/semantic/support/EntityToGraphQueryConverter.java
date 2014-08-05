@@ -19,7 +19,7 @@ import org.springframework.util.StringUtils;
 public class EntityToGraphQueryConverter {
 	
 	private static String variableChars = "abcdefghijklmnopqrstuvwxyz";
-	private static String rdfTypePred = "<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>";
+	
 	
 	/**
 	 * Create a graph query retrieving a specific property of the entity identified by this uri
@@ -108,7 +108,7 @@ public class EntityToGraphQueryConverter {
 			//sb.append(contextP.); TODO
 			sb.append("{ ");
 		}*/
-		appendPattern(sb, "<"+uri.stringValue()+">", rdfTypePred, "<"+entity.getRDFType()+">");
+		appendPattern(sb, "<"+uri.stringValue()+">", "<"+ValueUtils.RDF_TYPE_PREDICATE+">", "<"+entity.getRDFType()+">");
 		entity.doWithProperties(new PropertiesToPatternsHandler(sb, uri));
 		//TODO associations?
 		//entity.doWithAssociations(new PropertiesToPatternsHandler(sb, uri));

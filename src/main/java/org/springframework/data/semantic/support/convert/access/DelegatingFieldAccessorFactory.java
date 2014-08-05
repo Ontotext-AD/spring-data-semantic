@@ -5,28 +5,26 @@ import java.util.List;
 
 import org.springframework.data.semantic.convert.fieldaccess.FieldAccessor;
 import org.springframework.data.semantic.convert.fieldaccess.FieldAccessorFactory;
+import org.springframework.data.semantic.core.SemanticOperationsCRUD;
 import org.springframework.data.semantic.mapping.SemanticPersistentProperty;
-import org.springframework.data.semantic.support.SemanticTemplateCRUD;
-import org.springframework.data.semantic.support.SemanticTemplateObjectCreator;
 import org.springframework.data.semantic.support.SemanticTemplateStatementsCollector;
-import org.springframework.data.semantic.support.mapping.SemanticMappingContext;
 
 public class DelegatingFieldAccessorFactory implements FieldAccessorFactory{
 
 	private List<FieldAccessorFactory> factories = new LinkedList<FieldAccessorFactory>();
 	private SemanticTemplateStatementsCollector statementsCollector;
-	private SemanticTemplateObjectCreator objectCreator;
+	private SemanticOperationsCRUD operations;
 	
 	public DelegatingFieldAccessorFactory(SemanticTemplateStatementsCollector statementsCollector, 
-			SemanticTemplateObjectCreator objectCreator){
+			SemanticOperationsCRUD operations){
 		this.statementsCollector = statementsCollector;
-		this.objectCreator = objectCreator;
+		this.operations = operations;
 		createFactories();
 	}
 	
 	private void createFactories(){
 		PropertyFieldAccessorFactory pfaf = new PropertyFieldAccessorFactory(statementsCollector);
-		AssociationFieldAccessorFactory afaf = new AssociationFieldAccessorFactory(statementsCollector, objectCreator);
+		AssociationFieldAccessorFactory afaf = new AssociationFieldAccessorFactory(statementsCollector, operations);
 		factories.add(pfaf);
 		factories.add(afaf);
 	}

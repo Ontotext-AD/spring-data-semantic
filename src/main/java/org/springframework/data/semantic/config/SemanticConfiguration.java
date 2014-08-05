@@ -11,7 +11,6 @@ import org.springframework.dao.support.PersistenceExceptionTranslator;
 import org.springframework.data.semantic.core.SemanticDatabase;
 import org.springframework.data.semantic.core.SemanticExceptionTranslator;
 import org.springframework.data.semantic.support.SemanticTemplateCRUD;
-import org.springframework.data.semantic.support.SemanticTemplateObjectCreator;
 import org.springframework.data.semantic.support.SemanticTemplateStatementsCollector;
 import org.springframework.data.semantic.support.mapping.SemanticMappingContext;
 
@@ -29,11 +28,6 @@ public class SemanticConfiguration {
 	@Bean
 	public SemanticTemplateCRUD semanticTemplateCRUD() {
 		return new SemanticTemplateCRUD(semanticDatabase, conversionService());
-	}
-	
-	@Bean
-	public SemanticTemplateObjectCreator semanticTemplateObjectCreator() {
-		return new SemanticTemplateObjectCreator(semanticDatabase, conversionService());
 	}
 	
 	@Bean

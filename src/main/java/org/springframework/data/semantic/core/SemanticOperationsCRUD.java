@@ -1,26 +1,12 @@
 package org.springframework.data.semantic.core;
 
-import java.util.List;
-
-import org.openrdf.model.Statement;
+import org.openrdf.model.Model;
 import org.openrdf.model.URI;
-import org.openrdf.query.GraphQueryResult;
-import org.springframework.data.semantic.mapping.MappingPolicy;
-import org.springframework.data.semantic.mapping.SemanticPersistentProperty;
 
 public interface SemanticOperationsCRUD {
-	/*
-	public void persistStatement(Statement statement);
-	
-	public void persistStatements(List<Statement> statements);
-	
-	public void deleteStatement(Statement statement);
-	
-	public void deleteStatements(List<Statement> statements);*/
-	
 	
 	 /**
-     * Stores the given entity in the rdf store, if the subject URI is already present in the store, the statements are updated, otherwise
+     * Stores the given entity in the rdf store, if the subject {@link URI} is already present in the store, the statements are updated, otherwise
      * statements are just added. Attached relationships will be cascaded.
      * This method is also provided by the appropriate repository.
      */
@@ -34,12 +20,19 @@ public interface SemanticOperationsCRUD {
     void delete(Object entity);
     
     /**
-     * Loades the provided statements to be used as an entity of the given type.
-     * @param statements
-     * @param target
+     * Retrieves an entity of the given type T that is identified by the given {@link URI}.
+     * @param resourceId
      * @return
      */
-    <T> T load(List<Statement> statements, T target);
+    <T> T find(URI resourceId, Class<? extends T> clazz);
+    
+    /**
+     * Create a new entity form the given {@link Class} and {@link Model}.
+     * @param statements
+     * @param clazz
+     * @return
+     */
+    <T> T createEntity(Model statements, Class<T> clazz);
 
 	
 	

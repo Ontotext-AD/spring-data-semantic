@@ -1,9 +1,8 @@
 package org.springframework.data.semantic.support.convert;
 
-import org.openrdf.model.Model;
 import org.springframework.data.semantic.convert.SemanticEntityConverter;
 import org.springframework.data.semantic.convert.SemanticEntityPersister;
-import org.springframework.data.semantic.mapping.MappingPolicy;
+import org.springframework.data.semantic.core.RDFState;
 
 public class SemanticEntityPersisterImpl implements SemanticEntityPersister{
 	
@@ -15,14 +14,21 @@ public class SemanticEntityPersisterImpl implements SemanticEntityPersister{
 	
 
 	@Override
-	public <T> T createEntityFromState(Model statements,
-			Class<T> type, MappingPolicy mappingPolicy) {
-		if (statements == null || statements.isEmpty()) {
+	public <T> T createEntityFromState(RDFState statements,
+			Class<T> type) {
+		if (statements.isEmpty()) {
             return null;
         }
-		//TODO what is the purpose of the mappingPolicy object?
 		return entityConverter.read(type, statements); 
 		//TODO add at this point caching of entities		
+	}
+
+
+	@Override
+	public <T> T persistEntity(T entity) {
+		entityConverter.write(entity, null);
+		return entity;
+		//TODO invalidate cache if applicable
 	}
 
 }

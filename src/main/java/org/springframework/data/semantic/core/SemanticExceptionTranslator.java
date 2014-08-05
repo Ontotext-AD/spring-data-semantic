@@ -16,7 +16,13 @@ import org.springframework.dao.support.PersistenceExceptionTranslator;
 public class SemanticExceptionTranslator implements PersistenceExceptionTranslator{
 
 	public DataAccessException translateExceptionIfPossible(RuntimeException ex) {
-		if(ex.getCause() instanceof RepositoryException){
+		if(ex instanceof SemanticDatabaseAccessException){
+			return new DataAccessResourceFailureException(ex.getMessage(), ex);
+		}
+		else if(ex instanceof InvalidDataAccessApiUsageException){
+			return (InvalidDataAccessApiUsageException) ex;
+		}
+		else if(ex.getCause() instanceof RepositoryException){
 			RepositoryException e = (RepositoryException) ex.getCause();
 			return new DataAccessResourceFailureException(e.getMessage(), e);
 		}

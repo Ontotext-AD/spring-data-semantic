@@ -1,11 +1,16 @@
 package org.springframework.data.semantic.model;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.openrdf.model.Statement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.semantic.core.SemanticDatabase;
 import org.springframework.data.semantic.model.vocabulary.WINE;
@@ -33,6 +38,22 @@ public class TestSemanticRepository {
 		WineBody entity = repository.findOne(WINE.LIGHT);
 		assertNotNull(entity);
 		assertEquals(WINE.LIGHT, entity.getUri());
+		assertNotNull(entity.getLabel());
+	}
+	
+	@Test
+	public void testSaveUpdate(){
+		long count = sdb.count();
+		WineBody newEntity = new WineBody();
+		newEntity.setUri(WINE.RUBIN);
+		newEntity.setLabel("Rubin");
+		repository.save(newEntity);
+		assertTrue(count < sdb.count());
+		List<Statement> statementsForResource = sdb.getStatementsForSubject(WINE.RUBIN);
+		assertFalse(statementsForResource.isEmpty());
+		System.out.println(statementsForResource);
+		WineBody rubin = repository.findOne(WINE.RUBIN);
+		assertNotNull(rubin);
 	}
 
 }

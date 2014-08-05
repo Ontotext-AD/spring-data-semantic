@@ -7,10 +7,14 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.openrdf.model.Model;
 import org.openrdf.model.Namespace;
+import org.openrdf.model.impl.LinkedHashModel;
+import org.openrdf.model.impl.URIImpl;
 import org.openrdf.query.BindingSet;
 import org.openrdf.repository.RepositoryException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.semantic.support.ValueUtils;
 import org.springframework.data.semantic.testutils.Utils;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -74,5 +78,22 @@ public class SemanticDatabaseTest {
 		} catch (RepositoryException e) {
 			assertTrue(false);
 		}
+	}
+	
+	@Test
+	public void testAddStatement(){
+		long count = sdb.count();
+		sdb.addStatement(new URIImpl("urn:test:statement"), new URIImpl(ValueUtils.RDF_TYPE_PREDICATE), new URIImpl("unr:type:test-statement"));
+		assertEquals(count+1, sdb.count());
+	}
+	
+	@Test
+	public void testAddStatements(){
+		long count = sdb.count();
+		Model model = new LinkedHashModel();
+		model.add(new URIImpl("urn:test:statement1"), new URIImpl(ValueUtils.RDF_TYPE_PREDICATE), new URIImpl("unr:type:test-statement"));
+		model.add(new URIImpl("urn:test:statement2"), new URIImpl(ValueUtils.RDF_TYPE_PREDICATE), new URIImpl("unr:type:test-statement"));
+		sdb.addStatements(model);
+		assertEquals(count+2, sdb.count());
 	}
 }

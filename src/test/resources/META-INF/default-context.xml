@@ -10,6 +10,7 @@
 	<context:annotation-config  />
 	<semantic:repositories base-package="org.springframework.data.semantic" />
 	<semantic:config semantic-database-ref="lcie" />
+	
 	<semantic:semantic-database id="lcie" url="target/repositories/data-test" configFile="classpath:META-INF/config/data-memory.ttl"/>
 	
 		

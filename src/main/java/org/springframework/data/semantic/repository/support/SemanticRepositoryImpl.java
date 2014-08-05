@@ -1,17 +1,15 @@
 package org.springframework.data.semantic.repository.support;
 
-import org.openrdf.model.Model;
+import java.util.LinkedList;
+import java.util.List;
+
 import org.openrdf.model.URI;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.semantic.core.SemanticOperationsCRUD;
 import org.springframework.data.semantic.repository.SemanticRepository;
-import org.springframework.data.semantic.support.SemanticTemplateObjectCreator;
-import org.springframework.data.semantic.support.SemanticTemplateStatementsCollector;
 
 /**
  * Implementation of SemanticRepository interface (and consequently {@link PagingAndSortingRepository}).
@@ -21,15 +19,12 @@ import org.springframework.data.semantic.support.SemanticTemplateStatementsColle
  */
 public class SemanticRepositoryImpl<T> implements SemanticRepository<T> {
 	
-	protected SemanticTemplateStatementsCollector statementsCollector;
-	protected SemanticTemplateObjectCreator objectCreator;
 	protected Class<T> clazz;
 	
-	private Logger logger = LoggerFactory.getLogger(SemanticRepositoryImpl.class);
+	protected SemanticOperationsCRUD operations;
 	
-	public SemanticRepositoryImpl(SemanticTemplateStatementsCollector statementsCollector, SemanticTemplateObjectCreator objectCreator, Class<T> clazz) {
-		this.statementsCollector = statementsCollector;
-		this.objectCreator = objectCreator;
+	public SemanticRepositoryImpl(SemanticOperationsCRUD operations, Class<T> clazz) {
+		this.operations = operations;
 		this.clazz = clazz;
 	}
 
@@ -47,24 +42,21 @@ public class SemanticRepositoryImpl<T> implements SemanticRepository<T> {
 
 	@Override
 	public <S extends T> S save(S entity) {
-		// TODO Auto-generated method stub
-		return null;
+		return operations.save(entity);
 	}
 
 	@Override
 	public <S extends T> Iterable<S> save(Iterable<S> entities) {
-		// TODO Auto-generated method stub
-		return null;
+		List<S> result = new LinkedList<S>();
+		for(S entity : entities){
+			result.add(save(entity));
+		}
+		return result;
 	}
 
 	@Override
 	public T findOne(URI id) {
-		try{
-			return createEntity(statementsCollector.getStatementsForResourceClass(id, clazz));
-		} catch (DataAccessException e){
-			logger.debug(e.getMessage(), e);
-		}
-		return null;
+		return operations.find(id, clazz);
 	}
 
 	@Override
@@ -115,8 +107,6 @@ public class SemanticRepositoryImpl<T> implements SemanticRepository<T> {
 		
 	}
 	
-	protected T createEntity(Model statements) {
-        return objectCreator.createObjectFromStatements(statements, clazz, statementsCollector.getMappingPolicy(clazz));
-    }
+	
 
 }

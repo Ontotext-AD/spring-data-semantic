@@ -1,9 +1,12 @@
 package org.springframework.data.semantic.core;
 
+import info.aduna.iteration.Iterations;
+
 import java.io.File;
 import java.io.IOException;
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.openrdf.model.Namespace;
@@ -11,7 +14,9 @@ import org.openrdf.model.Resource;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.Value;
+import org.openrdf.model.impl.ContextStatementImpl;
 import org.openrdf.model.impl.NamespaceImpl;
+import org.openrdf.model.impl.StatementImpl;
 import org.openrdf.query.BindingSet;
 import org.openrdf.query.GraphQuery;
 import org.openrdf.query.GraphQueryResult;
@@ -28,6 +33,9 @@ import org.openrdf.repository.RepositoryResult;
 import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFParseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.repository.query.QueryCreationException;
 import org.springframework.data.semantic.query.TupleSparqlQuery;
 import org.springframework.data.semantic.support.database.SesameConnectionPool;
@@ -41,9 +49,11 @@ import org.springframework.data.semantic.support.database.SesameConnectionPool;
 public class PooledSemanticDatabase implements SemanticDatabase{
 
 	private SesameConnectionPool connectionPool;
+	
+	private Logger logger = LoggerFactory.getLogger(PooledSemanticDatabase.class);
 
 	public PooledSemanticDatabase(Repository repository, int maxConnections){
-		this(new SesameConnectionPool(repository, maxConnections));			
+		this(new SesameConnectionPool(repository, maxConnections, 6000));			
 	}
 
 	public PooledSemanticDatabase(SesameConnectionPool pool){
@@ -54,7 +64,7 @@ public class PooledSemanticDatabase implements SemanticDatabase{
 		RepositoryConnection con = connectionPool.getConnection();
 		try {
 			RepositoryResult<Namespace> repoResult = con.getNamespaces();
-			return repoResult.asList();	
+			return Iterations.asList(repoResult);
 		} finally {
 			con.close();
 		}		
@@ -74,7 +84,7 @@ public class PooledSemanticDatabase implements SemanticDatabase{
 		RepositoryConnection con = connectionPool.getConnection();
 		try {
 			RepositoryResult<Resource> contexts = con.getContextIDs();
-			return contexts.asList();
+			return Iterations.asList(contexts);
 		} finally {
 			con.close();
 		}
@@ -180,138 +190,198 @@ public class PooledSemanticDatabase implements SemanticDatabase{
 
 	//-------------------------------------------------------------------------
 	
-	public List<Statement> getStatementsForSubject(Resource subject)
-			throws RepositoryException {
+	public List<Statement> getStatementsForSubject(Resource subject){
 		return getStatementsForQuadruplePattern(subject, null, null, null);
 	}
 
-	public List<Statement> getStatementsForPredicate(URI predicate)
-			throws RepositoryException {
+	public List<Statement> getStatementsForPredicate(URI predicate){
 		return getStatementsForQuadruplePattern(null, predicate, null, null);
 	}
 
-	public List<Statement> getStatementsForObject(Value object)
-			throws RepositoryException {
+	public List<Statement> getStatementsForObject(Value object){
 		return getStatementsForQuadruplePattern(null, null, object, null);
 	}
 
-	public List<Statement> getStatementsForContext(Resource context)
-			throws RepositoryException {
+	public List<Statement> getStatementsForContext(Resource context){
 		return getStatementsForQuadruplePattern(null, null, null, context);
 	}
 
 	public List<Statement> getStatementsForTriplePattern(Resource subject,
-			URI predicate, Value object) throws RepositoryException {
+			URI predicate, Value object){
 		return getStatementsForQuadruplePattern(subject, predicate, object, null);
 	}
 
 	public List<Statement> getStatementsForQuadruplePattern(Resource subject,
-			URI predicate, Value object, Resource context)
-					throws RepositoryException {
+			URI predicate, Value object, Resource context){
 		RepositoryConnection con = connectionPool.getConnection();
 		try {
 			RepositoryResult<Statement> repoResult = con.getStatements(subject, predicate, object, true, context);
-			return repoResult.asList();
+			return Iterations.asList(repoResult);
+		} catch (RepositoryException e) {
+			logger.error(e.getMessage(), e);
+			throw new SemanticDatabaseAccessException(e);
 		} finally {
-			con.close();
+			try {
+				con.close();
+			} catch (RepositoryException e) {
+				logger.error(e.getMessage(), e);
+				throw new SemanticDatabaseAccessException(e);
+			}
 		}		
 	}
 
-	public void addStatement(Statement statement) throws RepositoryException {
+	public void addStatement(Statement statement) {
 		RepositoryConnection con = connectionPool.getConnection();
 		try {
 			con.add(statement);
 			con.commit();
-		} finally {
-			con.close();
+		} catch (RepositoryException e) {
+			logger.error(e.getMessage(),e);
+			try {
+				con.rollback();
+			} catch (RepositoryException e1) {
+				logger.error(e.getMessage(),e);
+			}
+			throw new SemanticDatabaseAccessException(e);
+		}finally {
+			try {
+				con.close();
+			} catch (RepositoryException e) {
+				logger.error(e.getMessage(),e);
+			}
 		}		
 	}
 
-	public void addStatement(Resource subject, URI predicate, Value object)
-			throws RepositoryException {
-		RepositoryConnection con = connectionPool.getConnection();
-		try {
-			con.add(subject, predicate, object);
-			con.commit();
-		} finally {
-			con.close();
-		}	
+	public void addStatement(Resource subject, URI predicate, Value object) {
+		addStatement(new StatementImpl(subject, predicate, object));
 	}
 
 	public void addStatement(Resource subject, URI predicate, Value object,
-			Resource context) throws RepositoryException {
-		RepositoryConnection con = connectionPool.getConnection();
-		try {
-			con.add(subject, predicate, object, context);
-			con.commit();
-		} finally {
-			con.close();
-		}		
+			Resource context) {
+		addStatement(new ContextStatementImpl(subject, predicate, object, context));	
 	}
 
-	public void addStatements(List<Statement> statements)
-			throws RepositoryException {
+	public void addStatements(Collection<? extends Statement> statements) {
 		RepositoryConnection con = connectionPool.getConnection();
 		try {
 			con.add(statements);
 			con.commit();
+		} catch (RepositoryException e) {
+			logger.error(e.getMessage(),e);
+			try {
+				con.rollback();
+			} catch (RepositoryException e1) {
+				logger.error(e.getMessage(),e);
+			}
+			throw new SemanticDatabaseAccessException(e);
 		} finally {
-			con.close();
+			try {
+				con.close();
+			} catch (RepositoryException e) {
+				logger.error(e.getMessage(),e);
+			}
 		}		
 	}
 
-	public void addStatementsFromFile(File rdfSource)
-			throws RepositoryException, RDFParseException, IOException {
+	public void addStatementsFromFile(File rdfSource) {
 
 		RDFFormat format = RDFFormat.forFileName(rdfSource.getName());
 		if(format == null) {
 			throw new InvalidParameterException("File should be in a valid RDF format; cannot determine one from the file extension.");
 		}
-
-		RepositoryConnection conn = null;
+		RepositoryConnection con = connectionPool.getConnection();
 		try {
-			conn = connectionPool.getConnection();
-			conn.add(rdfSource, null, format, new Resource[]{});
+			con.add(rdfSource, null, format, new Resource[]{});
+		} catch (RDFParseException e) {
+			logger.error(e.getMessage(),e);
+			try {
+				con.rollback();
+			} catch (RepositoryException e1) {
+				logger.error(e.getMessage(),e);
+			}
+			throw new InvalidDataAccessApiUsageException(e.getMessage(), e);
+		} catch (RepositoryException e) {
+			logger.error(e.getMessage(),e);
+			try {
+				con.rollback();
+			} catch (RepositoryException e1) {
+				logger.error(e.getMessage(),e);
+			}
+			throw new SemanticDatabaseAccessException(e);
+		} catch (IOException e) {
+			logger.error(e.getMessage(),e);
+			try {
+				con.rollback();
+			} catch (RepositoryException e1) {
+				logger.error(e.getMessage(),e);
+			}
+			throw new UncategorizedSemanticDataAccessException(e.getMessage(), e);
 		} finally {
-			conn.close();
+			try {
+				con.close();
+			} catch (RepositoryException e) {
+				logger.error(e.getMessage(),e);
+			}
 		}
 	}
 
-	public void removeStatement(Statement statement) throws RepositoryException {
+	public void removeStatement(Statement statement) {
 		RepositoryConnection con = connectionPool.getConnection();
 		try {
 			con.remove(statement);
 			con.commit();
-		} finally {
-			con.close();
+		} catch (RepositoryException e) {
+			logger.error(e.getMessage(),e);
+			try {
+				con.rollback();
+			} catch (RepositoryException e1) {
+				logger.error(e.getMessage(),e);
+			}
+			throw new SemanticDatabaseAccessException(e);
+		}finally {
+			try {
+				con.close();
+			} catch (RepositoryException e) {
+				logger.error(e.getMessage(),e);
+			}
 		}		
 	}
 
-	public void removeStatement(Resource subject, URI predicate, Value object)
-			throws RepositoryException {
-		RepositoryConnection con = connectionPool.getConnection();
-		try {
-			con.remove(subject, predicate, object);
-			con.commit();
-		} finally {
-			con.close();
-		}		
+	public void removeStatement(Resource subject, URI predicate, Value object) {
+		removeStatement(new StatementImpl(subject, predicate, object));	
 	}
 
 	public void removeStatement(Resource subject, URI predicate, Value object,
-			Resource context) throws RepositoryException {
+			Resource context) {
+		removeStatement(new ContextStatementImpl(subject, predicate, object, context));	
+	}
+	
+	@Override
+	public void removeStatement(Collection<? extends Statement> statements) {
 		RepositoryConnection con = connectionPool.getConnection();
 		try {
-			con.add(subject, predicate, object, context);
+			con.remove(statements);
 			con.commit();
+		} catch (RepositoryException e) {
+			logger.error(e.getMessage(),e);
+			try {
+				con.rollback();
+			} catch (RepositoryException e1) {
+				logger.error(e.getMessage(),e);
+			}
+			throw new SemanticDatabaseAccessException(e);
 		} finally {
-			con.close();
-		}		
+			try {
+				con.close();
+			} catch (RepositoryException e) {
+				logger.error(e.getMessage(),e);
+			}
+		}
 	}
 
 	@Override
 	public void shutdown() {
-		this.connectionPool.shutdown();
+		this.connectionPool.shutDown();
 		this.connectionPool.shutdownThread();
 	}
 
@@ -343,5 +413,29 @@ public class PooledSemanticDatabase implements SemanticDatabase{
 			con.close();
 		}
 	}
+
+	@Override
+	public long count() {
+		long size = 0;
+		RepositoryConnection con = connectionPool.getConnection();
+		try {
+			 size = con.size();
+		} catch (RepositoryException e) {
+			logger.error(e.getMessage(),e);
+			throw new SemanticDatabaseAccessException(e);
+		} finally{
+			try {
+				con.close();
+			} catch (RepositoryException e) {
+				logger.error(e.getMessage(),e);
+				throw new SemanticDatabaseAccessException(e);
+			}
+		}
+		return size;
+	}
+
+
+
+	
 
 }

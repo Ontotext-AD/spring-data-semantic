@@ -4,7 +4,7 @@ import org.openrdf.model.URI;
 
 public final class ValueUtils {
 	
-	private ValueUtils(){}
+	public static final String RDF_TYPE_PREDICATE = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type";
 	
 	/**
 	 * Checks whether the given string is a valid {@link URI}.

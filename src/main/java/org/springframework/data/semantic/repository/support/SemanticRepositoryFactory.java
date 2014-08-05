@@ -5,18 +5,15 @@ import java.io.Serializable;
 import org.springframework.data.repository.core.EntityInformation;
 import org.springframework.data.repository.core.RepositoryMetadata;
 import org.springframework.data.repository.core.support.RepositoryFactorySupport;
-import org.springframework.data.semantic.support.SemanticTemplateObjectCreator;
-import org.springframework.data.semantic.support.SemanticTemplateStatementsCollector;
+import org.springframework.data.semantic.core.SemanticOperationsCRUD;
 
 public class SemanticRepositoryFactory extends RepositoryFactorySupport{
 	
-	public SemanticRepositoryFactory(SemanticTemplateStatementsCollector statementCollector, SemanticTemplateObjectCreator objectCreator){
-		this.statementCollector = statementCollector;
-		this.objectCreator = objectCreator;
+	public SemanticRepositoryFactory(SemanticOperationsCRUD operations){
+		this.operations = operations;
 	}
 	
-	private SemanticTemplateStatementsCollector statementCollector;
-	private SemanticTemplateObjectCreator objectCreator;
+	private SemanticOperationsCRUD operations;
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
@@ -29,7 +26,7 @@ public class SemanticRepositoryFactory extends RepositoryFactorySupport{
 	@Override
 	protected Object getTargetRepository(RepositoryMetadata metadata) {
 		Class<?> type = metadata.getDomainType();
-		return new SemanticRepositoryImpl(statementCollector, objectCreator, type);
+		return new SemanticRepositoryImpl(operations, type);
 	}
 
 	@Override

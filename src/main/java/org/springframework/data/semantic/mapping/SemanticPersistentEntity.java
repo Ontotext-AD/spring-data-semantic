@@ -1,8 +1,8 @@
 package org.springframework.data.semantic.mapping;
 
-import org.openrdf.model.Model;
 import org.openrdf.model.URI;
 import org.springframework.data.mapping.PersistentEntity;
+import org.springframework.data.semantic.core.RDFState;
 
 /**
  * 
@@ -25,6 +25,12 @@ public interface SemanticPersistentEntity<T> extends PersistentEntity<T, Semanti
 	 SemanticPersistentProperty getContextProperty();
 	 
 	 /**
+	  * Check if a context property is defined and set.
+	  * @return
+	  */
+	 boolean hasContextProperty();
+	 
+	 /**
 	  * Returns the 
 	  * @return
 	  */
@@ -37,6 +43,6 @@ public interface SemanticPersistentEntity<T> extends PersistentEntity<T, Semanti
 	  * @param entity
 	  * @param statements
 	  */
-	 public void setPersistentState(Object entity, Model statements);
+	 public void setPersistentState(Object entity, RDFState statements);
 
 }

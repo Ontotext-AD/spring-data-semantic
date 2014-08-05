@@ -17,8 +17,8 @@ public class WINE {
 	public static final URI WINE = create("Wine");
 	public static final URI RED_WINE = create("RedWine");
 	public static final URI WHITE_WINE = create("WhiteWine");
-
 	public static final URI LIGHT = create("Light");
+	public static final URI RUBIN = create("Rubin");
 
 	private static final URI create(String localName) {
 		final ValueFactory f = ValueFactoryImpl.getInstance();

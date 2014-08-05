@@ -1,9 +1,8 @@
 package org.springframework.data.semantic.convert;
 
-import org.openrdf.model.Model;
 import org.openrdf.model.Statement;
 import org.openrdf.query.GraphQueryResult;
-import org.springframework.data.semantic.mapping.MappingPolicy;
+import org.springframework.data.semantic.core.RDFState;
 
 
 /**
@@ -17,8 +16,14 @@ public interface SemanticEntityPersister {
 	 * Creates a DAO entity from a given state and a set of {@link Statement}s given as a {@link GraphQueryResult}.
 	 * @param statements
 	 * @param type
-	 * @param mappingPolicy
 	 * @return
 	 */
-	public <T> T createEntityFromState(Model statements, Class<T> type, MappingPolicy mappingPolicy);
+	public <T> T createEntityFromState(RDFState statements, Class<T> type);
+	
+	/**
+	 * Persist the given entity's state.
+	 * @param entity
+	 * @return
+	 */
+	public <T> T persistEntity(T entity);
 }

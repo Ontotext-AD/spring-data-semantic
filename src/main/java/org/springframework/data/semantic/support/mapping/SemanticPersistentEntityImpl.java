@@ -1,9 +1,9 @@
 package org.springframework.data.semantic.support.mapping;
 
-import org.openrdf.model.Model;
 import org.openrdf.model.URI;
 import org.springframework.data.mapping.model.BasicPersistentEntity;
 import org.springframework.data.semantic.annotation.SemanticEntity;
+import org.springframework.data.semantic.core.RDFState;
 import org.springframework.data.semantic.mapping.MappingPolicy;
 import org.springframework.data.semantic.mapping.SemanticPersistentEntity;
 import org.springframework.data.semantic.mapping.SemanticPersistentProperty;
@@ -67,15 +67,20 @@ public class SemanticPersistentEntityImpl<T> extends BasicPersistentEntity<T, Se
 	}
 
 	@Override
-	public void setPersistentState(Object entity, Model statements) {
+	public void setPersistentState(Object entity, RDFState statements) {
 		SemanticPersistentProperty idProperty = getIdProperty();
-		URI subjectId = (URI) statements.subjects().iterator().next();
+		URI subjectId = (URI) statements.getCurrentStatements().subjects().iterator().next();
 		idProperty.setValue(entity, subjectId);
 	}
 
 	@Override
 	public URI getResourceId(Object entity) {
 		return (URI) getIdProperty().getValue(entity, null);
+	}
+
+	@Override
+	public boolean hasContextProperty() {
+		return contextProperty != null;
 	}
 
 }

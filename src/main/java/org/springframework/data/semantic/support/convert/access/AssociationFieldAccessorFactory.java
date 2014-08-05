@@ -1,16 +1,18 @@
 package org.springframework.data.semantic.support.convert.access;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.openrdf.model.Model;
+import org.openrdf.model.Resource;
 import org.openrdf.model.URI;
 import org.springframework.data.semantic.convert.fieldaccess.FieldAccessor;
 import org.springframework.data.semantic.convert.fieldaccess.FieldAccessorFactory;
+import org.springframework.data.semantic.core.SemanticOperationsCRUD;
 import org.springframework.data.semantic.mapping.MappingPolicy;
 import org.springframework.data.semantic.mapping.SemanticPersistentProperty;
-import org.springframework.data.semantic.support.SemanticTemplateObjectCreator;
 import org.springframework.data.semantic.support.SemanticTemplateStatementsCollector;
-import org.springframework.data.semantic.support.mapping.SemanticMappingContext;
 
 /**
  * Handles the creation of {@link AssociationFieldAccessor}
@@ -20,12 +22,11 @@ import org.springframework.data.semantic.support.mapping.SemanticMappingContext;
 public class AssociationFieldAccessorFactory implements FieldAccessorFactory {
 	
 	private SemanticTemplateStatementsCollector statementsCollector;
-	private SemanticTemplateObjectCreator objectCreator;
-	private SemanticMappingContext mappingContext;
+	private SemanticOperationsCRUD operations;
 	
-	public AssociationFieldAccessorFactory(SemanticTemplateStatementsCollector statementsCollector, SemanticTemplateObjectCreator objectCreator) {
+	public AssociationFieldAccessorFactory(SemanticTemplateStatementsCollector statementsCollector, SemanticOperationsCRUD operations) {
 		this.statementsCollector = statementsCollector;
-		this.objectCreator = objectCreator;
+		this.operations = operations;
 	}
 	
 	@Override
@@ -35,7 +36,7 @@ public class AssociationFieldAccessorFactory implements FieldAccessorFactory {
 
 	@Override
 	public FieldAccessor forField(SemanticPersistentProperty property) {
-		return new AssociationFieldAccessor(statementsCollector, objectCreator, property);
+		return new AssociationFieldAccessor(statementsCollector, operations, property);
 	}
 	
 	/**
@@ -47,17 +48,17 @@ public class AssociationFieldAccessorFactory implements FieldAccessorFactory {
 	public static class AssociationFieldAccessor implements FieldAccessor {
 		
 		private SemanticPersistentProperty property;
-		private List<URI> predicates;
+		//private List<URI> predicates;
 		private Class<?> fieldType;
 		private SemanticTemplateStatementsCollector statementsCollector;
-		private SemanticTemplateObjectCreator objectCreator;
+		private SemanticOperationsCRUD operations;
 		
 		public AssociationFieldAccessor(SemanticTemplateStatementsCollector statementsCollector, 
-				SemanticTemplateObjectCreator objectCreator, SemanticPersistentProperty property) {
+				SemanticOperationsCRUD operations, SemanticPersistentProperty property) {
 			this.statementsCollector = statementsCollector;
-			this.objectCreator = objectCreator;
+			this.operations = operations;
 			this.property = property;
-			this.predicates = property.getPredicate();
+			//this.predicates = property.getPredicate();
 			this.fieldType = property.getType();
 		}
 		
@@ -75,14 +76,29 @@ public class AssociationFieldAccessorFactory implements FieldAccessorFactory {
 
 		@Override
 		public Object getValue(Object entity, MappingPolicy mappingPolicy) {
-			//TODO multiple values
 			Model stIterator = statementsCollector.getStatementsForResourceProperty(entity, property);
-			if(!stIterator.isEmpty()) {
-				
-				URI resource = (URI) stIterator.objects().iterator().next();
-				Model iterator = statementsCollector.getStatementsForResourceClass(resource, fieldType);
-				
-				return objectCreator.createObjectFromStatements(iterator, fieldType, mappingPolicy);
+			if(this.property.isCollectionLike()){
+				Set<Resource> subjects = stIterator.subjects();
+				List<Object> result = new ArrayList<Object>(subjects.size());
+				for(Resource subject : subjects){
+					Model iterator = statementsCollector.getStatementsForResourceClass((URI) subject, fieldType);
+					result.add(operations.createEntity(iterator, fieldType));
+				}
+				if(this.property.isArray()){
+					return result.toArray();
+				}
+				else{
+					return result;
+				}
+			}
+			else{
+				if(!stIterator.isEmpty()) {
+					
+					URI resource = (URI) stIterator.objects().iterator().next();
+					Model iterator = statementsCollector.getStatementsForResourceClass(resource, fieldType);
+					
+					return operations.createEntity(iterator, fieldType);
+				}
 			}
 			return null;
 		}
