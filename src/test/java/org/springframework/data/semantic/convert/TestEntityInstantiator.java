@@ -15,7 +15,7 @@ import org.openrdf.model.impl.StatementImpl;
 import org.openrdf.model.impl.URIImpl;
 import org.springframework.data.semantic.core.RDFState;
 import org.springframework.data.semantic.mapping.SemanticPersistentEntity;
-import org.springframework.data.semantic.model.TestEntity;
+import org.springframework.data.semantic.model.ModelEntity;
 import org.springframework.data.semantic.support.convert.SemanticEntityInstantiatorImpl;
 import org.springframework.data.semantic.support.mapping.SemanticMappingContext;
 import org.springframework.data.util.ClassTypeInformation;
@@ -28,7 +28,7 @@ public class TestEntityInstantiator {
 	private Literal name = new LiteralImpl("name");
 	private SemanticEntityInstantiator instantiator = new SemanticEntityInstantiatorImpl();
 	private SemanticMappingContext mappingContext;
-	private SemanticPersistentEntity<TestEntity> testEntityType;
+	private SemanticPersistentEntity<ModelEntity> testEntityType;
 	
 	@SuppressWarnings("unchecked")
 	@Before
@@ -37,12 +37,12 @@ public class TestEntityInstantiator {
 		state.addStatement(new StatementImpl(id, namePredicate, name));
 		
 		mappingContext = new SemanticMappingContext(Arrays.asList(new NamespaceImpl("skos", "http://www.w3.org/2004/02/skos/core#")), new NamespaceImpl("", "urn:default:"));
-		testEntityType = (SemanticPersistentEntity<TestEntity>) mappingContext.getPersistentEntity(ClassTypeInformation.from(TestEntity.class));
+		testEntityType = (SemanticPersistentEntity<ModelEntity>) mappingContext.getPersistentEntity(ClassTypeInformation.from(ModelEntity.class));
 	}
 	
 	@Test
 	public void testInstantiateDefaultCtor(){
-		TestEntity entity = instantiator.createInstanceFromState(testEntityType, state);
+		ModelEntity entity = instantiator.createInstanceFromState(testEntityType, state);
 		assertNotNull(entity);
 		assertNotNull(entity.getUri());
 		assertEquals(id, entity.getUri());

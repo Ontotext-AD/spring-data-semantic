@@ -3,7 +3,6 @@ package org.springframework.data.semantic.testutils;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import java.util.Properties;
 
 import org.openrdf.query.BindingSet;
 import org.openrdf.query.MalformedQueryException;
@@ -31,40 +30,31 @@ public class Utils {
 			return;
 		}
 		
-		//get the sample data
-		File sampleDataFile = getSampleDataFile();
-		if(sampleDataFile == null) return;		
-		try {							
-			//populate with sample data			
-			sdb.addStatementsFromFile(sampleDataFile);
-		} catch (IOException e) {
-			log.error("Error loading the data file '"+sampleDataFile.getName()+"'", e);
-		} catch(RepositoryException e) {
-			log.error("Error accessing the repository", e);
-		} catch (RDFParseException e) {
-			e.printStackTrace();
+		String[] filesToLoad = new String[]{"wine.ttl", "model-data.n3"};
+		for(String fileName : filesToLoad){
+			File sampleDataFile = getSampleDataFile(fileName);
+			if(sampleDataFile == null) return;		
+			try {							
+				//populate with sample data			
+				sdb.addStatementsFromFile(sampleDataFile);
+			} catch (IOException e) {
+				log.error("Error loading the data file '"+sampleDataFile.getName()+"'", e);
+			} catch(RepositoryException e) {
+				log.error("Error accessing the repository", e);
+			} catch (RDFParseException e) {
+				e.printStackTrace();
+			}
 		}
+		
 	}
 
 	//retrieves the sample RDF data file as configured in a properties file
-	private static File getSampleDataFile() {
-		
-		//get the properties
-		ClassPathResource propsResource = new ClassPathResource("test-repository.properties"); 		
-		Properties props = new Properties();
-		try {				
-			props.load(propsResource.getInputStream());
-		}catch (IOException e) {
-			log.error("Error loading the props file 'test-repository.properties'", e);
-		}
-		
-		//get the sample data file
-		String sampleDataFileName = props.getProperty("sampleDataFile");
+	private static File getSampleDataFile(String name) {
 		try {
-			File sampleDataFile = new ClassPathResource(sampleDataFileName).getFile();
+			File sampleDataFile = new ClassPathResource(name).getFile();
 			return sampleDataFile;
 		} catch (IOException e) {
-			log.error("Error retrieving the sample data file '"+sampleDataFileName+"'", e);
+			log.error("Error retrieving the sample data file '"+name+"'", e);
 		}
 		return null;
 	}

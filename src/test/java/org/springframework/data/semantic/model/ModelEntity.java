@@ -14,7 +14,7 @@ import org.springframework.data.semantic.annotation.Language.Languages;
 import org.springframework.data.semantic.support.Direction;
 
 @SemanticEntity()
-public class TestEntity {
+public class ModelEntity {
 	
 	@ResourceId
 	private URI uri;
@@ -29,7 +29,7 @@ public class TestEntity {
 	
 	@Fetch
 	@RelatedTo(dicrection=Direction.BOTH)
-	private List<TestEntity> related;
+	private List<ModelEntity> related;
 
 	/**
 	 * @return the uri
@@ -62,14 +62,14 @@ public class TestEntity {
 	/**
 	 * @return the related
 	 */
-	public List<TestEntity> getRelated() {
+	public List<ModelEntity> getRelated() {
 		return related;
 	}
 
 	/**
 	 * @param related the related to set
 	 */
-	public void setRelated(List<TestEntity> related) {
+	public void setRelated(List<ModelEntity> related) {
 		this.related = related;
 	}
 

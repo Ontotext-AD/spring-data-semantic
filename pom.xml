@@ -103,6 +103,11 @@
 			<artifactId>spring-context</artifactId>
 			<version>3.2.9.RELEASE</version>
 		</dependency>
+		<dependency>
+			<groupId>org.openrdf.sesame</groupId>
+			<artifactId>sesame-rio-n3</artifactId>
+			<version>${sesame.version}</version>
+		</dependency>
 	</dependencies>
 	<properties>
 		<sesame.version>2.7.12</sesame.version>

@@ -11,7 +11,7 @@ import org.junit.Test;
 import org.openrdf.model.URI;
 import org.openrdf.model.impl.NamespaceImpl;
 import org.openrdf.model.impl.URIImpl;
-import org.springframework.data.semantic.model.TestEntity;
+import org.springframework.data.semantic.model.ModelEntity;
 import org.springframework.data.semantic.support.mapping.SemanticMappingContext;
 import org.springframework.data.util.ClassTypeInformation;
 
@@ -23,7 +23,7 @@ public class SemanticPersistentEntityTest {
 	@Before
 	public void setup(){
 		mappingContext = new SemanticMappingContext(Arrays.asList(new NamespaceImpl("skos", "http://www.w3.org/2004/02/skos/core#")), new NamespaceImpl("", "urn:default:"));
-		testEntityType = mappingContext.getPersistentEntity(ClassTypeInformation.from(TestEntity.class));
+		testEntityType = mappingContext.getPersistentEntity(ClassTypeInformation.from(ModelEntity.class));
 	}
 	
 	@Test

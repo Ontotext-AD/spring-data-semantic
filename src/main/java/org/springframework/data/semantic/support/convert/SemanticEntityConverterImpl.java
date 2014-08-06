@@ -1,5 +1,7 @@
 package org.springframework.data.semantic.support.convert;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 import org.openrdf.model.URI;
@@ -103,9 +105,19 @@ public class SemanticEntityConverterImpl implements SemanticEntityConverter {
                 	@SuppressWarnings("unchecked")
 					SemanticPersistentEntity<Object> entity = (SemanticPersistentEntity<Object>) mappingContext.getPersistentEntity(property.getTypeInformation().getActualType());
                 	Set<Value> associatedEntityIds = source.getCurrentStatements().filter(null, new URIImpl(property.getAliasPredicate()), null).objects();
-                	for(Value associatedEntityId : associatedEntityIds){
-                		if(associatedEntityId instanceof URI){
-                			Object associatedEntity = entityInstantiator.createInstance(entity, (URI) associatedEntityId);
+                	if (property.getTypeInformation().isCollectionLike()) {
+                		List<Object> associationValuesList = new LinkedList<Object>();
+                		for(Value associatedEntityId : associatedEntityIds){
+                    		if(associatedEntityId instanceof URI){
+                    			Object associatedEntity = entityInstantiator.createInstance(entity, (URI) associatedEntityId);
+                    			associationValuesList.add(associatedEntity);
+                    		}
+                    	}
+                		sourceStateTransmitter.setProperty(wrapper, property, associationValuesList);
+                	}
+                	else{
+                		if(!associatedEntityIds.isEmpty()){
+                			Object associatedEntity = entityInstantiator.createInstance(entity, (URI) associatedEntityIds.iterator().next());
                 			sourceStateTransmitter.setProperty(wrapper, property, associatedEntity);
                 		}
                 	}

@@ -13,6 +13,7 @@ import org.junit.runner.RunWith;
 import org.openrdf.model.Statement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.semantic.core.SemanticDatabase;
+import org.springframework.data.semantic.model.vocabulary.MODEL_ENTITY;
 import org.springframework.data.semantic.model.vocabulary.WINE;
 import org.springframework.data.semantic.testutils.Utils;
 import org.springframework.test.context.ContextConfiguration;
@@ -23,7 +24,10 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 public class TestSemanticRepository {
 
 	@Autowired
-	private WineBodyRepository repository;
+	private WineBodyRepository wineRepository;
+	
+	@Autowired
+	private ModelEntityRepository modelEntityRepository;
 
 	@Autowired
 	private SemanticDatabase sdb;
@@ -35,7 +39,7 @@ public class TestSemanticRepository {
 	
 	@Test
 	public void testFindOne() {
-		WineBody entity = repository.findOne(WINE.LIGHT);
+		WineBody entity = wineRepository.findOne(WINE.LIGHT);
 		assertNotNull(entity);
 		assertEquals(WINE.LIGHT, entity.getUri());
 		assertNotNull(entity.getLabel());
@@ -47,13 +51,21 @@ public class TestSemanticRepository {
 		WineBody newEntity = new WineBody();
 		newEntity.setUri(WINE.RUBIN);
 		newEntity.setLabel("Rubin");
-		repository.save(newEntity);
+		wineRepository.save(newEntity);
 		assertTrue(count < sdb.count());
 		List<Statement> statementsForResource = sdb.getStatementsForSubject(WINE.RUBIN);
 		assertFalse(statementsForResource.isEmpty());
-		System.out.println(statementsForResource);
-		WineBody rubin = repository.findOne(WINE.RUBIN);
+		//System.out.println(statementsForResource);
+		WineBody rubin = wineRepository.findOne(WINE.RUBIN);
 		assertNotNull(rubin);
+	}
+	
+	@Test
+	public void testCollectionOfAssociations(){
+		ModelEntity modelEntity = modelEntityRepository.findOne(MODEL_ENTITY.ENTITY_ONE);
+		assertNotNull(modelEntity);
+		assertNotNull(modelEntity.getRelated());
+		assertEquals(2, modelEntity.getRelated().size());
 	}
 
 }
