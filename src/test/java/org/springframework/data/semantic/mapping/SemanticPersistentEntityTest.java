@@ -60,7 +60,7 @@ public class SemanticPersistentEntityTest {
 	@Test
 	public void TestRdfType(){
 		URI rdfType = testEntityType.getRDFType();
-		assertEquals(new URIImpl("urn:default:TestEntity"), rdfType);
+		assertEquals(new URIImpl("urn:default:ModelEntity"), rdfType);
 	}
 
 }

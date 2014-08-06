@@ -76,7 +76,7 @@
 			<groupId>org.openrdf.sesame</groupId>
 			<artifactId>sesame-rio-turtle</artifactId>
 			<version>${sesame.version}</version>
-			<scope>compile</scope>
+			<scope>test</scope>
 		</dependency>
 
 		<!-- Test -->
@@ -107,6 +107,7 @@
 			<groupId>org.openrdf.sesame</groupId>
 			<artifactId>sesame-rio-n3</artifactId>
 			<version>${sesame.version}</version>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 	<properties>
