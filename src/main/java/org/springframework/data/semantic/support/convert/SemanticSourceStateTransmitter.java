@@ -1,7 +1,5 @@
 package org.springframework.data.semantic.support.convert;
 
-import org.springframework.data.mapping.Association;
-import org.springframework.data.mapping.AssociationHandler;
 import org.springframework.data.mapping.PropertyHandler;
 import org.springframework.data.mapping.model.BeanWrapper;
 import org.springframework.data.mapping.model.MappingException;
@@ -36,7 +34,7 @@ public class SemanticSourceStateTransmitter {
 	 * @param mappingPolicy
 	 */
 	public <R> void copyPropertiesFrom(
-			final BeanWrapper<SemanticPersistentEntity<R>, R> wrapper,
+			final BeanWrapper<R> wrapper,
 			RDFState source,
 			SemanticPersistentEntity<R> persistentEntity,
 			final MappingPolicy mappingPolicy) {
@@ -56,21 +54,21 @@ public class SemanticSourceStateTransmitter {
 		});
 	}
 
-	private <R> Object copyEntityStatePropertyValue(SemanticPersistentProperty property, EntityState<R, RDFState> state, 	BeanWrapper<SemanticPersistentEntity<R>, R> wrapper,
+	private <R> Object copyEntityStatePropertyValue(SemanticPersistentProperty property, EntityState<R, RDFState> state, 	BeanWrapper<R> wrapper,
 			final MappingPolicy mappingPolicy) {
 		final Object value = state.getValue(property, mappingPolicy);
 		setProperty(wrapper, property, value);
 		return value;
 	}
 	
-	public void copyPropertiesTo(BeanWrapper<SemanticPersistentEntity<Object>, Object> wrapper, RDFState model){
+	public void copyPropertiesTo(BeanWrapper<Object> wrapper, RDFState model){
 		final Object entity = wrapper.getBean();
 		final EntityState<Object, RDFState> state = this.entityStateFactory.getEntityState(entity, false);
 		state.setPersistentState(model);
 		state.persist();
 	}
 
-	public <R> void setProperty(BeanWrapper<SemanticPersistentEntity<R>, R> wrapper, SemanticPersistentProperty property, Object value) {
+	public <R> void setProperty(BeanWrapper<R> wrapper, SemanticPersistentProperty property, Object value) {
 		try {
 			wrapper.setProperty(property, value);
 		} catch (Exception e) {

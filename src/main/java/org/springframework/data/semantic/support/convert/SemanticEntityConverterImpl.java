@@ -66,7 +66,7 @@ public class SemanticEntityConverterImpl implements SemanticEntityConverter {
 		final SemanticPersistentEntityImpl<?> persistentEntity = mappingContext.getPersistentEntity(source.getClass());
 		final URI resourceId = persistentEntity.getResourceId(source);
 		
-		final BeanWrapper<SemanticPersistentEntity<Object>, Object> wrapper = BeanWrapper.<SemanticPersistentEntity<Object>, Object>create(source, conversionService);
+		final BeanWrapper<Object> wrapper = BeanWrapper.<Object>create(source, conversionService);
         if (sink == null) {
         	sink = toStatementsConverter.convertEntityToStatements(resourceId, persistentEntity, source);
         }
@@ -79,8 +79,8 @@ public class SemanticEntityConverterImpl implements SemanticEntityConverter {
 			MappingPolicy mappingPolicy,
 			SemanticPersistentEntity<R> persistentEntity) {
 		if (mappingPolicy.eagerLoad()) {
-            final BeanWrapper<SemanticPersistentEntity<R>, R> wrapper = 
-            		BeanWrapper.<SemanticPersistentEntity<R>, R>create(entity, conversionService);
+            final BeanWrapper<R> wrapper = 
+            		BeanWrapper.<R>create(entity, conversionService);
             
             sourceStateTransmitter.copyPropertiesFrom(wrapper, source, persistentEntity, mappingPolicy);
             
@@ -89,7 +89,7 @@ public class SemanticEntityConverterImpl implements SemanticEntityConverter {
         return entity;
 	}
 	
-	private <R> void cascadeFetch(SemanticPersistentEntity<R> persistentEntity, final BeanWrapper<SemanticPersistentEntity<R>, R> wrapper, final RDFState source, final MappingPolicy policy) {
+	private <R> void cascadeFetch(SemanticPersistentEntity<R> persistentEntity, final BeanWrapper<R> wrapper, final RDFState source, final MappingPolicy policy) {
 		persistentEntity.doWithAssociations(new AssociationHandler<SemanticPersistentProperty>() {
             @Override
             public void doWithAssociation(Association<SemanticPersistentProperty> association) {

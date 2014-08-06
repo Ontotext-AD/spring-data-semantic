@@ -60,8 +60,7 @@ public class SemanticPersistentPropertyImpl extends
 		this.mappingContext = mappingContext;
 	}
 
-	private Map<Class<? extends Annotation>, ? extends Annotation> extractAnnotations(
-			Field field) {
+	private Map<Class<? extends Annotation>, ? extends Annotation> extractAnnotations(Field field) {
 		Map<Class<? extends Annotation>, Annotation> extracted = new HashMap<Class<? extends Annotation>, Annotation>();
 		for (Annotation annotation : field.getAnnotations()) {
 			extracted.put(annotation.annotationType(), annotation);
@@ -192,5 +191,28 @@ public class SemanticPersistentPropertyImpl extends
 	@Override
 	public boolean shallBePersisted() {
 		return super.shallBePersisted() && (getPredicate().size() == 1);
+	}
+
+	@Override
+	public boolean isVersionProperty() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public <A extends Annotation> A findAnnotation(Class<A> annotationType) {
+		return (A) annotations.get(annotationType);
+	}
+
+	@Override
+	public <A extends Annotation> A findPropertyOrOwnerAnnotation(Class<A> annotationType) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public boolean isAnnotationPresent(Class<? extends Annotation> annotationType) {
+		return annotations.containsKey(annotationType);
 	}
 }
