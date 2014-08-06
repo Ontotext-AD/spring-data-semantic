@@ -45,7 +45,7 @@ public class SemanticSourceStateTransmitter {
 			@Override
 			public void doWithPersistentProperty(SemanticPersistentProperty property) {
 				//Id property is populated on entity instantiation; nothing to do with it here
-				if(property.isIdProperty()) {
+				if(property.isIdProperty() || property.isContext()) {
 					return;
 				}
 

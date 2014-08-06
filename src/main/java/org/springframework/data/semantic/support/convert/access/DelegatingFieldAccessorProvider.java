@@ -6,8 +6,8 @@ import java.util.Map;
 import org.springframework.data.mapping.Association;
 import org.springframework.data.mapping.AssociationHandler;
 import org.springframework.data.mapping.PropertyHandler;
-import org.springframework.data.semantic.convert.fieldaccess.FieldAccessor;
-import org.springframework.data.semantic.convert.fieldaccess.FieldAccessorProvider;
+import org.springframework.data.semantic.convert.access.FieldAccessor;
+import org.springframework.data.semantic.convert.access.FieldAccessorProvider;
 import org.springframework.data.semantic.mapping.SemanticPersistentEntity;
 import org.springframework.data.semantic.mapping.SemanticPersistentProperty;
 import org.springframework.data.util.TypeInformation;
@@ -16,10 +16,10 @@ public class DelegatingFieldAccessorProvider implements FieldAccessorProvider {
 
 	private final DelegatingFieldAccessorFactory delegatingFactory;
 	
-	private final Map<TypeInformation<?>, Map<SemanticPersistentProperty, FieldAccessor>> cache = new HashMap<TypeInformation<?>, Map<SemanticPersistentProperty,FieldAccessor>>();
+	private final Map<TypeInformation<?>, Map<SemanticPersistentProperty, FieldAccessor>> fieldAccessorCache = new HashMap<TypeInformation<?>, Map<SemanticPersistentProperty,FieldAccessor>>();
 	
 	public DelegatingFieldAccessorProvider(DelegatingFieldAccessorFactory factory){
-		this.delegatingFactory = factory; 
+		this.delegatingFactory = factory;
 	}
 	
 	@Override
@@ -27,8 +27,8 @@ public class DelegatingFieldAccessorProvider implements FieldAccessorProvider {
 			SemanticPersistentEntity<?> entity) {
 		
 		final TypeInformation<?> typeInformation = entity.getTypeInformation();
-		if(cache.containsKey(typeInformation)){
-			return cache.get(typeInformation);
+		if(fieldAccessorCache.containsKey(typeInformation)){
+			return fieldAccessorCache.get(typeInformation);
 		}
 		else{
 			final Map<SemanticPersistentProperty, FieldAccessor> fieldAccessors =  new HashMap<SemanticPersistentProperty, FieldAccessor>();
@@ -52,7 +52,7 @@ public class DelegatingFieldAccessorProvider implements FieldAccessorProvider {
 	                }
 	            }
 	        });
-			cache.put(typeInformation, fieldAccessors);
+			fieldAccessorCache.put(typeInformation, fieldAccessors);
 			return fieldAccessors;
 		}
 	}

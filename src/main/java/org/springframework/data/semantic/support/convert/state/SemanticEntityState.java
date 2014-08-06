@@ -9,8 +9,10 @@ import org.openrdf.model.Model;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.impl.URIImpl;
-import org.springframework.data.semantic.convert.fieldaccess.FieldAccessor;
-import org.springframework.data.semantic.convert.fieldaccess.FieldAccessorProvider;
+import org.springframework.data.semantic.convert.access.FieldAccessor;
+import org.springframework.data.semantic.convert.access.FieldAccessorProvider;
+import org.springframework.data.semantic.convert.access.listener.FieldAccessListener;
+import org.springframework.data.semantic.convert.access.listener.FieldAccessListenerProvider;
 import org.springframework.data.semantic.convert.state.EntityState;
 import org.springframework.data.semantic.core.RDFState;
 import org.springframework.data.semantic.core.SemanticDatabase;
@@ -19,6 +21,8 @@ import org.springframework.data.semantic.mapping.SemanticPersistentEntity;
 import org.springframework.data.semantic.mapping.SemanticPersistentProperty;
 import org.springframework.data.semantic.support.convert.access.DelegatingFieldAccessorFactory;
 import org.springframework.data.semantic.support.convert.access.DelegatingFieldAccessorProvider;
+import org.springframework.data.semantic.support.convert.access.listener.DelegatingFieldAccessListenerFactory;
+import org.springframework.data.semantic.support.convert.access.listener.DelegatingFieldAccessListenerProvider;
 
 public class SemanticEntityState<T> implements
 		EntityState<T, RDFState> {
@@ -26,10 +30,12 @@ public class SemanticEntityState<T> implements
 	private final T entity;
 	//private final Class<? extends T> type;
 	private final Map<SemanticPersistentProperty, FieldAccessor> fieldAccessors;
+	private final Map<SemanticPersistentProperty, List<FieldAccessListener>> fieldAccessorListeners;
 	private RDFState state;
 	private final SemanticDatabase semanticDb;
 	//private final static Logger log = LoggerFactory.getLogger(SemanticEntityState.class);
 	private final FieldAccessorProvider fieldAccessorProvider;
+	private final FieldAccessListenerProvider fieldAccessListenerProvider;
 	private final SemanticPersistentEntity<T> persistentEntity;
 	
 
@@ -39,6 +45,7 @@ public class SemanticEntityState<T> implements
 			final T entity,
 			final Class<? extends T> type,
 			final DelegatingFieldAccessorFactory nodeDelegatingFieldAccessorFactory,
+			final DelegatingFieldAccessListenerFactory delegatingFieldAccessListenerFactory,
 			SemanticPersistentEntity<T> persistentEntity) {
 		this.entity = entity;
 		//this.type = type;
@@ -46,8 +53,9 @@ public class SemanticEntityState<T> implements
 		this.semanticDb = semanticDatabase;
 		this.fieldAccessorProvider = new DelegatingFieldAccessorProvider(
 				nodeDelegatingFieldAccessorFactory);
-		this.fieldAccessors = fieldAccessorProvider
-				.provideFieldAccessors(persistentEntity);
+		this.fieldAccessListenerProvider = new DelegatingFieldAccessListenerProvider(delegatingFieldAccessListenerFactory);
+		this.fieldAccessors = fieldAccessorProvider.provideFieldAccessors(persistentEntity);
+		this.fieldAccessorListeners = fieldAccessListenerProvider.provideFieldAccessListeners(persistentEntity);
 		this.persistentEntity = persistentEntity;
 	}
 
@@ -112,15 +120,24 @@ public class SemanticEntityState<T> implements
 	@Override
 	public Object setValue(Field field, Object newVal,
 			MappingPolicy mappingPolicy) {
-		// TODO Auto-generated method stub
-		return null;
+		return setValue(persistentEntity.getPersistentProperty(field.getName()), newVal, mappingPolicy);
 	}
 
 	@Override
 	public Object setValue(SemanticPersistentProperty property, Object newVal,
 			MappingPolicy mappingPolicy) {
-		// TODO Auto-generated method stub
-		return null;
+		final FieldAccessor accessor = fieldAccessors.get(property);
+		final Object oldValue = getValue(property, mappingPolicy);
+        final Object result=accessor!=null ? accessor.setValue(entity, newVal, mappingPolicy) : newVal;
+        notifyListeners(property, oldValue, result);
+        return result;
+	}
+	
+	 private void notifyListeners(final SemanticPersistentProperty field, final Object oldValue, final Object newValue) {
+        if (!fieldAccessorListeners.containsKey(field) || fieldAccessorListeners.get(field) == null) return;
+        for (final FieldAccessListener listener : fieldAccessorListeners.get(field)) {
+            listener.valueChanged(entity, null, newValue); // todo oldValue
+        }
 	}
 
 	@Override

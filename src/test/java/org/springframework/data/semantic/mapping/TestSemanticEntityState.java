@@ -12,6 +12,7 @@ import org.springframework.data.semantic.core.RDFState;
 import org.springframework.data.semantic.core.SemanticDatabase;
 import org.springframework.data.semantic.support.ValueUtils;
 import org.springframework.data.semantic.support.convert.access.MockFieldAccessorFactory;
+import org.springframework.data.semantic.support.convert.access.listener.MockFieldAccessListenerFactory;
 import org.springframework.data.semantic.support.convert.state.SemanticEntityState;
 import org.springframework.data.semantic.support.mapping.SemanticPersistentEntityImpl;
 import org.springframework.data.util.ClassTypeInformation;
@@ -29,7 +30,7 @@ public class TestSemanticEntityState {
 	
 	@Before
 	public void setUp(){
-		entityState = new SemanticEntityState<Object>(null, sdb, new Object(), Object.class, new MockFieldAccessorFactory(), new SemanticPersistentEntityImpl<Object>(ClassTypeInformation.from(Object.class)));
+		entityState = new SemanticEntityState<Object>(null, sdb, new Object(), Object.class, new MockFieldAccessorFactory(), new MockFieldAccessListenerFactory(), new SemanticPersistentEntityImpl<Object>(ClassTypeInformation.from(Object.class)));
 	}
 	
 	@Test

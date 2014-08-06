@@ -55,7 +55,7 @@ public class RDFState {
 	
 	public void deleteStatement(Statement st){
 		this.currentStatements.remove(st);
-		this.deleteStatements.remove(st);
+		this.deleteStatements.add(st);
 	}
 	
 	public boolean isEmpty(){

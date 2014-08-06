@@ -1,6 +1,6 @@
 package org.springframework.data.semantic.support.convert.access;
 
-import org.springframework.data.semantic.convert.fieldaccess.FieldAccessor;
+import org.springframework.data.semantic.convert.access.FieldAccessor;
 import org.springframework.data.semantic.mapping.SemanticPersistentProperty;
 
 public class MockFieldAccessorFactory extends DelegatingFieldAccessorFactory {

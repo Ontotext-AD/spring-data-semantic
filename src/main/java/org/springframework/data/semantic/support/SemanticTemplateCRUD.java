@@ -22,6 +22,7 @@ import org.springframework.data.semantic.support.convert.SemanticEntityInstantia
 import org.springframework.data.semantic.support.convert.SemanticEntityPersisterImpl;
 import org.springframework.data.semantic.support.convert.SemanticSourceStateTransmitter;
 import org.springframework.data.semantic.support.convert.access.DelegatingFieldAccessorFactory;
+import org.springframework.data.semantic.support.convert.access.listener.DelegatingFieldAccessListenerFactory;
 import org.springframework.data.semantic.support.convert.state.SemanticEntityStateFactory;
 import org.springframework.data.semantic.support.mapping.SemanticMappingContext;
 
@@ -39,6 +40,7 @@ public class SemanticTemplateCRUD implements SemanticOperationsCRUD, Initializin
 	
 	private SemanticEntityInstantiator entityInstantiator;
 	private DelegatingFieldAccessorFactory delegatingFieldAxsorFactory;
+	private DelegatingFieldAccessListenerFactory delegatingFieldAccessListenerFactory;
 	private SemanticEntityStateFactory sesFactory;
 	private SemanticSourceStateTransmitter sourceStateTransmitter;
 	private SemanticEntityConverter entityConverter;
@@ -53,7 +55,8 @@ public class SemanticTemplateCRUD implements SemanticOperationsCRUD, Initializin
 			this.entityInstantiator = new SemanticEntityInstantiatorImpl();
 			this.statementsCollector = new SemanticTemplateStatementsCollector(semanticDB, conversionService, this.mappingContext);
 			this.delegatingFieldAxsorFactory = new DelegatingFieldAccessorFactory(this.statementsCollector, this);
-			this.sesFactory = new SemanticEntityStateFactory(this.mappingContext, this.delegatingFieldAxsorFactory, semanticDB);
+			this.delegatingFieldAccessListenerFactory = new DelegatingFieldAccessListenerFactory(this.statementsCollector, this);
+			this.sesFactory = new SemanticEntityStateFactory(this.mappingContext, this.delegatingFieldAxsorFactory, this.delegatingFieldAccessListenerFactory, semanticDB);
 			this.sourceStateTransmitter = new SemanticSourceStateTransmitter(this.sesFactory);
 			this.entityConverter = new SemanticEntityConverterImpl(this.mappingContext, conversionService, this.entityInstantiator, this.sourceStateTransmitter);
 			this.entityPersister = new SemanticEntityPersisterImpl(this.entityConverter);

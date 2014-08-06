@@ -66,8 +66,11 @@ public class EntityToStatementsConverter {
 		}
 		
 		private void addToStatements(SemanticPersistentProperty persistentProperty, Object value){
-			if(persistentProperty.isIdProperty()){
-				if(persistentEntity.hasContextProperty()){
+			if(persistentProperty.isContext()){
+				return;
+			}
+			else if(persistentProperty.isIdProperty()){
+				if(persistentEntity.hasContextProperty() && persistentEntity.getContextProperty().getValue(entity, persistentProperty.getMappingPolicy()) != null){
 					statements.addStatement(new ContextStatementImpl((URI) value, new URIImpl(ValueUtils.RDF_TYPE_PREDICATE), persistentEntity.getRDFType(), (Resource) persistentEntity.getContextProperty().getValue(entity, persistentProperty.getMappingPolicy())));
 				}
 				else{
@@ -80,7 +83,7 @@ public class EntityToStatementsConverter {
 				}
 				else{
 					//TODO handle language tags and data types; test if Resource
-					if(persistentEntity.hasContextProperty()){
+					if(persistentEntity.hasContextProperty() && persistentEntity.getContextProperty().getValue(entity, persistentProperty.getMappingPolicy()) != null){
 						statements.addStatement(new ContextStatementImpl(resourceId, persistentProperty.getPredicate().get(0), new LiteralImpl(value.toString()), (Resource) persistentEntity.getContextProperty().getValue(entity, persistentProperty.getMappingPolicy())));
 					}
 					else{

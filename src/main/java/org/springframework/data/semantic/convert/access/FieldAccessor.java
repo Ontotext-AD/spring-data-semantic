@@ -1,4 +1,4 @@
-package org.springframework.data.semantic.convert.fieldaccess;
+package org.springframework.data.semantic.convert.access;
 
 
 import org.springframework.data.semantic.mapping.MappingPolicy;

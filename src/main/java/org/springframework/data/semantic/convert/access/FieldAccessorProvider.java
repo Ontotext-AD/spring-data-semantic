@@ -1,4 +1,4 @@
-package org.springframework.data.semantic.convert.fieldaccess;
+package org.springframework.data.semantic.convert.access;
 
 import java.util.Map;
 
@@ -7,6 +7,7 @@ import org.springframework.data.semantic.mapping.SemanticPersistentProperty;
 
 public interface FieldAccessorProvider {
 	
-	public  Map<SemanticPersistentProperty, FieldAccessor> provideFieldAccessors(SemanticPersistentEntity<?> entity);
-
+	Map<SemanticPersistentProperty, FieldAccessor> provideFieldAccessors(SemanticPersistentEntity<?> entity);
+	
+	
 }

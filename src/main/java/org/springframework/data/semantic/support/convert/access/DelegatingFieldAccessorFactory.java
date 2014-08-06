@@ -3,8 +3,8 @@ package org.springframework.data.semantic.support.convert.access;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.springframework.data.semantic.convert.fieldaccess.FieldAccessor;
-import org.springframework.data.semantic.convert.fieldaccess.FieldAccessorFactory;
+import org.springframework.data.semantic.convert.access.FieldAccessor;
+import org.springframework.data.semantic.convert.access.FieldAccessorFactory;
 import org.springframework.data.semantic.core.SemanticOperationsCRUD;
 import org.springframework.data.semantic.mapping.SemanticPersistentProperty;
 import org.springframework.data.semantic.support.SemanticTemplateStatementsCollector;

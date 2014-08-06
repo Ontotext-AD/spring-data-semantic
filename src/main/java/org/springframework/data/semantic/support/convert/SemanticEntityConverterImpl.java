@@ -73,7 +73,6 @@ public class SemanticEntityConverterImpl implements SemanticEntityConverter {
         	sink = toStatementsConverter.convertEntityToStatements(resourceId, persistentEntity, source);
         }
         sourceStateTransmitter.copyPropertiesTo(wrapper, sink);
-
 	}
 
 	@Override

@@ -4,8 +4,8 @@ import java.util.List;
 
 import org.openrdf.model.Model;
 import org.openrdf.model.URI;
-import org.springframework.data.semantic.convert.fieldaccess.FieldAccessor;
-import org.springframework.data.semantic.convert.fieldaccess.FieldAccessorFactory;
+import org.springframework.data.semantic.convert.access.FieldAccessor;
+import org.springframework.data.semantic.convert.access.FieldAccessorFactory;
 import org.springframework.data.semantic.mapping.MappingPolicy;
 import org.springframework.data.semantic.mapping.SemanticPersistentProperty;
 import org.springframework.data.semantic.support.SemanticTemplateStatementsCollector;
