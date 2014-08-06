@@ -1,5 +1,6 @@
 package org.springframework.data.semantic.support.convert;
 
+import org.openrdf.model.URI;
 import org.springframework.data.convert.EntityInstantiator;
 import org.springframework.data.convert.ReflectionEntityInstantiator;
 import org.springframework.data.semantic.convert.SemanticEntityInstantiator;
@@ -15,6 +16,13 @@ public class SemanticEntityInstantiatorImpl implements SemanticEntityInstantiato
 			RDFState statements) {
 		T instance = instantiator.createInstance(entity, null);
 		entity.setPersistentState(instance, statements);
+		return instance;
+	}
+
+	@Override
+	public <T> T createInstance(SemanticPersistentEntity<T> entity, URI id) {
+		T instance = instantiator.createInstance(entity, null);
+		entity.setResourceId(instance, id);
 		return instance;
 	}
 

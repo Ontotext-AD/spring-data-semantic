@@ -70,8 +70,8 @@ public class EntityToGraphQueryConverter {
 	protected static String getPropertyBindings(URI uri, SemanticPersistentEntity<?> entity){
 		StringBuilder sb = new StringBuilder();
 		entity.doWithProperties(new PropertiesToBindingsHandler(sb, uri));
-		//TODO associations?
-		//entity.doWithAssociations(new PropertiesToBindingsHandler(sb, uri));
+
+		entity.doWithAssociations(new PropertiesToBindingsHandler(sb, uri));
 		return sb.toString();
 	}
 	
@@ -110,8 +110,8 @@ public class EntityToGraphQueryConverter {
 		}*/
 		appendPattern(sb, "<"+uri.stringValue()+">", "<"+ValueUtils.RDF_TYPE_PREDICATE+">", "<"+entity.getRDFType()+">");
 		entity.doWithProperties(new PropertiesToPatternsHandler(sb, uri));
-		//TODO associations?
-		//entity.doWithAssociations(new PropertiesToPatternsHandler(sb, uri));
+
+		entity.doWithAssociations(new PropertiesToPatternsHandler(sb, uri));
 		return sb.toString();
 	}
 	
@@ -211,7 +211,7 @@ public class EntityToGraphQueryConverter {
 		@Override
 		public void doWithAssociation(
 				Association<SemanticPersistentProperty> association) {
-			handlePersistentProperty(association.getInverse());
+			handleAssociation(association.getInverse());
 			
 		}
 		
@@ -219,7 +219,16 @@ public class EntityToGraphQueryConverter {
 			if(isRetrivableProperty(persistentProperty)){
 				appendPattern(sb, "<"+id.stringValue()+">", "<" + persistentProperty.getAliasPredicate() + ">", "?"+persistentProperty.getName());
 			}
-		}		
+		}
+		
+		private void handleAssociation(SemanticPersistentProperty persistentProperty) {
+			if(persistentProperty.getMappingPolicy().eagerLoad()){
+				//TODO
+			}
+			else{
+				appendPattern(sb, "<"+id.stringValue()+">", "<" + persistentProperty.getAliasPredicate() + ">", "?"+persistentProperty.getName());
+			}
+		}
 	}
 	
 	/**

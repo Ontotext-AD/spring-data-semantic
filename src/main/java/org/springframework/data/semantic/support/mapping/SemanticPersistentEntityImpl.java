@@ -83,4 +83,10 @@ public class SemanticPersistentEntityImpl<T> extends BasicPersistentEntity<T, Se
 		return contextProperty != null;
 	}
 
+	@Override
+	public void setResourceId(Object entity, URI id) {
+		SemanticPersistentProperty idProperty = getIdProperty();
+		idProperty.setValue(entity, id);
+	}
+
 }

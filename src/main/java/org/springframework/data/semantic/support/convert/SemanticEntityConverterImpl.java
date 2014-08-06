@@ -1,7 +1,13 @@
 package org.springframework.data.semantic.support.convert;
 
+import java.util.Set;
+
 import org.openrdf.model.URI;
+import org.openrdf.model.Value;
+import org.openrdf.model.impl.URIImpl;
 import org.springframework.core.convert.ConversionService;
+import org.springframework.data.mapping.Association;
+import org.springframework.data.mapping.AssociationHandler;
 import org.springframework.data.mapping.context.MappingContext;
 import org.springframework.data.mapping.model.BeanWrapper;
 import org.springframework.data.semantic.convert.SemanticEntityConverter;
@@ -78,13 +84,34 @@ public class SemanticEntityConverterImpl implements SemanticEntityConverter {
             
             sourceStateTransmitter.copyPropertiesFrom(wrapper, source, persistentEntity, mappingPolicy);
             
-            cascadeFetch(persistentEntity, wrapper, mappingPolicy);
+            cascadeFetch(persistentEntity, wrapper, source, mappingPolicy);
         }
         return entity;
 	}
 	
-	private <R> void cascadeFetch(SemanticPersistentEntity<R> persistentEntity, final BeanWrapper<SemanticPersistentEntity<R>, R> wrapper, final MappingPolicy policy) {
-		//TODO
+	private <R> void cascadeFetch(SemanticPersistentEntity<R> persistentEntity, final BeanWrapper<SemanticPersistentEntity<R>, R> wrapper, final RDFState source, final MappingPolicy policy) {
+		persistentEntity.doWithAssociations(new AssociationHandler<SemanticPersistentProperty>() {
+            @Override
+            public void doWithAssociation(Association<SemanticPersistentProperty> association) {
+                final SemanticPersistentProperty property = association.getInverse();
+                // MappingPolicy mappingPolicy = policy.combineWith(property.getMappingPolicy());
+                final MappingPolicy mappingPolicy = property.getMappingPolicy();
+                if (mappingPolicy.eagerLoad()) {
+                   //TODO
+                }
+                else{
+                	@SuppressWarnings("unchecked")
+					SemanticPersistentEntity<Object> entity = (SemanticPersistentEntity<Object>) mappingContext.getPersistentEntity(property.getTypeInformation().getActualType());
+                	Set<Value> associatedEntityIds = source.getCurrentStatements().filter(null, new URIImpl(property.getAliasPredicate()), null).objects();
+                	for(Value associatedEntityId : associatedEntityIds){
+                		if(associatedEntityId instanceof URI){
+                			Object associatedEntity = entityInstantiator.createInstance(entity, (URI) associatedEntityId);
+                			sourceStateTransmitter.setProperty(wrapper, property, associatedEntity);
+                		}
+                	}
+                }
+            }
+        });
 	}
 
 }

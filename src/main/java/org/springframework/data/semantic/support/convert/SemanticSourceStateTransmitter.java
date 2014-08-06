@@ -54,14 +54,6 @@ public class SemanticSourceStateTransmitter {
 				copyEntityStatePropertyValue(property, entityState,	wrapper, mappingPolicy.combineWith(property.getMappingPolicy()));
 			}
 		});
-		persistentEntity.doWithAssociations(new AssociationHandler<SemanticPersistentProperty>() {
-			@Override
-			public void doWithAssociation(Association<SemanticPersistentProperty> association) {
-				final SemanticPersistentProperty property = association.getInverse();
-				property.getClass();
-				//TODO
-			}
-		});
 	}
 
 	private <R> Object copyEntityStatePropertyValue(SemanticPersistentProperty property, EntityState<R, RDFState> state, 	BeanWrapper<SemanticPersistentEntity<R>, R> wrapper,

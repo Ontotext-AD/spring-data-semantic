@@ -36,6 +36,11 @@ public interface SemanticPersistentEntity<T> extends PersistentEntity<T, Semanti
 	  */
 	 URI getRDFType();
 	 
+	 /**
+	  * Retrieve the {@link URI} of the given instance.
+	  * @param entity
+	  * @return
+	  */
 	 URI getResourceId(Object entity);
 	 
 	 /**
@@ -43,6 +48,12 @@ public interface SemanticPersistentEntity<T> extends PersistentEntity<T, Semanti
 	  * @param entity
 	  * @param statements
 	  */
-	 public void setPersistentState(Object entity, RDFState statements);
+	 void setPersistentState(Object entity, RDFState statements);
+	 
+	 /**
+	  * Set the given {@link URI} as the id of the given instance.
+	  * @param id
+	  */
+	 void setResourceId(Object entity, URI id);
 
 }

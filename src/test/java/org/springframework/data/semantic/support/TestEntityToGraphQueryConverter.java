@@ -15,9 +15,9 @@ import org.springframework.data.semantic.support.mapping.SemanticMappingContext;
 import org.springframework.data.util.ClassTypeInformation;
 
 public class TestEntityToGraphQueryConverter {
-	private String expectedBindings = "<http://ontotext.com/resource/test> <urn:field:name> ?name . ";
-	private String expectedPattern = "<http://ontotext.com/resource/test> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <urn:default:TestEntity> . <http://ontotext.com/resource/test> <http://www.w3.org/2004/02/skos/core#prefLabel> ?name . ";
-	private String expectedQuery = "CONSTRUCT { <http://ontotext.com/resource/test> <urn:field:name> ?name . } WHERE { <http://ontotext.com/resource/test> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <urn:default:TestEntity> . <http://ontotext.com/resource/test> <http://www.w3.org/2004/02/skos/core#prefLabel> ?name . }";
+	private String expectedBindings = "<http://ontotext.com/resource/test> <urn:field:name> ?name . <http://ontotext.com/resource/test> <urn:field:related> ?related . ";
+	private String expectedPattern = "<http://ontotext.com/resource/test> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <urn:default:TestEntity> . <http://ontotext.com/resource/test> <http://www.w3.org/2004/02/skos/core#prefLabel> ?name . <http://ontotext.com/resource/test> <urn:default:related> ?related . ";
+	private String expectedQuery = "CONSTRUCT { "+expectedBindings+" } WHERE { "+expectedPattern+"}";
 	private URI resource = new URIImpl("http://ontotext.com/resource/test");
 	private SemanticMappingContext mappingContext;
 	private SemanticPersistentEntity<?> testEntityType;

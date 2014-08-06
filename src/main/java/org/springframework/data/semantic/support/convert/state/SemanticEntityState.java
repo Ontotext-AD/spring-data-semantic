@@ -1,12 +1,14 @@
 package org.springframework.data.semantic.support.convert.state;
 
 import java.lang.reflect.Field;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.openrdf.model.Model;
 import org.openrdf.model.Statement;
+import org.openrdf.model.URI;
+import org.openrdf.model.impl.URIImpl;
 import org.springframework.data.semantic.convert.fieldaccess.FieldAccessor;
 import org.springframework.data.semantic.convert.fieldaccess.FieldAccessorProvider;
 import org.springframework.data.semantic.convert.state.EntityState;
@@ -87,14 +89,12 @@ public class SemanticEntityState<T> implements
 	}
 	
 	private Object getValueFromState(String alias){
-		Iterator<Statement> stIterator = state.getCurrentStatements().iterator();
+		URI predicate = new URIImpl(alias);
+		Model model = state.getCurrentStatements();
 		List<Object> values = new LinkedList<Object>();
-		//TODO optimize: do not iterate through all the statements each time a value is needed
-		while(stIterator.hasNext()){
-			Statement st = stIterator.next();
-			if(alias.equals(st.getPredicate().toString())){
-				values.add(st.getObject().stringValue());
-			}
+		Model results = model.filter(null, predicate, null);
+		for(Statement st : results){
+			values.add(st.getObject().stringValue());
 		}
 		return values;
 	}

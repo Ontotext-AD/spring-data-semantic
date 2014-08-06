@@ -1,5 +1,6 @@
 package org.springframework.data.semantic.convert;
 
+import org.openrdf.model.URI;
 import org.springframework.data.semantic.core.RDFState;
 import org.springframework.data.semantic.mapping.SemanticPersistentEntity;
 
@@ -17,5 +18,13 @@ public interface SemanticEntityInstantiator {
 	 * @return
 	 */
 	public <T> T createInstanceFromState(SemanticPersistentEntity<T> entity, RDFState statements); 
+	
+	/**
+	 * Creates and instance of the given class with the given {@link URI} as id.
+	 * @param entity
+	 * @param id
+	 * @return
+	 */
+	public <T> T createInstance(SemanticPersistentEntity<T> entity, URI id);
 	
 }
