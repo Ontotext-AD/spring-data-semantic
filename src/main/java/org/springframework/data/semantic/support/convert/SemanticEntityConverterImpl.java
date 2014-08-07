@@ -32,7 +32,7 @@ public class SemanticEntityConverterImpl implements SemanticEntityConverter {
 	private final ConversionService conversionService;
 	private final SemanticEntityInstantiator entityInstantiator;
 	private final SemanticSourceStateTransmitter sourceStateTransmitter;
-	private final EntityToStatementsConverter toStatementsConverter = new EntityToStatementsConverter();
+	private final EntityToStatementsConverter toStatementsConverter;
 	
 	
 	
@@ -41,6 +41,7 @@ public class SemanticEntityConverterImpl implements SemanticEntityConverter {
 		this.conversionService = conversionService;
 		this.entityInstantiator = entityInstantiator;
 		this.sourceStateTransmitter = sourceStateTransmitter;
+		this.toStatementsConverter = new EntityToStatementsConverter(mappingContext);
 	}
 
 	@Override
@@ -64,15 +65,20 @@ public class SemanticEntityConverterImpl implements SemanticEntityConverter {
 	}
 
 	@Override
-	public void write(Object source, RDFState sink) {
+	public void write(Object source, RDFState dbStatements) {
 		final SemanticPersistentEntityImpl<?> persistentEntity = mappingContext.getPersistentEntity(source.getClass());
 		final URI resourceId = persistentEntity.getResourceId(source);
 		
 		final BeanWrapper<Object> wrapper = BeanWrapper.<Object>create(source, conversionService);
-        if (sink == null) {
-        	sink = toStatementsConverter.convertEntityToStatements(resourceId, persistentEntity, source);
+        RDFState currentState = toStatementsConverter.convertEntityToStatements(resourceId, persistentEntity, source);
+		if (dbStatements != null && !dbStatements.isEmpty()) {
+			//TODO optimize conversion of alias statements to actual statements
+			Object dbObject = read(source.getClass(), dbStatements);
+			RDFState dbState = toStatementsConverter.convertEntityToStatements(resourceId, persistentEntity, dbObject);
+			dbState.getCurrentStatements().removeAll(currentState.getCurrentStatements());
+        	currentState.setDeleteStatements(dbState.getCurrentStatements());
         }
-        sourceStateTransmitter.copyPropertiesTo(wrapper, sink);
+        sourceStateTransmitter.copyPropertiesTo(wrapper, currentState);
 	}
 
 	@Override

@@ -9,6 +9,8 @@ public class MODEL_ENTITY {
 	public static final String NAMESPACE = "urn:sprind-data-semantic:";
 	
 	public final static URI ENTITY_ONE = create("entity:1");
+	
+	public final static URI ENTITY_TWO = create("entity:2");
 
 	private static final URI create(String localName) {
 		final ValueFactory f = ValueFactoryImpl.getInstance();

@@ -3,4 +3,8 @@
 <urn:sprind-data-semantic:entity:1> <urn:sprind-data-semantic:related> <urn:sprind-data-semantic:entity:2> .
 <urn:sprind-data-semantic:entity:1> <urn:sprind-data-semantic:related> <urn:sprind-data-semantic:entity:3> .
 <urn:sprind-data-semantic:entity:2> a <urn:sprind-data-semantic:ModelEntity> .
+<urn:sprind-data-semantic:entity:2> <http://www.w3.org/2004/02/skos/core#prefLabel> "Model Entity Two" .
 <urn:sprind-data-semantic:entity:3> a <urn:sprind-data-semantic:ModelEntity> .
+<urn:sprind-data-semantic:entity:4> a <urn:sprind-data-semantic:ModelEntity> .
+<urn:sprind-data-semantic:entity:2> <urn:sprind-data-semantic:related> <urn:sprind-data-semantic:entity:3> .
+<urn:sprind-data-semantic:entity:2> <urn:sprind-data-semantic:related> <urn:sprind-data-semantic:entity:4> .

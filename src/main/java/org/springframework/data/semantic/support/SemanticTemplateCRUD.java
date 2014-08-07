@@ -17,6 +17,7 @@ import org.springframework.data.semantic.convert.SemanticEntityPersister;
 import org.springframework.data.semantic.core.RDFState;
 import org.springframework.data.semantic.core.SemanticDatabase;
 import org.springframework.data.semantic.core.SemanticOperationsCRUD;
+import org.springframework.data.semantic.mapping.SemanticPersistentEntity;
 import org.springframework.data.semantic.support.convert.SemanticEntityConverterImpl;
 import org.springframework.data.semantic.support.convert.SemanticEntityInstantiatorImpl;
 import org.springframework.data.semantic.support.convert.SemanticEntityPersisterImpl;
@@ -83,7 +84,10 @@ public class SemanticTemplateCRUD implements SemanticOperationsCRUD, Initializin
 	
 	@Override
 	public <T> T save(T entity) {
-		return this.entityPersister.persistEntity(entity);
+		@SuppressWarnings("unchecked")
+		SemanticPersistentEntity<T> persistentEntity = (SemanticPersistentEntity<T>) this.mappingContext.getPersistentEntity(entity.getClass());
+		Model dbState = this.statementsCollector.getStatementsForResourceClass(persistentEntity.getResourceId(entity), entity.getClass());
+		return this.entityPersister.persistEntity(entity, new RDFState(dbState));
 	}
 
 	@Override
@@ -95,7 +99,7 @@ public class SemanticTemplateCRUD implements SemanticOperationsCRUD, Initializin
 	@Override
 	public <T> T find(URI resourceId, Class<? extends T> clazz) {
 		try{
-			return createEntity(statementsCollector.getStatementsForResourceClass(resourceId, clazz), clazz);
+			return createEntity(this.statementsCollector.getStatementsForResourceClass(resourceId, clazz), clazz);
 		} catch (DataAccessException e){
 			logger.debug(e.getMessage(), e);
 		}

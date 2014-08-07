@@ -25,5 +25,5 @@ public interface SemanticEntityPersister {
 	 * @param entity
 	 * @return
 	 */
-	public <T> T persistEntity(T entity);
+	public <T> T persistEntity(T entity, RDFState existing);
 }

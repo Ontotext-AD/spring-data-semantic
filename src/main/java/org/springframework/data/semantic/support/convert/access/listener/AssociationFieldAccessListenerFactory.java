@@ -32,14 +32,6 @@ public class AssociationFieldAccessListenerFactory implements FieldAccessListene
 		return listeners;
 	}
 	
-	private class DeleteAssociationFieldAccessListener implements FieldAccessListener {
 
-		@Override
-		public void valueChanged(Object entity, Object oldVal, Object newVal) {
-			// TODO Auto-generated method stub
-			
-		}
-		
-	}
 
 }

@@ -25,8 +25,8 @@ public class SemanticEntityPersisterImpl implements SemanticEntityPersister{
 
 
 	@Override
-	public <T> T persistEntity(T entity) {
-		entityConverter.write(entity, null);
+	public <T> T persistEntity(T entity, RDFState dbState) {
+		entityConverter.write(entity, dbState);
 		return entity;
 		//TODO invalidate cache if applicable
 	}

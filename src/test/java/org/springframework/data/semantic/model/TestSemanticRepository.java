@@ -72,7 +72,7 @@ public class TestSemanticRepository {
 	@Test
 	public void testModificationOfCollectionOfAssociations(){
 		long count = sdb.count();
-		ModelEntity modelEntity = modelEntityRepository.findOne(MODEL_ENTITY.ENTITY_ONE);
+		ModelEntity modelEntity = modelEntityRepository.findOne(MODEL_ENTITY.ENTITY_TWO);
 		modelEntity.getRelated().remove(1);
 		modelEntityRepository.save(modelEntity);
 		assertEquals(count -1, sdb.count());
