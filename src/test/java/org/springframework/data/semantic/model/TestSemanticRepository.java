@@ -5,12 +5,14 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openrdf.model.Statement;
+import org.openrdf.model.URI;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.semantic.core.SemanticDatabase;
 import org.springframework.data.semantic.model.vocabulary.MODEL_ENTITY;
@@ -81,6 +83,18 @@ public class TestSemanticRepository {
 	@Test
 	public void testCount(){
 		assertEquals(4, modelEntityRepository.count());
+	}
+	
+	@Test
+	public void testFindList(){
+		List<URI> uris = Arrays.asList(MODEL_ENTITY.ENTITY_ONE, MODEL_ENTITY.ENTITY_TWO);
+		Iterable<ModelEntity> entities = modelEntityRepository.findAll(uris);
+		int count = 0;
+		for(ModelEntity entity : entities){
+			assertTrue(uris.contains(entity.getUri()));
+			count++;
+		}
+		assertEquals(uris.size(), count);
 	}
 
 }

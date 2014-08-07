@@ -1,5 +1,6 @@
 package org.springframework.data.semantic.repository.support;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -73,8 +74,14 @@ public class SemanticRepositoryImpl<T> implements SemanticRepository<T> {
 
 	@Override
 	public Iterable<T> findAll(Iterable<URI> ids) {
-		// TODO Auto-generated method stub
-		return null;
+		List<T> result = new LinkedList<T>();
+		for(URI id : ids){
+			T entity = this.operations.find(id, clazz);
+			if(entity != null){
+				result.add(entity);
+			}
+		}
+		return result;
 	}
 
 	@Override
