@@ -2,7 +2,6 @@ package org.springframework.data.semantic.support;
 
 import org.openrdf.model.Model;
 import org.openrdf.model.URI;
-import org.openrdf.query.QueryResults;
 import org.openrdf.repository.RepositoryException;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.data.semantic.core.SemanticDatabase;
@@ -40,8 +39,8 @@ public class SemanticTemplateStatementsCollector implements SemanticOperationsSt
 		SemanticPersistentEntity<?> persistentEntity = getPersistentEntity(entity.getClass());
 		URI uri = persistentEntity.getResourceId(entity);
 		try {
-			return QueryResults.asModel(semanticDB.getStatementsForGraphQuery(
-					EntityToGraphQueryConverter.getGraphQueryForResourceProperty(uri, persistentEntity, property)));
+			return semanticDB.getGraphQueryResults(
+				EntityToGraphQueryConverter.getGraphQueryForResourceProperty(uri, persistentEntity, property));
 		} catch (Exception e) {
 			throw ExceptionTranslator.translateExceptionIfPossible(e);
 		}
@@ -50,8 +49,8 @@ public class SemanticTemplateStatementsCollector implements SemanticOperationsSt
 	@Override
 	public Model getStatementsForResourceClass(URI resource, Class<?> clazz) {
 		try {
-			return QueryResults.asModel(semanticDB.getStatementsForGraphQuery(
-					EntityToGraphQueryConverter.getGraphQueryForResource(resource, getPersistentEntity(clazz))));
+			return semanticDB.getGraphQueryResults(
+					EntityToGraphQueryConverter.getGraphQueryForResource(resource, getPersistentEntity(clazz)));
 		} catch (Exception e) {
 			throw ExceptionTranslator.translateExceptionIfPossible(e);
 		} 

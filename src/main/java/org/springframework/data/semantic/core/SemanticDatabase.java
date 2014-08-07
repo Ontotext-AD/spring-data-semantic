@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
+import org.openrdf.model.Model;
 import org.openrdf.model.Namespace;
 import org.openrdf.model.Resource;
 import org.openrdf.model.Statement;
@@ -12,7 +13,6 @@ import org.openrdf.model.URI;
 import org.openrdf.model.Value;
 import org.openrdf.query.BindingSet;
 import org.openrdf.query.GraphQuery;
-import org.openrdf.query.GraphQueryResult;
 import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.query.QueryInterruptedException;
@@ -67,9 +67,32 @@ public interface SemanticDatabase {
 	
 	List<BindingSet> getQueryResults(String source, Long offset, Long limit) throws RepositoryException, QueryCreationException, QueryEvaluationException, QueryInterruptedException, MalformedQueryException;
 	
-	List<Statement> getGraphQueryResults(String source) throws RepositoryException, QueryCreationException, QueryEvaluationException, QueryInterruptedException, MalformedQueryException;
+	/**
+	 * Create a {@link GraphQuery} from the given source {@link String} and return the results from its execution.
+	 * @param graphQuery
+	 * @return
+	 * @throws RepositoryException
+	 * @throws QueryCreationException
+	 * @throws QueryEvaluationException
+	 * @throws QueryInterruptedException
+	 * @throws MalformedQueryException 
+	 */
+	Model getGraphQueryResults(String graphQuery) throws RepositoryException, QueryCreationException, QueryEvaluationException, QueryInterruptedException, MalformedQueryException;
 	
-	List<Statement> getGraphQueryResults(String source, Long offset, Long limit) throws RepositoryException, QueryCreationException, QueryEvaluationException, QueryInterruptedException, MalformedQueryException;
+	/**
+	 * Create a {@link GraphQuery} from the given source {@link String} and return the results from its execution.
+	 * @param graphQuery
+	 * @param offset
+	 * @param limit
+	 * @return
+	 * @throws RepositoryException
+	 * @throws QueryCreationException
+	 * @throws QueryEvaluationException
+	 * @throws QueryInterruptedException
+	 * @throws MalformedQueryException
+	 */
+	Model getGraphQueryResults(String graphQuery, Long offset, Long limit) throws RepositoryException, QueryCreationException, QueryEvaluationException, QueryInterruptedException, MalformedQueryException;
+	
 	
 	boolean getBooleanQueryResult(String source) throws RepositoryException, QueryCreationException, QueryEvaluationException, QueryInterruptedException, MalformedQueryException;
 	
@@ -197,17 +220,6 @@ public interface SemanticDatabase {
 	 */
 	void removeStatement(Collection<? extends Statement> statements);
 	
-	/**
-	 * Create a {@link GraphQuery} from the given source {@link String} and return the results from its execution.
-	 * @param graphQuery
-	 * @return
-	 * @throws RepositoryException
-	 * @throws QueryCreationException
-	 * @throws QueryEvaluationException
-	 * @throws QueryInterruptedException
-	 * @throws MalformedQueryException 
-	 */
-	GraphQueryResult getStatementsForGraphQuery(String graphQuery) throws RepositoryException, QueryCreationException, QueryEvaluationException, QueryInterruptedException, MalformedQueryException;
 	
 	/**
 	 * Clear all connections and other resources in use.

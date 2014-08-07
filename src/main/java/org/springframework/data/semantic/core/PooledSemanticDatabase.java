@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.openrdf.model.Model;
 import org.openrdf.model.Namespace;
 import org.openrdf.model.Resource;
 import org.openrdf.model.Statement;
@@ -18,12 +19,10 @@ import org.openrdf.model.impl.ContextStatementImpl;
 import org.openrdf.model.impl.NamespaceImpl;
 import org.openrdf.model.impl.StatementImpl;
 import org.openrdf.query.BindingSet;
-import org.openrdf.query.GraphQuery;
-import org.openrdf.query.GraphQueryResult;
 import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.query.QueryInterruptedException;
-import org.openrdf.query.QueryLanguage;
+import org.openrdf.query.QueryResults;
 import org.openrdf.query.TupleQueryResult;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
@@ -36,6 +35,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.repository.query.QueryCreationException;
 import org.springframework.data.semantic.query.BooleanSparqlQuery;
+import org.springframework.data.semantic.query.GraphSparqlQuery;
 import org.springframework.data.semantic.query.TupleSparqlQuery;
 import org.springframework.data.semantic.support.database.SesameConnectionPool;
 
@@ -118,19 +118,6 @@ public class PooledSemanticDatabase implements SemanticDatabase{
 		}
 
 
-	}
-	
-	@Override
-	public List<Statement> getGraphQueryResults(String source) throws RepositoryException, QueryCreationException, QueryEvaluationException,
-			QueryInterruptedException, MalformedQueryException {
-		return getGraphQueryResults(source, null, null);
-	}
-
-	@Override
-	public List<Statement> getGraphQueryResults(String source, Long offset, Long limit) throws RepositoryException, QueryCreationException,
-			QueryEvaluationException, QueryInterruptedException, MalformedQueryException {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	@Override
@@ -358,14 +345,25 @@ public class PooledSemanticDatabase implements SemanticDatabase{
 	}
 
 	@Override
-	public GraphQueryResult getStatementsForGraphQuery(String graphQuery)
+	public Model getGraphQueryResults(String graphQuery)
 			throws RepositoryException, QueryCreationException,
 			QueryEvaluationException, QueryInterruptedException, MalformedQueryException {
-
+		return getGraphQueryResults(graphQuery, null, null);
+	}
+	
+	@Override
+	public Model getGraphQueryResults(String graphQuery, Long offset, Long limit) throws RepositoryException, QueryCreationException,
+			QueryEvaluationException, QueryInterruptedException, MalformedQueryException {
 		RepositoryConnection con = connectionPool.getConnection();		
 		try{
-			GraphQuery query = con.prepareGraphQuery(QueryLanguage.SPARQL, graphQuery);
-			return query.evaluate();
+			GraphSparqlQuery query = new GraphSparqlQuery(graphQuery, con);
+			if(offset != null){
+				query.setOffset(offset);
+			}
+			if(limit != null){
+				query.setLimit(limit);
+			}
+			return QueryResults.asModel(query.evaluate());
 		}
 		finally {
 			con.close();
@@ -391,4 +389,6 @@ public class PooledSemanticDatabase implements SemanticDatabase{
 		}
 		return size;
 	}
+
+
 }
