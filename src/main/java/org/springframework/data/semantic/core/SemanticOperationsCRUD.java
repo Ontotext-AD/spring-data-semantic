@@ -34,6 +34,11 @@ public interface SemanticOperationsCRUD {
      */
     <T> T createEntity(Model statements, Class<T> clazz);
 
-	
+    /**
+     * Count the instances of a given class in the semantic database.
+     * @param clazz
+     * @return
+     */
+	<T> long count(Class<T> clazz);
 	
 }

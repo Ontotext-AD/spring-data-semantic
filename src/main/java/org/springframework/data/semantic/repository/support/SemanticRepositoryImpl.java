@@ -79,8 +79,7 @@ public class SemanticRepositoryImpl<T> implements SemanticRepository<T> {
 
 	@Override
 	public long count() {
-		// TODO Auto-generated method stub
-		return 0;
+		return operations.count(clazz);
 	}
 
 	@Override

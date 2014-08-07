@@ -77,5 +77,10 @@ public class TestSemanticRepository {
 		modelEntityRepository.save(modelEntity);
 		assertEquals(count -1, sdb.count());
 	}
+	
+	@Test
+	public void testCount(){
+		assertEquals(4, modelEntityRepository.count());
+	}
 
 }

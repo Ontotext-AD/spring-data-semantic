@@ -62,6 +62,15 @@ public class EntityToGraphQueryConverter {
 	}
 	
 	/**
+	 * Create a select count query for a given entity type.
+	 * @param entity
+	 * @return
+	 */
+	public static String getGraphQueryForResourceCount(SemanticPersistentEntity<?> entity){
+		return "SELECT (COUNT (DISTINCT ?uri) as ?count) WHERE { ?uri a <"+entity.getRDFType()+">}";
+	}
+	
+	/**
 	 * Get bindings for the retrievable properties of the entity
 	 * @param uri - the uri of the entity
 	 * @param entity - the container holding the information about the entity's structure

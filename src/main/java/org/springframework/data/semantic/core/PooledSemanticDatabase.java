@@ -130,63 +130,6 @@ public class PooledSemanticDatabase implements SemanticDatabase{
 
 	}
 
-	/**
-	 * gets the size of the result which would be returned by a query upon execution
-	 */
-	public Long getQueryResultsCount(String source) throws RepositoryException,
-	QueryEvaluationException, MalformedQueryException {
-
-		RepositoryConnection con = connectionPool.getConnection();
-		try {
-			if(con.getRepository() instanceof SailRepository) {
-				return getQueryResultsCountForLocalRepo(source);
-			} else {
-				return getQueryResultsCountForRemoteRepo(source, con);			
-			}
-		} finally {
-			con.close();
-		}
-
-	}
-
-	//-----------Helpers for the getQueryResultsCount method-------------------
-	private Long getQueryResultsCountForLocalRepo(String source) 
-			throws RepositoryException, QueryEvaluationException, MalformedQueryException {
-		/* TODO dumb dumb way to check the size of the result returned by the query
-		 * TODO when issued against a local repository!!!
-		 * TODO check if editing the query to get COUNT(1) instead of 
-		 * TODO projection vars will result in a faster query
-		 * TODO and if yes, do it that way
-		 * */
-		List<BindingSet> result = getQueryResults(source);
-		return (long) result.size();
-	}
-
-	private Long getQueryResultsCountForRemoteRepo(String source, RepositoryConnection con) 
-			throws MalformedQueryException, QueryEvaluationException {
-		
-		TupleSparqlQuery query = new TupleSparqlQuery(source, con);
-		query.setCount(true);
-		TupleQueryResult queryResult = query.evaluate();
-
-		if(!queryResult.hasNext()) {
-			throw new QueryEvaluationException(String.format("Query with source %s returned no count results.", source));
-		}
-
-		List<String> bindingNames = queryResult.getBindingNames();		
-		if(bindingNames.isEmpty()) {
-			throw new MalformedQueryException(String.format("No binding names for query string '%s'", source));
-		}
-		String bindingName = bindingNames.get(0);
-
-		String countStr = queryResult.next().getBinding(bindingName).getValue().stringValue();
-		try {
-			return Long.parseLong(countStr);
-		} catch(NumberFormatException nfe) {
-			throw new QueryEvaluationException(String.format("Evaluating count query failed for query source %s. " +
-					"The returned result ('%s') for binding '%s' is not a number.", source, countStr, bindingName));
-		}
-	}
 
 	//-------------------------------------------------------------------------
 	

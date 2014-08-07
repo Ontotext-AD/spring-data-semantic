@@ -32,21 +32,6 @@ public class SemanticDatabaseTest {
 	}
 	
 	@Test
-	public void testCountQuery() {
-		int expected = 2;
-		String source = "SELECT ?s WHERE " +
-				"{ ?s ?p ?o } LIMIT "+ expected;
-		
-		Long res = -1l;
-		try {
-			res = sdb.getQueryResultsCount(source);
-		} catch (Exception e) {
-			assertTrue(false);
-		}
-		assertTrue(res == expected);		
-	}
-	
-	@Test
 	public void testPagingQuery() {
 		String source = "SELECT ?o WHERE " +
 				"{ <http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#Wine> ?p ?o } ORDER BY ?p";
