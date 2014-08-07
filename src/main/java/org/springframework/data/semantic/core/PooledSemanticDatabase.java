@@ -24,19 +24,18 @@ import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.query.QueryInterruptedException;
 import org.openrdf.query.QueryLanguage;
-import org.openrdf.query.TupleQuery;
 import org.openrdf.query.TupleQueryResult;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.RepositoryResult;
-import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.repository.query.QueryCreationException;
+import org.springframework.data.semantic.query.BooleanSparqlQuery;
 import org.springframework.data.semantic.query.TupleSparqlQuery;
 import org.springframework.data.semantic.support.database.SesameConnectionPool;
 
@@ -93,31 +92,22 @@ public class PooledSemanticDatabase implements SemanticDatabase{
 
 	public List<BindingSet> getQueryResults(String source)
 			throws RepositoryException, QueryEvaluationException, MalformedQueryException {
-
-		RepositoryConnection con = connectionPool.getConnection();		
-		try{
-			TupleQuery query = con.prepareTupleQuery(QueryLanguage.SPARQL, source);			
-			TupleQueryResult queryResult = query.evaluate();
-			List<BindingSet> result = new ArrayList<BindingSet>(); 	
-			while(queryResult.hasNext()){
-				result.add(queryResult.next());
-			}
-			return result;
-		} finally {
-			con.close();
-		}
+		return getQueryResults(source, null, null);
 	}
 
-	public List<BindingSet> getQueryResults(String source, Integer offset, Integer limit) 
+	public List<BindingSet> getQueryResults(String source, Long offset, Long limit) 
 			throws RepositoryException, QueryEvaluationException, MalformedQueryException {
 
 		List<BindingSet> result = new ArrayList<BindingSet>();		
 		RepositoryConnection con = connectionPool.getConnection();
 		try{
 			TupleSparqlQuery query = new TupleSparqlQuery(source, con);
-			query.setLimit(limit.longValue());
-			query.setOffset(offset.longValue());
-
+			if(offset != null){
+				query.setLimit(limit);
+			}
+			if(limit != null){
+				query.setOffset(offset);
+			}
 			TupleQueryResult queryResult = query.evaluate();
 			while(queryResult.hasNext()){
 				result.add(queryResult.next());
@@ -128,6 +118,31 @@ public class PooledSemanticDatabase implements SemanticDatabase{
 		}
 
 
+	}
+	
+	@Override
+	public List<Statement> getGraphQueryResults(String source) throws RepositoryException, QueryCreationException, QueryEvaluationException,
+			QueryInterruptedException, MalformedQueryException {
+		return getGraphQueryResults(source, null, null);
+	}
+
+	@Override
+	public List<Statement> getGraphQueryResults(String source, Long offset, Long limit) throws RepositoryException, QueryCreationException,
+			QueryEvaluationException, QueryInterruptedException, MalformedQueryException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public boolean getBooleanQueryResult(String source) throws RepositoryException, QueryCreationException, QueryEvaluationException,
+			QueryInterruptedException, MalformedQueryException {
+		RepositoryConnection con = connectionPool.getConnection();
+		try {
+			BooleanSparqlQuery query = new BooleanSparqlQuery(source, con);
+			return query.evaluate();
+		} finally {
+			con.close();
+		}
 	}
 
 
@@ -376,9 +391,4 @@ public class PooledSemanticDatabase implements SemanticDatabase{
 		}
 		return size;
 	}
-
-
-
-	
-
 }

@@ -41,4 +41,12 @@ public interface SemanticOperationsCRUD {
      */
 	<T> long count(Class<T> clazz);
 	
+	/**
+	 * Check if an instance of the given class with the given {@link URI} id exists in the semantic database. 
+	 * @param resourceId
+	 * @param clazz
+	 * @return
+	 */
+	<T> boolean exists(URI resourceId, Class<? extends T> clazz);
+	
 }

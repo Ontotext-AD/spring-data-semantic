@@ -40,7 +40,7 @@ public class SemanticDatabaseTest {
 		List<BindingSet> res1 = null;
 		List<BindingSet> res2 = null;
 		try {
-			res1 = sdb.getQueryResults(source, 2, 2);
+			res1 = sdb.getQueryResults(source, 2L, 2L);
 			res2 = sdb.getQueryResults(source + orderLimit);		
 		} catch (Exception e) {
 			assertTrue(false);

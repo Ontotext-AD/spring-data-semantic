@@ -70,6 +70,10 @@ public class EntityToGraphQueryConverter {
 		return "SELECT (COUNT (DISTINCT ?uri) as ?count) WHERE { ?uri a <"+entity.getRDFType()+">}";
 	}
 	
+	public static String getQueryForResourceExistence(URI resourceId, SemanticPersistentEntity<?> entity){
+		return "ASK {<"+resourceId+"> a <"+entity.getRDFType()+">}";
+	}
+	
 	/**
 	 * Get bindings for the retrievable properties of the entity
 	 * @param uri - the uri of the entity

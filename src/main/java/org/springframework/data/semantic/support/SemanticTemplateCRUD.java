@@ -5,9 +5,6 @@ import java.util.List;
 import org.openrdf.model.Model;
 import org.openrdf.model.URI;
 import org.openrdf.query.BindingSet;
-import org.openrdf.query.MalformedQueryException;
-import org.openrdf.query.QueryEvaluationException;
-import org.openrdf.query.QueryInterruptedException;
 import org.openrdf.repository.RepositoryException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,7 +14,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.dao.DataAccessException;
-import org.springframework.data.repository.query.QueryCreationException;
 import org.springframework.data.semantic.convert.SemanticEntityConverter;
 import org.springframework.data.semantic.convert.SemanticEntityInstantiator;
 import org.springframework.data.semantic.convert.SemanticEntityPersister;
@@ -120,14 +116,23 @@ public class SemanticTemplateCRUD implements SemanticOperationsCRUD, Initializin
 
 	@Override
 	public <T> long count(Class<T> clazz) {
-		List<BindingSet> result;
 		try {
-			result = this.semanticDB.getQueryResults(EntityToGraphQueryConverter.getGraphQueryForResourceCount(this.mappingContext.getPersistentEntity(clazz)));
+			List<BindingSet> result = this.semanticDB.getQueryResults(EntityToGraphQueryConverter.getGraphQueryForResourceCount(this.mappingContext.getPersistentEntity(clazz)));
 			return Long.valueOf(result.get(0).getValue("count").stringValue());
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 		}
 		return 0;
+	}
+
+	@Override
+	public <T> boolean exists(URI resourceId, Class<? extends T> clazz) {
+		try {
+			return this.semanticDB.getBooleanQueryResult(EntityToGraphQueryConverter.getQueryForResourceExistence(resourceId, this.mappingContext.getPersistentEntity(clazz)));
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+		}
+		return false;
 	}
 	
 }

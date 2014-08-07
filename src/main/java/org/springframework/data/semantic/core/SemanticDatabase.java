@@ -65,7 +65,13 @@ public interface SemanticDatabase {
 	
 	List<BindingSet> getQueryResults(String source) throws RepositoryException, QueryCreationException, QueryEvaluationException, QueryInterruptedException, MalformedQueryException;
 	
-	List<BindingSet> getQueryResults(String source, Integer offset, Integer limit) throws RepositoryException, QueryCreationException, QueryEvaluationException, QueryInterruptedException, MalformedQueryException;
+	List<BindingSet> getQueryResults(String source, Long offset, Long limit) throws RepositoryException, QueryCreationException, QueryEvaluationException, QueryInterruptedException, MalformedQueryException;
+	
+	List<Statement> getGraphQueryResults(String source) throws RepositoryException, QueryCreationException, QueryEvaluationException, QueryInterruptedException, MalformedQueryException;
+	
+	List<Statement> getGraphQueryResults(String source, Long offset, Long limit) throws RepositoryException, QueryCreationException, QueryEvaluationException, QueryInterruptedException, MalformedQueryException;
+	
+	boolean getBooleanQueryResult(String source) throws RepositoryException, QueryCreationException, QueryEvaluationException, QueryInterruptedException, MalformedQueryException;
 	
 	/**
 	 * Retrieve the {@link List} of {@link Statement}s for the given subject.

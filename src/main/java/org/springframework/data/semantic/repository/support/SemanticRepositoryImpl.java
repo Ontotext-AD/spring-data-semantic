@@ -62,8 +62,7 @@ public class SemanticRepositoryImpl<T> implements SemanticRepository<T> {
 
 	@Override
 	public boolean exists(URI id) {
-		// TODO Auto-generated method stub
-		return false;
+		return this.operations.exists(id, clazz);
 	}
 
 	@Override

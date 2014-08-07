@@ -11,6 +11,8 @@ public class MODEL_ENTITY {
 	public final static URI ENTITY_ONE = create("entity:1");
 	
 	public final static URI ENTITY_TWO = create("entity:2");
+	
+	public final static URI ENTITY_NOT_EXISTS = create("entity:33");
 
 	private static final URI create(String localName) {
 		final ValueFactory f = ValueFactoryImpl.getInstance();

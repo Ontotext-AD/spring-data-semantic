@@ -96,5 +96,11 @@ public class TestSemanticRepository {
 		}
 		assertEquals(uris.size(), count);
 	}
+	
+	@Test
+	public void testExists(){
+		assertTrue(modelEntityRepository.exists(MODEL_ENTITY.ENTITY_ONE));
+		assertFalse(modelEntityRepository.exists(MODEL_ENTITY.ENTITY_NOT_EXISTS));
+	}
 
 }
