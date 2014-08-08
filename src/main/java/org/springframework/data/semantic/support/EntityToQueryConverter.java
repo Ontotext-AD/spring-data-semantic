@@ -16,7 +16,7 @@ import org.springframework.util.StringUtils;
  * @author konstantin.pentchev
  *
  */
-public class EntityToGraphQueryConverter {
+public class EntityToQueryConverter {
 	
 	private static String variableChars = "abcdefghijklmnopqrstuvwxyz";
 	
@@ -70,8 +70,27 @@ public class EntityToGraphQueryConverter {
 		return "SELECT (COUNT (DISTINCT ?uri) as ?count) WHERE { ?uri a <"+entity.getRDFType()+">}";
 	}
 	
+	/**
+	 * Create an ask query checking if an entity exists.
+	 * @param resourceId
+	 * @param entity
+	 * @return
+	 */
 	public static String getQueryForResourceExistence(URI resourceId, SemanticPersistentEntity<?> entity){
 		return "ASK {<"+resourceId+"> a <"+entity.getRDFType()+">}";
+	}
+	
+	public static String getGraphQueryForEntityClass(SemanticPersistentEntity<?> entity){
+		StringBuilder sb = new StringBuilder();
+		
+		sb.append("CONSTRUCT { ");
+		sb.append(getPropertyBindings(null, entity));
+		sb.append(" }\n");
+		sb.append("WHERE { ");
+		sb.append(getPropertyPatterns(null, entity));
+		sb.append(" }");
+		
+		return sb.toString();
 	}
 	
 	/**
@@ -82,9 +101,15 @@ public class EntityToGraphQueryConverter {
 	 */
 	protected static String getPropertyBindings(URI uri, SemanticPersistentEntity<?> entity){
 		StringBuilder sb = new StringBuilder();
-		entity.doWithProperties(new PropertiesToBindingsHandler(sb, uri));
-
-		entity.doWithAssociations(new PropertiesToBindingsHandler(sb, uri));
+		if(uri != null){
+			appendPattern(sb, "<"+uri+">", "a", "<"+entity.getRDFType()+">");
+		}
+		else{
+			appendPattern(sb, "?uri", "a", "<"+entity.getRDFType()+">");
+		}
+		PropertiesToBindingsHandler handler = new PropertiesToBindingsHandler(sb, uri);
+		entity.doWithProperties(handler);
+		entity.doWithAssociations(handler);
 		return sb.toString();
 	}
 	
@@ -96,7 +121,7 @@ public class EntityToGraphQueryConverter {
 	 */
 	protected static String getPropertyBinding(URI uri, SemanticPersistentProperty property){
 		StringBuilder sb = new StringBuilder();
-		appendPattern(sb, "<"+uri.stringValue()+">", "<" + property.getAliasPredicate() + ">", "?"+property.getName());
+		appendPattern(sb, "<"+uri+">", "<" + property.getAliasPredicate() + ">", "?"+property.getName());
 		return sb.toString();
 	}
 	
@@ -121,10 +146,15 @@ public class EntityToGraphQueryConverter {
 			//sb.append(contextP.); TODO
 			sb.append("{ ");
 		}*/
-		appendPattern(sb, "<"+uri.stringValue()+">", "<"+ValueUtils.RDF_TYPE_PREDICATE+">", "<"+entity.getRDFType()+">");
-		entity.doWithProperties(new PropertiesToPatternsHandler(sb, uri));
-
-		entity.doWithAssociations(new PropertiesToPatternsHandler(sb, uri));
+		if(uri != null){
+			appendPattern(sb, "<"+uri.stringValue()+">", "<"+ValueUtils.RDF_TYPE_PREDICATE+">", "<"+entity.getRDFType()+">");
+		}
+		else{
+			appendPattern(sb, "?uri", "<"+ValueUtils.RDF_TYPE_PREDICATE+">", "<"+entity.getRDFType()+">");
+		}
+		PropertiesToPatternsHandler handler = new PropertiesToPatternsHandler(sb, uri);
+		entity.doWithProperties(handler);
+		entity.doWithAssociations(handler);
 		return sb.toString();
 	}
 	
@@ -183,11 +213,19 @@ public class EntityToGraphQueryConverter {
 				int i = 0;
 				String subj = "";
 				String obj = "";
+				if(persistentProperty.isOptional()){
+					sb.append("OPTIONAL { ");
+				}
 				while(predicates.hasNext()){
 					String pred = "<"+predicates.next().stringValue()+">";
 					if(var.isEmpty()){
+						if(id != null){
+							subj = "<"+id.stringValue()+">";
+						}
+						else{
+							subj = "?uri";
+						}
 						var = getVar(processedProps++);
-						subj = "<"+id.stringValue()+">";
 					}
 					else{
 						subj = "?"+String.valueOf(var)+String.valueOf(i);
@@ -200,6 +238,9 @@ public class EntityToGraphQueryConverter {
 					}
 					appendPattern(sb, subj, pred, obj);
 					i++;
+				}
+				if(persistentProperty.isOptional()){
+					sb.append("} ");
 				}
 			}
 		}		
@@ -230,7 +271,12 @@ public class EntityToGraphQueryConverter {
 		
 		private void handlePersistentProperty(SemanticPersistentProperty persistentProperty) {
 			if(isRetrivableProperty(persistentProperty)){
-				appendPattern(sb, "<"+id.stringValue()+">", "<" + persistentProperty.getAliasPredicate() + ">", "?"+persistentProperty.getName());
+				if(id != null){
+					appendPattern(sb, "<"+id.stringValue()+">", "<" + persistentProperty.getAliasPredicate() + ">", "?"+persistentProperty.getName());
+				}
+				else{
+					appendPattern(sb, "?uri", "<" + persistentProperty.getAliasPredicate() + ">", "?"+persistentProperty.getName());
+				}
 			}
 		}
 		
@@ -239,7 +285,12 @@ public class EntityToGraphQueryConverter {
 				//TODO
 			}
 			else{
-				appendPattern(sb, "<"+id.stringValue()+">", "<" + persistentProperty.getAliasPredicate() + ">", "?"+persistentProperty.getName());
+				if(id != null){
+					appendPattern(sb, "<"+id.stringValue()+">", "<" + persistentProperty.getAliasPredicate() + ">", "?"+persistentProperty.getName());
+				}
+				else{
+					appendPattern(sb, "?uri", "<" + persistentProperty.getAliasPredicate() + ">", "?"+persistentProperty.getName());
+				}
 			}
 		}
 	}

@@ -7,7 +7,7 @@ import javax.annotation.PreDestroy;
 
 import org.openrdf.model.Graph;
 import org.openrdf.model.Resource;
-import org.openrdf.model.impl.GraphImpl;
+import org.openrdf.model.impl.TreeModel;
 import org.openrdf.model.util.GraphUtil;
 import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.repository.Repository;
@@ -38,8 +38,6 @@ public class SemanticDatabaseFactoryBean implements
 
 	private SemanticDatabase semanticDB;
 	
-	private String defaultNamespace;
-
 	/**
 	 * @return the url
 	 */
@@ -127,7 +125,7 @@ public class SemanticDatabaseFactoryBean implements
 	}
 	
 	private RepositoryConfig getConfig(){
-		Graph graph = new GraphImpl();
+		Graph graph = new TreeModel();
 		PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
 		RDFParser rdfParser = Rio.createParser(RDFFormat.TURTLE);
 		rdfParser.setRDFHandler(new StatementCollector(graph));

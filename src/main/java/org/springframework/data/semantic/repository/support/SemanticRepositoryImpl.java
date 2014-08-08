@@ -30,6 +30,11 @@ public class SemanticRepositoryImpl<T> implements SemanticRepository<T> {
 	}
 
 	@Override
+	public Iterable<T> findAll() {
+		return this.operations.findAll(clazz);
+	}
+	
+	@Override
 	public Iterable<T> findAll(Sort sort) {
 		// TODO Auto-generated method stub
 		return null;
@@ -63,12 +68,6 @@ public class SemanticRepositoryImpl<T> implements SemanticRepository<T> {
 	@Override
 	public boolean exists(URI id) {
 		return this.operations.exists(id, clazz);
-	}
-
-	@Override
-	public Iterable<T> findAll() {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	@Override

@@ -27,6 +27,13 @@ public interface SemanticOperationsCRUD {
     <T> T find(URI resourceId, Class<? extends T> clazz);
     
     /**
+     * Retrieve all entities of the given type T.
+     * @param clazz
+     * @return
+     */
+    <T> Iterable<T> findAll(Class<? extends T> clazz);
+    
+    /**
      * Create a new entity form the given {@link Class} and {@link Model}.
      * @param statements
      * @param clazz

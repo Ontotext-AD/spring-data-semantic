@@ -5,6 +5,7 @@ import java.util.List;
 import org.openrdf.model.URI;
 import org.springframework.data.mapping.PersistentProperty;
 import org.springframework.data.semantic.annotation.Context;
+import org.springframework.data.semantic.annotation.Optional;
 
 public interface SemanticPersistentProperty extends PersistentProperty<SemanticPersistentProperty>{
 	
@@ -60,6 +61,12 @@ public interface SemanticPersistentProperty extends PersistentProperty<SemanticP
 	 * @return
 	 */
 	public boolean isContext();
+	
+	/**
+	 * Checks whether the property is annotated as {@link Optional}.
+	 * @return
+	 */
+	public boolean isOptional();
 	
 	
 	/**

@@ -1,4 +1,4 @@
-package org.springframework.data.semantic.model;
+package org.springframework.data.semantic.repository;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -15,6 +15,10 @@ import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.semantic.core.SemanticDatabase;
+import org.springframework.data.semantic.model.ModelEntity;
+import org.springframework.data.semantic.model.ModelEntityRepository;
+import org.springframework.data.semantic.model.WineBody;
+import org.springframework.data.semantic.model.WineBodyRepository;
 import org.springframework.data.semantic.model.vocabulary.MODEL_ENTITY;
 import org.springframework.data.semantic.model.vocabulary.WINE;
 import org.springframework.data.semantic.testutils.Utils;
@@ -101,6 +105,17 @@ public class TestSemanticRepository {
 	public void testExists(){
 		assertTrue(modelEntityRepository.exists(MODEL_ENTITY.ENTITY_ONE));
 		assertFalse(modelEntityRepository.exists(MODEL_ENTITY.ENTITY_NOT_EXISTS));
+	}
+	
+	@Test
+	public void testFindAll(){
+		Iterable<ModelEntity> modelEntities = modelEntityRepository.findAll();
+		int count = 0;
+		for(ModelEntity entity : modelEntities){
+			assertNotNull(entity.getName());
+			count++;
+		}
+		assertEquals(modelEntityRepository.count(), count);
 	}
 
 }

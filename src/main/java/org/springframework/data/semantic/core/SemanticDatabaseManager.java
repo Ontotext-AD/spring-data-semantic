@@ -10,7 +10,7 @@ import java.util.Map;
 import org.openrdf.http.protocol.Protocol;
 import org.openrdf.model.Graph;
 import org.openrdf.model.Resource;
-import org.openrdf.model.impl.GraphImpl;
+import org.openrdf.model.impl.TreeModel;
 import org.openrdf.model.util.GraphUtil;
 import org.openrdf.model.util.GraphUtilException;
 import org.openrdf.model.vocabulary.RDF;
@@ -154,7 +154,7 @@ public class SemanticDatabaseManager {
 			RDFHandlerException, IOException, GraphUtilException {
 
 		RepositoryConfig defaultConfig = new RepositoryConfig();
-		Graph graph = new GraphImpl();
+		Graph graph = new TreeModel();
 
 		InputStream configStream = SemanticDatabaseManager.class
 				.getClassLoader().getResourceAsStream(DEFAULT_CONFIG_FILE);

@@ -15,8 +15,8 @@ import org.springframework.data.semantic.support.mapping.SemanticMappingContext;
 import org.springframework.data.util.ClassTypeInformation;
 
 public class TestEntityToGraphQueryConverter {
-	private String expectedBindings = "<http://ontotext.com/resource/test> <urn:field:name> ?name . <http://ontotext.com/resource/test> <urn:field:related> ?related . ";
-	private String expectedPattern = "<http://ontotext.com/resource/test> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <urn:default:ModelEntity> . <http://ontotext.com/resource/test> <http://www.w3.org/2004/02/skos/core#prefLabel> ?name . <http://ontotext.com/resource/test> <urn:default:related> ?related . ";
+	private String expectedBindings = "<http://ontotext.com/resource/test> a <urn:default:ModelEntity> . <http://ontotext.com/resource/test> <urn:field:name> ?name . <http://ontotext.com/resource/test> <urn:field:related> ?related . ";
+	private String expectedPattern = "<http://ontotext.com/resource/test> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <urn:default:ModelEntity> . OPTIONAL { <http://ontotext.com/resource/test> <http://www.w3.org/2004/02/skos/core#prefLabel> ?name . } OPTIONAL { <http://ontotext.com/resource/test> <urn:default:related> ?related . } ";
 	private String expectedQuery = "CONSTRUCT { "+expectedBindings+" } WHERE { "+expectedPattern+"}";
 	private URI resource = new URIImpl("http://ontotext.com/resource/test");
 	private SemanticMappingContext mappingContext;
@@ -31,24 +31,24 @@ public class TestEntityToGraphQueryConverter {
 	
 	@Test
 	public void TestGetVar(){
-		assertEquals("bay", EntityToGraphQueryConverter.getVar(700));
+		assertEquals("bay", EntityToQueryConverter.getVar(700));
 	}
 	
 	@Test
 	public void TestBindingCreation(){
-		String queryBindings = EntityToGraphQueryConverter.getPropertyBindings(resource, testEntityType);
+		String queryBindings = EntityToQueryConverter.getPropertyBindings(resource, testEntityType);
 		assertEquals(expectedBindings, queryBindings);
 	}
 
 	@Test
 	public void TestPatternCreation(){
-		String queryPattern = EntityToGraphQueryConverter.getPropertyPatterns(resource, testEntityType);
+		String queryPattern = EntityToQueryConverter.getPropertyPatterns(resource, testEntityType);
 		assertEquals(expectedPattern, queryPattern);
 	}
 	
 	@Test
 	public void TestGraphQueryCreation(){
-		String query = EntityToGraphQueryConverter.getGraphQueryForResource(resource, testEntityType);
+		String query = EntityToQueryConverter.getGraphQueryForResource(resource, testEntityType);
 		assertEquals(expectedQuery.replaceAll("\\s+", " "), query.replaceAll("\\s+", " "));
 	}
 }

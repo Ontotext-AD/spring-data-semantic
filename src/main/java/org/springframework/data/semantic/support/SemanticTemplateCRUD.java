@@ -1,5 +1,7 @@
 package org.springframework.data.semantic.support;
 
+import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.openrdf.model.Model;
@@ -89,7 +91,7 @@ public class SemanticTemplateCRUD implements SemanticOperationsCRUD, Initializin
 	public <T> T save(T entity) {
 		@SuppressWarnings("unchecked")
 		SemanticPersistentEntity<T> persistentEntity = (SemanticPersistentEntity<T>) this.mappingContext.getPersistentEntity(entity.getClass());
-		Model dbState = this.statementsCollector.getStatementsForResourceClass(persistentEntity.getResourceId(entity), entity.getClass());
+		Model dbState = this.statementsCollector.getStatementsForResource(persistentEntity.getResourceId(entity), entity.getClass());
 		return this.entityPersister.persistEntity(entity, new RDFState(dbState));
 	}
 
@@ -98,11 +100,21 @@ public class SemanticTemplateCRUD implements SemanticOperationsCRUD, Initializin
 		// TODO Auto-generated method stub
 		
 	}
+	
+	@Override
+	public <T> Iterable<T> findAll(Class<? extends T> clazz) {
+		Collection<Model> statementsPerEntity = this.statementsCollector.getStatementsForResources(clazz);
+		List<T> results = new LinkedList<T>();
+		for(Model statements : statementsPerEntity){
+			results.add(createEntity(statements, clazz));
+		}
+		return results;
+	}
 
 	@Override
 	public <T> T find(URI resourceId, Class<? extends T> clazz) {
 		try{
-			return createEntity(this.statementsCollector.getStatementsForResourceClass(resourceId, clazz), clazz);
+			return createEntity(this.statementsCollector.getStatementsForResource(resourceId, clazz), clazz);
 		} catch (DataAccessException e){
 			logger.error(e.getMessage(), e);
 		}
@@ -117,7 +129,7 @@ public class SemanticTemplateCRUD implements SemanticOperationsCRUD, Initializin
 	@Override
 	public <T> long count(Class<T> clazz) {
 		try {
-			List<BindingSet> result = this.semanticDB.getQueryResults(EntityToGraphQueryConverter.getGraphQueryForResourceCount(this.mappingContext.getPersistentEntity(clazz)));
+			List<BindingSet> result = this.semanticDB.getQueryResults(EntityToQueryConverter.getGraphQueryForResourceCount(this.mappingContext.getPersistentEntity(clazz)));
 			return Long.valueOf(result.get(0).getValue("count").stringValue());
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
@@ -128,11 +140,13 @@ public class SemanticTemplateCRUD implements SemanticOperationsCRUD, Initializin
 	@Override
 	public <T> boolean exists(URI resourceId, Class<? extends T> clazz) {
 		try {
-			return this.semanticDB.getBooleanQueryResult(EntityToGraphQueryConverter.getQueryForResourceExistence(resourceId, this.mappingContext.getPersistentEntity(clazz)));
+			return this.semanticDB.getBooleanQueryResult(EntityToQueryConverter.getQueryForResourceExistence(resourceId, this.mappingContext.getPersistentEntity(clazz)));
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 		}
 		return false;
 	}
+
+
 	
 }

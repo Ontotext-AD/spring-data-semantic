@@ -6,6 +6,7 @@ import org.openrdf.model.URI;
 import org.springframework.data.semantic.annotation.Context;
 import org.springframework.data.semantic.annotation.Fetch;
 import org.springframework.data.semantic.annotation.Language;
+import org.springframework.data.semantic.annotation.Optional;
 import org.springframework.data.semantic.annotation.Predicate;
 import org.springframework.data.semantic.annotation.RelatedTo;
 import org.springframework.data.semantic.annotation.SemanticEntity;
@@ -20,6 +21,7 @@ public class ModelEntity {
 	private URI uri;
 	
 	//@Datatype(XSDDatatype.)
+	@Optional
 	@Language({Languages.en, Languages.de})
 	@Predicate({"http://www.w3.org/2004/02/skos/core#prefLabel"})
 	private String name;
@@ -27,6 +29,7 @@ public class ModelEntity {
 	@Context
 	private String graph;
 	
+	@Optional
 	@Fetch
 	@RelatedTo(dicrection=Direction.BOTH)
 	private List<ModelEntity> related;

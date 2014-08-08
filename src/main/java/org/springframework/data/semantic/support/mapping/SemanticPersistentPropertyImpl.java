@@ -21,6 +21,7 @@ import org.springframework.data.semantic.annotation.Datatype;
 import org.springframework.data.semantic.annotation.Fetch;
 import org.springframework.data.semantic.annotation.Language;
 import org.springframework.data.semantic.annotation.Language.Languages;
+import org.springframework.data.semantic.annotation.Optional;
 import org.springframework.data.semantic.annotation.Predicate;
 import org.springframework.data.semantic.annotation.ResourceId;
 import org.springframework.data.semantic.mapping.MappingPolicy;
@@ -214,5 +215,10 @@ public class SemanticPersistentPropertyImpl extends
 	@Override
 	public boolean isAnnotationPresent(Class<? extends Annotation> annotationType) {
 		return annotations.containsKey(annotationType);
+	}
+
+	@Override
+	public boolean isOptional() {
+		return annotations.containsKey(Optional.class);
 	}
 }
