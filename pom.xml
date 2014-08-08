@@ -8,6 +8,19 @@
 	<description></description>
 	<version>0.1-SNAPSHOT</version>
 
+	<distributionManagement>
+		<repository>
+			<id>internal</id>
+			<name>Ontotext Internal Repository</name>
+			<url>http://maven.ontotext.com/content/repositories/internal</url>
+		</repository>
+		<snapshotRepository>
+			<id>snapshots</id>
+			<name>Ontotext Snapshots Repository</name>
+			<url>http://maven.ontotext.com/content/repositories/snapshots</url>
+		</snapshotRepository>
+	</distributionManagement>
+
 	<dependencies>
 		<!-- Spring -->
 		<dependency>
