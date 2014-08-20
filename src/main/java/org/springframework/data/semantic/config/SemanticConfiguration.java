@@ -19,7 +19,7 @@ public class SemanticConfiguration {
 	
 	private SemanticDatabase semanticDatabase;
 	
-	@Autowired(required=true)
+	@Autowired(required=false)
 	public void setSemanticDatabase(SemanticDatabase semanticDatabase) {
 		this.semanticDatabase = semanticDatabase;
 	}
@@ -30,11 +30,11 @@ public class SemanticConfiguration {
 		return new SemanticTemplateCRUD(semanticDatabase, conversionService());
 	}
 	
-	@Bean
-	public SemanticTemplateStatementsCollector semanticTemplateStatementsCollector() throws RepositoryException {
-		return new SemanticTemplateStatementsCollector(semanticDatabase, conversionService(), 
-				new SemanticMappingContext(semanticDatabase.getNamespaces(), semanticDatabase.getDefaultNamespace()));
-	}
+//	@Bean
+//	public SemanticTemplateStatementsCollector semanticTemplateStatementsCollector() throws RepositoryException {
+//		return new SemanticTemplateStatementsCollector(semanticDatabase, conversionService(), 
+//				new SemanticMappingContext(semanticDatabase.getNamespaces(), semanticDatabase.getDefaultNamespace()));
+//	}
 	
 	@SuppressWarnings("deprecation")
 	@Bean

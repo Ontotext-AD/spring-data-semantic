@@ -7,7 +7,6 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.semantic.core.SemanticDatabase;
 import org.springframework.data.semantic.support.SemanticTemplateCRUD;
-import org.springframework.data.semantic.support.SemanticTemplateStatementsCollector;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -21,9 +20,6 @@ public class ConfigTest {
 	@Autowired(required=false)
 	SemanticTemplateCRUD crud;
 	
-	@Autowired(required=false)
-	SemanticTemplateStatementsCollector statementsCollector;
-	
 	@Test
 	public void testConfiguration() throws Exception{
 		assertNotNull(sdb);
@@ -32,7 +28,7 @@ public class ConfigTest {
 	@Test
 	public void testTemplateInstantiation(){
 		assertNotNull(crud);
-		assertNotNull(statementsCollector);
+		//assertNotNull(statementsCollector);
 		//assertNotNull(template.getSemanticDatabase());
 	}
 

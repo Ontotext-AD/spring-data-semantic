@@ -18,7 +18,10 @@ public class SemanticConfigurationBeanDefinitionParser extends
 			ParserContext parserContext) {
 		BeanDefinitionBuilder builder = BeanDefinitionBuilder
 				.rootBeanDefinition(SemanticConfiguration.class);
-		builder.addPropertyReference("semanticDatabase", element.getAttribute("semantic-database-ref"));
+		if(element.hasAttribute("semantic-database-ref")){
+			builder.addPropertyReference("semanticDatabase", element.getAttribute("semantic-database-ref"));
+		}
+		
 		builder.setAutowireMode(Autowire.BY_TYPE.value());
 		setupConfigurationClassPostProcessor(parserContext);
 		return getSourcedBeanDefinition(builder, element, parserContext);

@@ -106,5 +106,7 @@ public class SemanticTemplateStatementsCollector implements SemanticOperationsSt
 			} catch (Exception e) {
 				throw ExceptionTranslator.translateExceptionIfPossible(e);
 			}
-	}	
+	}
+	
+	
 }

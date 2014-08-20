@@ -12,6 +12,5 @@
 	<semantic:config semantic-database-ref="lcie" />
 	
 	<semantic:semantic-database id="lcie" url="target/repositories/data-test" configFile="classpath:META-INF/config/data-memory.ttl"/>
-	
 		
 </beans>

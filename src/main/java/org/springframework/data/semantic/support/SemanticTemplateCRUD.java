@@ -39,6 +39,8 @@ public class SemanticTemplateCRUD implements SemanticOperationsCRUD, Initializin
 		
 	private SemanticDatabase semanticDB;
 	
+	private ConversionService conversionService;
+	
 	private SemanticMappingContext mappingContext;
 	
 	private SemanticTemplateStatementsCollector statementsCollector;
@@ -55,21 +57,35 @@ public class SemanticTemplateCRUD implements SemanticOperationsCRUD, Initializin
 	
 	public SemanticTemplateCRUD(SemanticDatabase semanticDB, ConversionService conversionService){
 		this.semanticDB = semanticDB;
-		
-		try {
-			this.mappingContext = new SemanticMappingContext(semanticDB.getNamespaces(), this.semanticDB.getDefaultNamespace());
-			this.entityInstantiator = new SemanticEntityInstantiatorImpl();
-			this.statementsCollector = new SemanticTemplateStatementsCollector(semanticDB, conversionService, this.mappingContext);
-			this.delegatingFieldAxsorFactory = new DelegatingFieldAccessorFactory(this.statementsCollector, this);
-			this.delegatingFieldAccessListenerFactory = new DelegatingFieldAccessListenerFactory(this.statementsCollector, this);
-			this.sesFactory = new SemanticEntityStateFactory(this.mappingContext, this.delegatingFieldAxsorFactory, this.delegatingFieldAccessListenerFactory, semanticDB);
-			this.sourceStateTransmitter = new SemanticSourceStateTransmitter(this.sesFactory);
-			this.entityConverter = new SemanticEntityConverterImpl(this.mappingContext, conversionService, this.entityInstantiator, this.sourceStateTransmitter);
-			this.entityPersister = new SemanticEntityPersisterImpl(this.entityConverter);
-		} catch (RepositoryException e) {
-			throw ExceptionTranslator.translateExceptionIfPossible(e);
-		}		
-	}		
+		this.conversionService = conversionService;
+		init();
+	}
+	
+	public void changeDatabase(SemanticDatabase semanticDB){
+		this.semanticDB = semanticDB;
+		init();
+	}
+	
+	private void init(){
+		if(this.semanticDB != null && this.conversionService != null){
+			try {
+				this.mappingContext = new SemanticMappingContext(semanticDB.getNamespaces(), this.semanticDB.getDefaultNamespace());
+				this.entityInstantiator = new SemanticEntityInstantiatorImpl();
+				this.statementsCollector = new SemanticTemplateStatementsCollector(this.semanticDB, this.conversionService, this.mappingContext);
+				this.delegatingFieldAxsorFactory = new DelegatingFieldAccessorFactory(this.statementsCollector, this);
+				this.delegatingFieldAccessListenerFactory = new DelegatingFieldAccessListenerFactory(this.statementsCollector, this);
+				this.sesFactory = new SemanticEntityStateFactory(this.mappingContext, this.delegatingFieldAxsorFactory, this.delegatingFieldAccessListenerFactory, this.semanticDB);
+				this.sourceStateTransmitter = new SemanticSourceStateTransmitter(this.sesFactory);
+				this.entityConverter = new SemanticEntityConverterImpl(this.mappingContext, this.conversionService, this.entityInstantiator, this.sourceStateTransmitter);
+				this.entityPersister = new SemanticEntityPersisterImpl(this.entityConverter);
+			} catch (RepositoryException e) {
+				throw ExceptionTranslator.translateExceptionIfPossible(e);
+			}
+		}
+		else{
+			logger.warn("The SemanticTemplateCRUD is not initialized due to no semantic database or conversion service provided.");
+		}
+	}
 	
 	/*private SemanticPersistentEntity<?> getPersistentEntity(Class<?> targetClazz){
 		return (SemanticPersistentEntityImpl<?>) mappingContext.getPersistentEntity(targetClazz);
@@ -148,5 +164,6 @@ public class SemanticTemplateCRUD implements SemanticOperationsCRUD, Initializin
 	}
 
 
+	
 	
 }
