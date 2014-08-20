@@ -57,7 +57,7 @@ public class EntityToStatementsConverter {
 		@Override
 		public void doWithPersistentProperty(SemanticPersistentProperty persistentProperty) {
 			Object value = persistentProperty.getValue(entity, persistentEntity.getMappingPolicy());
-			if(persistentProperty.shallBePersisted()){
+			if(persistentProperty.shallBePersisted() && value != null){
 				if(persistentProperty.isCollectionLike()){
 					if(persistentProperty.isArray()){
 						Object[] values = (Object[]) value;
@@ -84,6 +84,9 @@ public class EntityToStatementsConverter {
 		public void doWithAssociation(Association<SemanticPersistentProperty> association) {
 			SemanticPersistentProperty persistentProperty = association.getInverse();
 			Object value = persistentProperty.getValue(entity, persistentEntity.getMappingPolicy());
+			if(value == null){
+				return;
+			}
 			if(persistentProperty.isCollectionLike()){
 				SemanticPersistentEntity<Object> associatedEntity = (SemanticPersistentEntity<Object>) mappingContext.getPersistentEntity(persistentProperty.getComponentType());
 				Collection<Object> associatedEntityInstances;
