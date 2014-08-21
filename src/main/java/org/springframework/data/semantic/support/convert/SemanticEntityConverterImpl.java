@@ -86,8 +86,7 @@ public class SemanticEntityConverterImpl implements SemanticEntityConverter {
 			MappingPolicy mappingPolicy,
 			SemanticPersistentEntity<R> persistentEntity) {
 		if (mappingPolicy.eagerLoad()) {
-            final BeanWrapper<R> wrapper = 
-            		BeanWrapper.<R>create(entity, conversionService);
+            final BeanWrapper<R> wrapper = BeanWrapper.<R>create(entity, conversionService);
             
             sourceStateTransmitter.copyPropertiesFrom(wrapper, source, persistentEntity, mappingPolicy);
             
@@ -103,30 +102,38 @@ public class SemanticEntityConverterImpl implements SemanticEntityConverter {
                 final SemanticPersistentProperty property = association.getInverse();
                 // MappingPolicy mappingPolicy = policy.combineWith(property.getMappingPolicy());
                 final MappingPolicy mappingPolicy = property.getMappingPolicy();
-                if (mappingPolicy.eagerLoad()) {
-                   //TODO
-                }
-                else{
-                	@SuppressWarnings("unchecked")
-					SemanticPersistentEntity<Object> entity = (SemanticPersistentEntity<Object>) mappingContext.getPersistentEntity(property.getTypeInformation().getActualType());
-                	Set<Value> associatedEntityIds = source.getCurrentStatements().filter(null, new URIImpl(property.getAliasPredicate()), null).objects();
-                	if (property.getTypeInformation().isCollectionLike()) {
-                		List<Object> associationValuesList = new LinkedList<Object>();
-                		for(Value associatedEntityId : associatedEntityIds){
-                    		if(associatedEntityId instanceof URI){
-                    			Object associatedEntity = entityInstantiator.createInstance(entity, (URI) associatedEntityId);
-                    			associationValuesList.add(associatedEntity);
-                    		}
-                    	}
-                		sourceStateTransmitter.setProperty(wrapper, property, associationValuesList);
-                	}
-                	else{
-                		if(!associatedEntityIds.isEmpty()){
-                			Object associatedEntity = entityInstantiator.createInstance(entity, (URI) associatedEntityIds.iterator().next());
-                			sourceStateTransmitter.setProperty(wrapper, property, associatedEntity);
+                @SuppressWarnings("unchecked")
+				SemanticPersistentEntity<Object> entity = (SemanticPersistentEntity<Object>) mappingContext.getPersistentEntity(property.getTypeInformation().getActualType());
+            	Set<Value> associatedEntityIds = source.getCurrentStatements().filter(null, new URIImpl(property.getAliasPredicate()), null).objects();
+            	if (property.getTypeInformation().isCollectionLike()) {
+            		List<Object> associationValuesList = new LinkedList<Object>();
+            		for(Value associatedEntityId : associatedEntityIds){
+                		if(associatedEntityId instanceof URI){
+                			URI associatedEntityURI = (URI) associatedEntityId;
+                			Object associatedEntity = entityInstantiator.createInstance(entity, (URI) associatedEntityId);
+                			associationValuesList.add(associatedEntity);
+                			if (mappingPolicy.eagerLoad()) {
+                                RDFState associatedEntityState = new RDFState(source.getCurrentStatements().filter(associatedEntityURI, null, null));
+                                final BeanWrapper<Object> associatedWrapper = BeanWrapper.<Object>create(associatedEntity, conversionService);
+                                sourceStateTransmitter.copyPropertiesFrom(associatedWrapper, associatedEntityState, entity, mappingPolicy);
+                            }
                 		}
                 	}
-                }
+            		sourceStateTransmitter.setProperty(wrapper, property, associationValuesList);
+            	}
+            	else{
+            		if(!associatedEntityIds.isEmpty()){
+            			URI associatedEntityURI = (URI) associatedEntityIds.iterator().next();
+            			Object associatedEntity = entityInstantiator.createInstance(entity, associatedEntityURI);
+            			if (mappingPolicy.eagerLoad()) {
+            				 RDFState associatedEntityState = new RDFState(source.getCurrentStatements().filter(associatedEntityURI, null, null));
+                             final BeanWrapper<Object> associatedWrapper = BeanWrapper.<Object>create(associatedEntity, conversionService);
+                             sourceStateTransmitter.copyPropertiesFrom(associatedWrapper, associatedEntityState, entity, mappingPolicy);
+                        }
+            			sourceStateTransmitter.setProperty(wrapper, property, associatedEntity);
+            			
+            		}
+            	}
             }
         });
 	}
