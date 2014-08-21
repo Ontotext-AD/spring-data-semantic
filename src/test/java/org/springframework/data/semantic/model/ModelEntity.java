@@ -4,14 +4,13 @@ import java.util.List;
 
 import org.openrdf.model.URI;
 import org.springframework.data.semantic.annotation.Context;
-import org.springframework.data.semantic.annotation.Fetch;
 import org.springframework.data.semantic.annotation.Language;
+import org.springframework.data.semantic.annotation.Language.Languages;
 import org.springframework.data.semantic.annotation.Optional;
 import org.springframework.data.semantic.annotation.Predicate;
 import org.springframework.data.semantic.annotation.RelatedTo;
-import org.springframework.data.semantic.annotation.SemanticEntity;
 import org.springframework.data.semantic.annotation.ResourceId;
-import org.springframework.data.semantic.annotation.Language.Languages;
+import org.springframework.data.semantic.annotation.SemanticEntity;
 import org.springframework.data.semantic.support.Direction;
 
 @SemanticEntity()
@@ -30,7 +29,6 @@ public class ModelEntity {
 	private String graph;
 	
 	@Optional
-	@Fetch
 	@RelatedTo(dicrection=Direction.BOTH)
 	private List<ModelEntity> related;
 

@@ -282,7 +282,13 @@ public class EntityToQueryConverter {
 		
 		private void handleAssociation(SemanticPersistentProperty persistentProperty) {
 			if(persistentProperty.getMappingPolicy().eagerLoad()){
-				//TODO
+				if(id != null){
+					appendPattern(sb, "<"+id.stringValue()+">", "<" + persistentProperty.getAliasPredicate() + ">", "?"+persistentProperty.getName());
+					
+				}
+				else{
+					//TODO
+				}
 			}
 			else{
 				if(id != null){

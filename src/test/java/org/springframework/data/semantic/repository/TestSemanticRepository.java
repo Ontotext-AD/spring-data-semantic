@@ -112,7 +112,7 @@ public class TestSemanticRepository {
 		Iterable<ModelEntity> modelEntities = modelEntityRepository.findAll();
 		int count = 0;
 		for(ModelEntity entity : modelEntities){
-			assertNotNull(entity.getName());
+			assertNotNull(entity.getUri());
 			count++;
 		}
 		assertEquals(modelEntityRepository.count(), count);

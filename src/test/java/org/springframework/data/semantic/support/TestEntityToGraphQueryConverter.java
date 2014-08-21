@@ -18,6 +18,9 @@ public class TestEntityToGraphQueryConverter {
 	private String expectedBindings = "<http://ontotext.com/resource/test> a <urn:default:ModelEntity> . <http://ontotext.com/resource/test> <urn:field:name> ?name . <http://ontotext.com/resource/test> <urn:field:related> ?related . ";
 	private String expectedPattern = "<http://ontotext.com/resource/test> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <urn:default:ModelEntity> . OPTIONAL { <http://ontotext.com/resource/test> <http://www.w3.org/2004/02/skos/core#prefLabel> ?name . } OPTIONAL { <http://ontotext.com/resource/test> <urn:default:related> ?related . } ";
 	private String expectedQuery = "CONSTRUCT { "+expectedBindings+" } WHERE { "+expectedPattern+"}";
+	
+	private String expectedBindingsEager = "<http://ontotext.com/resource/test> a ";
+	
 	private URI resource = new URIImpl("http://ontotext.com/resource/test");
 	private SemanticMappingContext mappingContext;
 	private SemanticPersistentEntity<?> testEntityType;
@@ -50,5 +53,10 @@ public class TestEntityToGraphQueryConverter {
 	public void TestGraphQueryCreation(){
 		String query = EntityToQueryConverter.getGraphQueryForResource(resource, testEntityType);
 		assertEquals(expectedQuery.replaceAll("\\s+", " "), query.replaceAll("\\s+", " "));
+	}
+	
+	@Test
+	public void TestBindingCreationEagerLoad(){
+		
 	}
 }

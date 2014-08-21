@@ -180,12 +180,12 @@ public class SemanticPersistentPropertyImpl extends
 
 	@Override
 	public MappingPolicy getMappingPolicy() {
-		if (!annotations.containsKey(Fetch.class) && !isAssociation()){
+		if (!annotations.containsKey(Fetch.class)){
             //return MappingPolicy.DEFAULT_POLICY;
-			return MappingPolicy.MAP_FIELD_DIRECT_POLICY;
+			return MappingPolicy.LAZY_LOAD_POLICY;
 		}
         else {
-            return MappingPolicy.LAZY_LOAD_POLICY;
+        	return MappingPolicy.DEFAULT_POLICY;
         }
 	}
 	
