@@ -99,8 +99,9 @@ public class EntityToStatementsConverter {
 				for(Object associatedEntityInstance : associatedEntityInstances){
 					URI associatedResourceId = associatedEntity.getResourceId(associatedEntityInstance);
 					addToStatements(persistentProperty, associatedResourceId);
-					if(persistentProperty.getMappingPolicy().eagerLoad()){
-						//TODO
+					if(persistentProperty.getMappingPolicy().eagerLoad() && !statements.getCurrentStatements().subjects().contains(associatedResourceId)){
+						associatedEntity.doWithProperties(this);
+						associatedEntity.doWithAssociations(this);
 					}
 				}
 			}
@@ -108,8 +109,9 @@ public class EntityToStatementsConverter {
 				SemanticPersistentEntity<Object> associatedEntity = (SemanticPersistentEntity<Object>) mappingContext.getPersistentEntity(persistentProperty.getType());
 				URI associatedResourceId = associatedEntity.getResourceId(value);
 				addToStatements(persistentProperty, associatedResourceId);
-				if(persistentProperty.getMappingPolicy().eagerLoad()){
-					//TODO
+				if(persistentProperty.getMappingPolicy().eagerLoad() && !statements.getCurrentStatements().subjects().contains(associatedResourceId)){
+					associatedEntity.doWithProperties(this);
+					associatedEntity.doWithAssociations(this);
 				}
 			}
 		}

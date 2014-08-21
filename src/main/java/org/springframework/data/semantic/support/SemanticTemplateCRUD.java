@@ -52,6 +52,7 @@ public class SemanticTemplateCRUD implements SemanticOperationsCRUD, Initializin
 	private SemanticEntityStateFactory sesFactory;
 	private SemanticSourceStateTransmitter sourceStateTransmitter;
 	private SemanticEntityConverter entityConverter;
+	private EntityToQueryConverter entityToQueryConverter;
 	
 	private Logger logger = LoggerFactory.getLogger(SemanticTemplateCRUD.class);
 	
@@ -69,15 +70,18 @@ public class SemanticTemplateCRUD implements SemanticOperationsCRUD, Initializin
 	private void init(){
 		if(this.semanticDB != null && this.conversionService != null){
 			try {
-				this.mappingContext = new SemanticMappingContext(semanticDB.getNamespaces(), this.semanticDB.getDefaultNamespace());
 				this.entityInstantiator = new SemanticEntityInstantiatorImpl();
-				this.statementsCollector = new SemanticTemplateStatementsCollector(this.semanticDB, this.conversionService, this.mappingContext);
+				this.mappingContext = new SemanticMappingContext(semanticDB.getNamespaces(), this.semanticDB.getDefaultNamespace());
+				this.entityToQueryConverter = new EntityToQueryConverter(this.mappingContext);
+				this.statementsCollector = new SemanticTemplateStatementsCollector(this.semanticDB, this.conversionService, this.mappingContext, this.entityToQueryConverter);
 				this.delegatingFieldAxsorFactory = new DelegatingFieldAccessorFactory(this.statementsCollector, this);
 				this.delegatingFieldAccessListenerFactory = new DelegatingFieldAccessListenerFactory(this.statementsCollector, this);
 				this.sesFactory = new SemanticEntityStateFactory(this.mappingContext, this.delegatingFieldAxsorFactory, this.delegatingFieldAccessListenerFactory, this.semanticDB);
 				this.sourceStateTransmitter = new SemanticSourceStateTransmitter(this.sesFactory);
 				this.entityConverter = new SemanticEntityConverterImpl(this.mappingContext, this.conversionService, this.entityInstantiator, this.sourceStateTransmitter);
 				this.entityPersister = new SemanticEntityPersisterImpl(this.entityConverter);
+				
+				
 			} catch (RepositoryException e) {
 				throw ExceptionTranslator.translateExceptionIfPossible(e);
 			}
@@ -145,7 +149,7 @@ public class SemanticTemplateCRUD implements SemanticOperationsCRUD, Initializin
 	@Override
 	public <T> long count(Class<T> clazz) {
 		try {
-			List<BindingSet> result = this.semanticDB.getQueryResults(EntityToQueryConverter.getGraphQueryForResourceCount(this.mappingContext.getPersistentEntity(clazz)));
+			List<BindingSet> result = this.semanticDB.getQueryResults(entityToQueryConverter.getGraphQueryForResourceCount(this.mappingContext.getPersistentEntity(clazz)));
 			return Long.valueOf(result.get(0).getValue("count").stringValue());
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
@@ -156,7 +160,7 @@ public class SemanticTemplateCRUD implements SemanticOperationsCRUD, Initializin
 	@Override
 	public <T> boolean exists(URI resourceId, Class<? extends T> clazz) {
 		try {
-			return this.semanticDB.getBooleanQueryResult(EntityToQueryConverter.getQueryForResourceExistence(resourceId, this.mappingContext.getPersistentEntity(clazz)));
+			return this.semanticDB.getBooleanQueryResult(entityToQueryConverter.getQueryForResourceExistence(resourceId, this.mappingContext.getPersistentEntity(clazz)));
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 		}

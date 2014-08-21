@@ -9,6 +9,7 @@ import org.springframework.data.mapping.AssociationHandler;
 import org.springframework.data.mapping.PropertyHandler;
 import org.springframework.data.semantic.mapping.SemanticPersistentEntity;
 import org.springframework.data.semantic.mapping.SemanticPersistentProperty;
+import org.springframework.data.semantic.support.mapping.SemanticMappingContext;
 import org.springframework.util.StringUtils;
 
 /**
@@ -20,6 +21,12 @@ public class EntityToQueryConverter {
 	
 	private static String variableChars = "abcdefghijklmnopqrstuvwxyz";
 	
+	private SemanticMappingContext mappingContext;
+	
+	public EntityToQueryConverter(SemanticMappingContext mappingContext){
+		this.mappingContext = mappingContext;
+	}
+	
 	
 	/**
 	 * Create a graph query retrieving a specific property of the entity identified by this uri
@@ -28,7 +35,7 @@ public class EntityToQueryConverter {
 	 * @param property
 	 * @return
 	 */
-	public static String getGraphQueryForResourceProperty(URI uri, SemanticPersistentEntity<?> entity, SemanticPersistentProperty property){
+	public String getGraphQueryForResourceProperty(URI uri, SemanticPersistentEntity<?> entity, SemanticPersistentProperty property){
 		StringBuilder sb = new StringBuilder();
 		
 		sb.append("CONSTRUCT { ");
@@ -48,7 +55,7 @@ public class EntityToQueryConverter {
 	 * @param entity - the container which holds the information about that entity
 	 * @return
 	 */
-	public static String getGraphQueryForResource(URI uri, SemanticPersistentEntity<?> entity){
+	public String getGraphQueryForResource(URI uri, SemanticPersistentEntity<?> entity){
 		StringBuilder sb = new StringBuilder();
 		
 		sb.append("CONSTRUCT { ");
@@ -66,7 +73,7 @@ public class EntityToQueryConverter {
 	 * @param entity
 	 * @return
 	 */
-	public static String getGraphQueryForResourceCount(SemanticPersistentEntity<?> entity){
+	public String getGraphQueryForResourceCount(SemanticPersistentEntity<?> entity){
 		return "SELECT (COUNT (DISTINCT ?uri) as ?count) WHERE { ?uri a <"+entity.getRDFType()+">}";
 	}
 	
@@ -76,11 +83,11 @@ public class EntityToQueryConverter {
 	 * @param entity
 	 * @return
 	 */
-	public static String getQueryForResourceExistence(URI resourceId, SemanticPersistentEntity<?> entity){
+	public String getQueryForResourceExistence(URI resourceId, SemanticPersistentEntity<?> entity){
 		return "ASK {<"+resourceId+"> a <"+entity.getRDFType()+">}";
 	}
 	
-	public static String getGraphQueryForEntityClass(SemanticPersistentEntity<?> entity){
+	public String getGraphQueryForEntityClass(SemanticPersistentEntity<?> entity){
 		StringBuilder sb = new StringBuilder();
 		
 		sb.append("CONSTRUCT { ");
@@ -99,15 +106,18 @@ public class EntityToQueryConverter {
 	 * @param entity - the container holding the information about the entity's structure
 	 * @return
 	 */
-	protected static String getPropertyBindings(URI uri, SemanticPersistentEntity<?> entity){
+	protected String getPropertyBindings(URI uri, SemanticPersistentEntity<?> entity){
 		StringBuilder sb = new StringBuilder();
+		String binding;
 		if(uri != null){
-			appendPattern(sb, "<"+uri+">", "a", "<"+entity.getRDFType()+">");
+			binding = "<"+uri+">";
 		}
 		else{
-			appendPattern(sb, "?uri", "a", "<"+entity.getRDFType()+">");
+			binding = "?"+entity.getRDFType().getLocalName();
+			
 		}
-		PropertiesToBindingsHandler handler = new PropertiesToBindingsHandler(sb, uri);
+		appendPattern(sb, binding, "a", "<"+entity.getRDFType()+">");
+		PropertiesToBindingsHandler handler = new PropertiesToBindingsHandler(sb, binding);
 		entity.doWithProperties(handler);
 		entity.doWithAssociations(handler);
 		return sb.toString();
@@ -132,13 +142,13 @@ public class EntityToQueryConverter {
 	 * @param property
 	 * @return
 	 */
-	protected static String getPropertyPattern(URI uri, SemanticPersistentEntity<?> entity, SemanticPersistentProperty property){
+	protected String getPropertyPattern(URI uri, SemanticPersistentEntity<?> entity, SemanticPersistentProperty property){
 		StringBuilder sb = new StringBuilder();
-		new PropertiesToPatternsHandler(sb, uri).doWithPersistentProperty(property);
+		new PropertiesToPatternsHandler(sb, "<"+uri+">").doWithPersistentProperty(property);
 		return sb.toString();
 	}
 	
-	protected static String getPropertyPatterns(URI uri, SemanticPersistentEntity<?> entity){
+	protected String getPropertyPatterns(URI uri, SemanticPersistentEntity<?> entity){
 		StringBuilder sb = new StringBuilder();
 		/*SemanticPersistentProperty contextP = entity.getContextProperty();
 		if(contextP != null){
@@ -146,13 +156,15 @@ public class EntityToQueryConverter {
 			//sb.append(contextP.); TODO
 			sb.append("{ ");
 		}*/
+		String binding;
 		if(uri != null){
-			appendPattern(sb, "<"+uri.stringValue()+">", "<"+ValueUtils.RDF_TYPE_PREDICATE+">", "<"+entity.getRDFType()+">");
+			binding = "<"+uri.stringValue()+">";
 		}
 		else{
-			appendPattern(sb, "?uri", "<"+ValueUtils.RDF_TYPE_PREDICATE+">", "<"+entity.getRDFType()+">");
+			binding = "?"+entity.getRDFType().getLocalName();
 		}
-		PropertiesToPatternsHandler handler = new PropertiesToPatternsHandler(sb, uri);
+		appendPattern(sb, binding, "<"+ValueUtils.RDF_TYPE_PREDICATE+">", "<"+entity.getRDFType()+">");
+		PropertiesToPatternsHandler handler = new PropertiesToPatternsHandler(sb, binding);
 		entity.doWithProperties(handler);
 		entity.doWithAssociations(handler);
 		return sb.toString();
@@ -167,7 +179,7 @@ public class EntityToQueryConverter {
 		sb.append(" . ");
 	}
 	
-	protected static  String getVar(int input){
+	protected String getVar(int input){
 		int alphabetSize = variableChars.length();
 		int result = input / alphabetSize;
 		int remainder = input % alphabetSize;
@@ -181,16 +193,16 @@ public class EntityToQueryConverter {
 		return StringUtils.collectionToDelimitedString(var, "");
 	}
 	
-	private static class PropertiesToPatternsHandler 
+	private class PropertiesToPatternsHandler 
 	implements PropertyHandler<SemanticPersistentProperty>, AssociationHandler<SemanticPersistentProperty>{
 
 		private StringBuilder sb;
-		private URI id;
+		private String binding;
 		private int processedProps = 0;
 
-		PropertiesToPatternsHandler(StringBuilder sb, URI id){
+		PropertiesToPatternsHandler(StringBuilder sb, String binding){
 			this.sb = sb;
-			this.id = id;
+			this.binding = binding;
 		}
 
 		@Override
@@ -219,12 +231,7 @@ public class EntityToQueryConverter {
 				while(predicates.hasNext()){
 					String pred = "<"+predicates.next().stringValue()+">";
 					if(var.isEmpty()){
-						if(id != null){
-							subj = "<"+id.stringValue()+">";
-						}
-						else{
-							subj = "?uri";
-						}
+						subj = binding;
 						var = getVar(processedProps++);
 					}
 					else{
@@ -246,14 +253,14 @@ public class EntityToQueryConverter {
 		}		
 	}
 		
-	private static class PropertiesToBindingsHandler implements  PropertyHandler<SemanticPersistentProperty>,  AssociationHandler<SemanticPersistentProperty> {
+	private class PropertiesToBindingsHandler implements  PropertyHandler<SemanticPersistentProperty>,  AssociationHandler<SemanticPersistentProperty> {
 
 		private StringBuilder sb;
-		private URI id;
+		private String binding;
 		
-		PropertiesToBindingsHandler(StringBuilder sb, URI id){
+		PropertiesToBindingsHandler(StringBuilder sb, String binding){
 			this.sb = sb;
-			this.id = id;
+			this.binding = binding;
 		}
 		
 		@Override
@@ -271,32 +278,19 @@ public class EntityToQueryConverter {
 		
 		private void handlePersistentProperty(SemanticPersistentProperty persistentProperty) {
 			if(isRetrivableProperty(persistentProperty)){
-				if(id != null){
-					appendPattern(sb, "<"+id.stringValue()+">", "<" + persistentProperty.getAliasPredicate() + ">", "?"+persistentProperty.getName());
-				}
-				else{
-					appendPattern(sb, "?uri", "<" + persistentProperty.getAliasPredicate() + ">", "?"+persistentProperty.getName());
-				}
+				appendPattern(sb, binding, "<" + persistentProperty.getAliasPredicate() + ">", "?"+persistentProperty.getName());
 			}
 		}
 		
 		private void handleAssociation(SemanticPersistentProperty persistentProperty) {
+			String associationBinding = "?"+persistentProperty.getName();
+			appendPattern(sb, binding, "<" + persistentProperty.getAliasPredicate() + ">", associationBinding);
 			if(persistentProperty.getMappingPolicy().eagerLoad()){
-				if(id != null){
-					appendPattern(sb, "<"+id.stringValue()+">", "<" + persistentProperty.getAliasPredicate() + ">", "?"+persistentProperty.getName());
-					
-				}
-				else{
-					//TODO
-				}
-			}
-			else{
-				if(id != null){
-					appendPattern(sb, "<"+id.stringValue()+">", "<" + persistentProperty.getAliasPredicate() + ">", "?"+persistentProperty.getName());
-				}
-				else{
-					appendPattern(sb, "?uri", "<" + persistentProperty.getAliasPredicate() + ">", "?"+persistentProperty.getName());
-				}
+				SemanticPersistentEntity<?> associatedPersistentEntity = mappingContext.getPersistentEntity(persistentProperty.getActualType());
+				appendPattern(sb, associationBinding, "a", "<"+associatedPersistentEntity.getRDFType()+">");
+				PropertiesToBindingsHandler associationHandler = new PropertiesToBindingsHandler(this.sb, associationBinding);
+				associatedPersistentEntity.doWithProperties(associationHandler);
+				associatedPersistentEntity.doWithAssociations(associationHandler);
 			}
 		}
 	}

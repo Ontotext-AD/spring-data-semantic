@@ -25,13 +25,16 @@ public class SemanticTemplateStatementsCollector implements SemanticOperationsSt
 	
 	private SemanticDatabase semanticDB;	
 	private SemanticMappingContext mappingContext;
+	private EntityToQueryConverter entityToQueryConverter;
+	
 	
 	public SemanticTemplateStatementsCollector(SemanticDatabase semanticDB, ConversionService conversionService, 
-			SemanticMappingContext mappingContext) throws RepositoryException {
+			SemanticMappingContext mappingContext, EntityToQueryConverter entityToQueryConverter) throws RepositoryException {
 		
 		this.semanticDB = semanticDB;
 		this.mappingContext = mappingContext != null ? mappingContext 
 				: new SemanticMappingContext(semanticDB.getNamespaces(), semanticDB.getDefaultNamespace());
+		this.entityToQueryConverter = entityToQueryConverter;
 	}	
 	
 	public MappingPolicy getMappingPolicy(Class<?> clazz){
@@ -49,7 +52,7 @@ public class SemanticTemplateStatementsCollector implements SemanticOperationsSt
 		URI uri = persistentEntity.getResourceId(entity);
 		try {
 			return semanticDB.getGraphQueryResults(
-				EntityToQueryConverter.getGraphQueryForResourceProperty(uri, persistentEntity, property));
+				entityToQueryConverter.getGraphQueryForResourceProperty(uri, persistentEntity, property));
 		} catch (Exception e) {
 			throw ExceptionTranslator.translateExceptionIfPossible(e);
 		}
@@ -59,7 +62,7 @@ public class SemanticTemplateStatementsCollector implements SemanticOperationsSt
 	public Model getStatementsForResource(URI resource, Class<?> clazz) {
 		try {
 			return semanticDB.getGraphQueryResults(
-					EntityToQueryConverter.getGraphQueryForResource(resource, getPersistentEntity(clazz)));
+					entityToQueryConverter.getGraphQueryForResource(resource, getPersistentEntity(clazz)));
 		} catch (Exception e) {
 			throw ExceptionTranslator.translateExceptionIfPossible(e);
 		} 
@@ -74,7 +77,7 @@ public class SemanticTemplateStatementsCollector implements SemanticOperationsSt
 	public Collection<Model> getStatementsForResources(Class<?> clazz, Long offset, Long limit) {
 			try {
 				SemanticPersistentEntity<?> persistentEntity = mappingContext.getPersistentEntity(clazz);
-				Model results = semanticDB.getGraphQueryResults(EntityToQueryConverter.getGraphQueryForEntityClass(persistentEntity), offset, limit);
+				Model results = semanticDB.getGraphQueryResults(entityToQueryConverter.getGraphQueryForEntityClass(persistentEntity), offset, limit);
 				Set<Resource> subjects = results.filter(null, null, persistentEntity.getRDFType()).subjects();
 				Map<Resource, Resource> resourceToSubject = new HashMap<Resource, Resource>();
 				Map<Resource, Model> subjectToModel = new HashMap<Resource, Model>();
