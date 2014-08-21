@@ -214,7 +214,16 @@ public class EntityToQueryConverter {
 		@Override
 		public void doWithAssociation(
 				Association<SemanticPersistentProperty> association) {
-			handlePersistentProperty(association.getInverse());
+			SemanticPersistentProperty persistentProperty = association.getInverse();
+			handlePersistentProperty(persistentProperty);
+			if(persistentProperty.getMappingPolicy().eagerLoad()){
+				SemanticPersistentEntity<?> associatedPersistentEntity = mappingContext.getPersistentEntity(persistentProperty.getActualType());
+				String associationBinding = "?"+persistentProperty.getName();
+				appendPattern(sb, associationBinding, "<"+ValueUtils.RDF_TYPE_PREDICATE+">", "<"+associatedPersistentEntity.getRDFType()+">");
+				PropertiesToPatternsHandler associationHandler = new PropertiesToPatternsHandler(this.sb, associationBinding);
+				associatedPersistentEntity.doWithProperties(associationHandler);
+				associatedPersistentEntity.doWithAssociations(associationHandler);
+			}
 
 		}
 		

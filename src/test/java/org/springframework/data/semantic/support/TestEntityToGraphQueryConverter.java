@@ -72,4 +72,16 @@ public class TestEntityToGraphQueryConverter {
 		String queryBindings = entityToQueryConverter.getPropertyBindings(collectionResource, testCollectionType);
 		assertEquals(expectedBindingsEager, queryBindings);
 	}
+	
+	@Test
+	public void TestPatternCreationEagerLoad(){
+		String queryPattern = entityToQueryConverter.getPropertyPatterns(collectionResource, testCollectionType);
+		assertEquals(expectedPatternEager, queryPattern);
+	}
+	
+	@Test
+	public void TestGraphQueryCreationEagerLoad(){
+		String query = entityToQueryConverter.getGraphQueryForResource(collectionResource, testCollectionType);
+		assertEquals(expectedQueryEager.replaceAll("\\s+", " "), query.replaceAll("\\s+", " "));
+	}
 }
