@@ -1,10 +1,8 @@
 package org.springframework.data.semantic.model.vocabulary;
 
 import org.openrdf.model.URI;
-import org.openrdf.model.ValueFactory;
-import org.openrdf.model.impl.ValueFactoryImpl;
 
-public class MODEL_ENTITY {
+public class MODEL_ENTITY extends VOCABULARY {
 	
 	public static final String NAMESPACE = "urn:sprind-data-semantic:";
 	
@@ -16,9 +14,8 @@ public class MODEL_ENTITY {
 	
 	public final static URI COLLECTOR = create("collector:1");
 
-	private static final URI create(String localName) {
-		final ValueFactory f = ValueFactoryImpl.getInstance();
-		return f.createURI(NAMESPACE, localName);
-	}		
+	private static URI create(String localName){
+		return create(NAMESPACE, localName);
+	}
 			
 }

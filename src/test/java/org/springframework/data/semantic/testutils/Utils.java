@@ -30,7 +30,7 @@ public class Utils {
 			return;
 		}
 		
-		String[] filesToLoad = new String[]{"wine.ttl", "model-data.n3"};
+		String[] filesToLoad = new String[]{"wine.ttl", "model-data.n3", "date-data.n3"};
 		for(String fileName : filesToLoad){
 			File sampleDataFile = getSampleDataFile(fileName);
 			if(sampleDataFile == null) return;		

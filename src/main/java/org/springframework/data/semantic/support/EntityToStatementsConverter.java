@@ -7,12 +7,12 @@ import org.openrdf.model.Resource;
 import org.openrdf.model.URI;
 import org.openrdf.model.Value;
 import org.openrdf.model.impl.ContextStatementImpl;
-import org.openrdf.model.impl.LiteralImpl;
 import org.openrdf.model.impl.StatementImpl;
 import org.openrdf.model.impl.URIImpl;
 import org.springframework.data.mapping.Association;
 import org.springframework.data.mapping.AssociationHandler;
 import org.springframework.data.mapping.PropertyHandler;
+import org.springframework.data.semantic.convert.ObjectToLiteralConverter;
 import org.springframework.data.semantic.core.RDFState;
 import org.springframework.data.semantic.mapping.SemanticPersistentEntity;
 import org.springframework.data.semantic.mapping.SemanticPersistentProperty;
@@ -26,6 +26,8 @@ import org.springframework.data.semantic.support.mapping.SemanticMappingContext;
 public class EntityToStatementsConverter {
 	
 	private SemanticMappingContext mappingContext;
+	
+	private ObjectToLiteralConverter objectToLiteralConverter = new ObjectToLiteralConverter();
 	
 	public EntityToStatementsConverter(SemanticMappingContext mappingContext){
 		this.mappingContext = mappingContext;
@@ -135,10 +137,10 @@ public class EntityToStatementsConverter {
 				else{
 					//TODO handle language tags and data types; test if Resource
 					if(persistentEntity.hasContextProperty() && persistentEntity.getContextProperty().getValue(entity, persistentProperty.getMappingPolicy()) != null){
-						statements.addStatement(new ContextStatementImpl(resourceId, persistentProperty.getPredicate().get(0), new LiteralImpl(value.toString()), (Resource) persistentEntity.getContextProperty().getValue(entity, persistentProperty.getMappingPolicy())));
+						statements.addStatement(new ContextStatementImpl(resourceId, persistentProperty.getPredicate().get(0), objectToLiteralConverter.convert(value), (Resource) persistentEntity.getContextProperty().getValue(entity, persistentProperty.getMappingPolicy())));
 					}
 					else{
-						statements.addStatement(new StatementImpl(resourceId, persistentProperty.getPredicate().get(0), new LiteralImpl(value.toString())));
+						statements.addStatement(new StatementImpl(resourceId, persistentProperty.getPredicate().get(0), objectToLiteralConverter.convert(value)));
 					}
 				}
 			}

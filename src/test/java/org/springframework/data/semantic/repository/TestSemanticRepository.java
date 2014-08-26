@@ -6,6 +6,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import org.junit.Before;
@@ -15,12 +16,15 @@ import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.semantic.core.SemanticDatabase;
+import org.springframework.data.semantic.model.DateEntity;
+import org.springframework.data.semantic.model.DateEntityRepository;
 import org.springframework.data.semantic.model.ModelEntity;
 import org.springframework.data.semantic.model.ModelEntityCollector;
 import org.springframework.data.semantic.model.ModelEntityCollectorRepository;
 import org.springframework.data.semantic.model.ModelEntityRepository;
 import org.springframework.data.semantic.model.WineBody;
 import org.springframework.data.semantic.model.WineBodyRepository;
+import org.springframework.data.semantic.model.vocabulary.DATE_ENTITY;
 import org.springframework.data.semantic.model.vocabulary.MODEL_ENTITY;
 import org.springframework.data.semantic.model.vocabulary.WINE;
 import org.springframework.data.semantic.testutils.Utils;
@@ -42,6 +46,9 @@ public class TestSemanticRepository {
 
 	@Autowired
 	private SemanticDatabase sdb;
+	
+	@Autowired
+	private DateEntityRepository dateEntityRepository;
 	
 	@Before
 	public void initRepo() {
@@ -132,6 +139,26 @@ public class TestSemanticRepository {
 			assertNotNull(modelEntity.getName());
 			assertFalse(modelEntity.getRelated().isEmpty());
 		}
+	}
+	
+	@Test
+	public void testDateLoad(){
+		DateEntity date = dateEntityRepository.findOne(DATE_ENTITY.DATE_ONE);
+		assertNotNull(date);
+		assertNotNull(date.getDate());
+	}
+	
+	@Test
+	public void testDateSave(){
+		Date date = new Date();
+		DateEntity dateEntity = new DateEntity();
+		dateEntity.setId(DATE_ENTITY.DATE_TWO);
+		dateEntity.setDate(date);
+		assertNotNull(dateEntityRepository.save(dateEntity));
+		
+		dateEntity = dateEntityRepository.findOne(DATE_ENTITY.DATE_TWO);
+		assertNotNull(dateEntity);
+		assertEquals(date, dateEntity.getDate());
 	}
 
 }
