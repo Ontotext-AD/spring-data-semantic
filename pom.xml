@@ -162,8 +162,8 @@
 		</plugins>
 	</build>
 	<scm>
-		<connection>scm:git:git@github.com:kpentchev/spring-data-semantic.git</connection>
-		<developerConnection>scm:git:git@github.com:kpentchev/spring-data-semantic.git</developerConnection>
+		<connection>scm:git:https://github.com:kpentchev/spring-data-semantic.git</connection>
+		<developerConnection>scm:git:https://github.com:kpentchev/spring-data-semantic.git</developerConnection>
 		<url>http://github.com/kpentchev/spring-data-semantic</url>
 	</scm>
 </project>
