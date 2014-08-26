@@ -50,13 +50,8 @@
 			<artifactId>spring-data-commons</artifactId>
 			<version>1.8.1.RELEASE</version>
 		</dependency>
-		<!-- 
-		<dependency>
-			<groupId>org.springframework.data</groupId>
-			<artifactId>spring-data-commons-core</artifactId>
-			<version>1.4.0.RELEASE</version>
-		</dependency>
-		 -->
+		<!-- <dependency> <groupId>org.springframework.data</groupId> <artifactId>spring-data-commons-core</artifactId> 
+			<version>1.4.0.RELEASE</version> </dependency> -->
 
 		<!-- Sesame -->
 		<dependency>
@@ -156,12 +151,19 @@
 					</systemProperties>
 				</configuration>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-release-plugin</artifactId>
+				<version>2.1</version>
+				<configuration>
+					<autoVersionSubmodules>true</autoVersionSubmodules>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 	<scm>
-		<url>https://svn.ontotext.com/svn/spring-data-semantic/trunk</url>
-		<connection>https://svn.ontotext.com/svn/spring-data-semantic/trunk</connection>
-		<developerConnection>https://svn.ontotext.com/svn/spring-data-semantic/trunk</developerConnection>
-		<tag>https://svn.ontotext.com/svn/spring-data-semantic/tags</tag>
+		<connection>scm:git:git@github.com/kpentchev/spring-data-semantic.git</connection>
+		<developerConnection>scm:git:git@github.com/kpentchev/spring-data-semantic.git</developerConnection>
+		<url>http://github.com/kpentchev/spring-data-semantic</url>
 	</scm>
 </project>
