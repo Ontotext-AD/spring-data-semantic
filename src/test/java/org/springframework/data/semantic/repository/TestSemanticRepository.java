@@ -16,6 +16,8 @@ import org.openrdf.model.URI;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.semantic.core.SemanticDatabase;
 import org.springframework.data.semantic.model.ModelEntity;
+import org.springframework.data.semantic.model.ModelEntityCollector;
+import org.springframework.data.semantic.model.ModelEntityCollectorRepository;
 import org.springframework.data.semantic.model.ModelEntityRepository;
 import org.springframework.data.semantic.model.WineBody;
 import org.springframework.data.semantic.model.WineBodyRepository;
@@ -34,6 +36,9 @@ public class TestSemanticRepository {
 	
 	@Autowired
 	private ModelEntityRepository modelEntityRepository;
+	
+	@Autowired
+	private ModelEntityCollectorRepository modelEntityCollectorRepository;
 
 	@Autowired
 	private SemanticDatabase sdb;
@@ -116,6 +121,17 @@ public class TestSemanticRepository {
 			count++;
 		}
 		assertEquals(modelEntityRepository.count(), count);
+	}
+	
+	@Test
+	public void testEagerLoad(){
+		ModelEntityCollector collector = modelEntityCollectorRepository.findOne(MODEL_ENTITY.COLLECTOR);
+		assertNotNull(collector);
+		assertFalse(collector.getEntities().isEmpty());
+		for(ModelEntity modelEntity : collector.getEntities()){
+			assertNotNull(modelEntity.getName());
+			assertFalse(modelEntity.getRelated().isEmpty());
+		}
 	}
 
 }

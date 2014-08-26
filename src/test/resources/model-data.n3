@@ -8,3 +8,6 @@
 <urn:sprind-data-semantic:entity:4> a <urn:sprind-data-semantic:ModelEntity> .
 <urn:sprind-data-semantic:entity:2> <urn:sprind-data-semantic:related> <urn:sprind-data-semantic:entity:3> .
 <urn:sprind-data-semantic:entity:2> <urn:sprind-data-semantic:related> <urn:sprind-data-semantic:entity:4> .
+<urn:sprind-data-semantic:collector:1> a <urn:sprind-data-semantic:ModelEntityCollector> .
+<urn:sprind-data-semantic:collector:1> <urn:sprind-data-semantic:entities> <urn:sprind-data-semantic:entity:1> .
+<urn:sprind-data-semantic:collector:1> <urn:sprind-data-semantic:entities> <urn:sprind-data-semantic:entity:2> .
