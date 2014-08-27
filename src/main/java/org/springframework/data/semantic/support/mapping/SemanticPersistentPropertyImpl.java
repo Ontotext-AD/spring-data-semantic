@@ -25,7 +25,9 @@ import org.springframework.data.semantic.annotation.Optional;
 import org.springframework.data.semantic.annotation.Predicate;
 import org.springframework.data.semantic.annotation.ResourceId;
 import org.springframework.data.semantic.mapping.MappingPolicy;
+import org.springframework.data.semantic.mapping.SemanticPersistentEntity;
 import org.springframework.data.semantic.mapping.SemanticPersistentProperty;
+import org.springframework.data.semantic.support.ValueUtils;
 
 /**
  * 
@@ -88,6 +90,13 @@ public class SemanticPersistentPropertyImpl extends
 			}
 			return predicates;
 		} else {
+			if(this.getOwner() instanceof SemanticPersistentEntity){
+				SemanticPersistentEntity<?> persistentEntity = (SemanticPersistentEntity<?>) this.getOwner();
+				URI namespace = persistentEntity.getNamespace();
+				if(namespace != null){
+					return Arrays.asList(ValueUtils.createUri(namespace.stringValue(), field.getName()));
+				}
+			}
 			return Arrays.asList(mappingContext.resolveURI(field.getName()));
 		}
 	}

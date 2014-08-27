@@ -55,5 +55,11 @@ public interface SemanticPersistentEntity<T> extends PersistentEntity<T, Semanti
 	  * @param id
 	  */
 	 void setResourceId(Object entity, URI id);
+	 
+	 /**
+	  * Retrieve the namespace value.
+	  * @return
+	  */
+	 URI getNamespace();
 
 }

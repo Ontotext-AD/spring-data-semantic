@@ -1,10 +1,14 @@
 package org.springframework.data.semantic.support;
 
 import org.openrdf.model.URI;
+import org.openrdf.model.ValueFactory;
+import org.openrdf.model.impl.ValueFactoryImpl;
 
 public final class ValueUtils {
 	
 	public static final String RDF_TYPE_PREDICATE = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type";
+	
+	private static final ValueFactory valueFactory = ValueFactoryImpl.getInstance();
 	
 	/**
 	 * Checks whether the given string is a valid {@link URI}.
@@ -76,6 +80,14 @@ public final class ValueUtils {
 			return false;
 		}
 		return true;
+	}
+	
+	public static URI createUri(String source){
+		return valueFactory.createURI(source);
+	}
+	
+	public static URI createUri(String namespace, String localName){
+		return valueFactory.createURI(namespace, localName);
 	}
 
 }

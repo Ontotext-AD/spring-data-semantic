@@ -2,11 +2,13 @@ package org.springframework.data.semantic.support.mapping;
 
 import org.openrdf.model.URI;
 import org.springframework.data.mapping.model.BasicPersistentEntity;
+import org.springframework.data.semantic.annotation.Namespace;
 import org.springframework.data.semantic.annotation.SemanticEntity;
 import org.springframework.data.semantic.core.RDFState;
 import org.springframework.data.semantic.mapping.MappingPolicy;
 import org.springframework.data.semantic.mapping.SemanticPersistentEntity;
 import org.springframework.data.semantic.mapping.SemanticPersistentProperty;
+import org.springframework.data.semantic.support.ValueUtils;
 import org.springframework.data.util.TypeInformation;
 import org.springframework.util.StringUtils;
 
@@ -21,6 +23,8 @@ public class SemanticPersistentEntityImpl<T> extends BasicPersistentEntity<T, Se
 	private SemanticPersistentProperty contextProperty;
 	private SemanticMappingContext mappingContext;
 	private URI rdfType;
+	private URI namespace;
+	private boolean hasNamespace = true;
 	
 	
 	public SemanticPersistentEntityImpl(TypeInformation<T> typeInformation) {
@@ -57,10 +61,16 @@ public class SemanticPersistentEntityImpl<T> extends BasicPersistentEntity<T, Se
 			SemanticEntity seAnnotation = getType().getAnnotation(SemanticEntity.class);
 			String type = seAnnotation.rdfType();
 			if(StringUtils.hasText(type)){
-				return mappingContext.resolveURI(type);
+				rdfType = mappingContext.resolveURI(type);
 			}
 			else{
-				return mappingContext.resolveURIDefaultNS(getType().getSimpleName());
+				URI namespace = getNamespace();
+				if(namespace == null){
+					rdfType = mappingContext.resolveURIDefaultNS(getType().getSimpleName());
+				}
+				else{
+					rdfType = ValueUtils.createUri(namespace.stringValue(), getType().getSimpleName());
+				}
 			}
 		}
 		return rdfType;
@@ -87,6 +97,23 @@ public class SemanticPersistentEntityImpl<T> extends BasicPersistentEntity<T, Se
 	public void setResourceId(Object entity, URI id) {
 		SemanticPersistentProperty idProperty = getIdProperty();
 		idProperty.setValue(entity, id);
+	}
+
+	@Override
+	public URI getNamespace() {
+		if(namespace == null && hasNamespace) {
+			Namespace nsAnnotation = getType().getAnnotation(Namespace.class);
+			if(nsAnnotation != null){
+				String ns = nsAnnotation.namespace();
+				if(StringUtils.hasText(ns)){
+					namespace = ValueUtils.createUri(ns);
+				}
+			}
+			else{
+				hasNamespace = false;
+			}
+		}
+		return namespace;
 	}
 
 }
