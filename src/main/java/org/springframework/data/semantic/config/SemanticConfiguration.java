@@ -7,6 +7,7 @@ import org.springframework.core.convert.ConversionService;
 import org.springframework.core.convert.support.DefaultConversionService;
 import org.springframework.dao.support.PersistenceExceptionTranslator;
 import org.springframework.data.semantic.convert.StringToDateConverter;
+import org.springframework.data.semantic.convert.StringToUriConverter;
 import org.springframework.data.semantic.core.SemanticDatabase;
 import org.springframework.data.semantic.core.SemanticExceptionTranslator;
 import org.springframework.data.semantic.support.SemanticTemplateCRUD;
@@ -31,6 +32,7 @@ public class SemanticConfiguration {
 	public ConversionService conversionService() {
 		DefaultConversionService conversionService = new DefaultConversionService();
 		conversionService.addConverter(new StringToDateConverter());
+		conversionService.addConverter(new StringToUriConverter());
 		return conversionService;
 	}
 	

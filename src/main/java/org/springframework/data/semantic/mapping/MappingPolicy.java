@@ -111,7 +111,7 @@ public interface MappingPolicy {
         }
     }
 
-    public MappingPolicy LAZY_LOAD_POLICY = new DefaultMappingPolicy(Option.LAZY_LOAD);
-    public MappingPolicy DEFAULT_POLICY = new DefaultMappingPolicy();
+    public MappingPolicy LAZY_LOAD_POLICY = new DefaultMappingPolicy(Option.LAZY_LOAD, Option.USE_DIRTY);
+    public MappingPolicy DEFAULT_POLICY = new DefaultMappingPolicy(Option.USE_DIRTY);
     public MappingPolicy MAP_FIELD_DIRECT_POLICY = new DefaultMappingPolicy(Option.USE_DIRTY);
 }

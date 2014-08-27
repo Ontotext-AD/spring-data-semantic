@@ -132,7 +132,12 @@ public class EntityToStatementsConverter {
 			}
 			else{
 				if(value instanceof Value){
-					statements.addStatement(new ContextStatementImpl(resourceId, persistentProperty.getPredicate().get(0), (Value) value, (Resource) persistentEntity.getContextProperty().getValue(entity, persistentProperty.getMappingPolicy())));
+					if(persistentEntity.hasContextProperty() && persistentEntity.getContextProperty().getValue(entity, persistentProperty.getMappingPolicy()) != null){
+						statements.addStatement(new ContextStatementImpl(resourceId, persistentProperty.getPredicate().get(0), (Value) value, (Resource) persistentEntity.getContextProperty().getValue(entity, persistentProperty.getMappingPolicy())));
+					}
+					else{
+						statements.addStatement(new StatementImpl(resourceId, persistentProperty.getPredicate().get(0), (Value) value));	
+					}
 				}
 				else{
 					//TODO handle language tags and data types; test if Resource

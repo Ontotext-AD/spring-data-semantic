@@ -9,7 +9,7 @@ public class TestMappingPolicy {
 	
 	@Test
 	public void testDefaultMP(){
-		assertFalse(MappingPolicy.DEFAULT_POLICY.useDirty());
+		assertTrue(MappingPolicy.DEFAULT_POLICY.useDirty());
 		assertTrue(MappingPolicy.DEFAULT_POLICY.eagerLoad());
 	}
 	
@@ -22,7 +22,7 @@ public class TestMappingPolicy {
 	@Test
 	public void testShouldLoadMP(){
 		assertFalse(MappingPolicy.LAZY_LOAD_POLICY.eagerLoad());
-		assertFalse(MappingPolicy.LAZY_LOAD_POLICY.useDirty());
+		assertTrue(MappingPolicy.LAZY_LOAD_POLICY.useDirty());
 	}
 	
 	@Test
