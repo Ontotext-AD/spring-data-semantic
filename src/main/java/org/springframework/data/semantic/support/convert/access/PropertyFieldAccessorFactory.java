@@ -19,10 +19,6 @@ public class PropertyFieldAccessorFactory implements FieldAccessorFactory {
 	}
 	@Override
 	public boolean accept(SemanticPersistentProperty property) {
-		//accept if it is really a property, not an association
-		/*TODO this is the framework's implementation ({@link AbstractPersistentProperty} ).
-		It checks if the property is annoteted with a @Reference annotation.
-		Override if necessary.*/
 		return !property.isAssociation();
 	}
 
