@@ -1,4 +1,4 @@
-package org.springframework.data.semantic.repository.support;
+package org.springframework.data.semantic.support.repository;
 
 import org.openrdf.model.URI;
 import org.springframework.data.repository.core.support.AbstractEntityInformation;

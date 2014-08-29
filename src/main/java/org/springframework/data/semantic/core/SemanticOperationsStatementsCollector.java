@@ -8,12 +8,12 @@ import org.springframework.data.semantic.mapping.SemanticPersistentProperty;
 
 public interface SemanticOperationsStatementsCollector {
 	
-	Model getStatementsForResourceProperty(Object entity,
+	<T> Model getStatementsForResourceProperty(T entity,
 			SemanticPersistentProperty property);
 
-	Model getStatementsForResource(URI resource, Class<?> clazz);
+	<T> Model getStatementsForResource(URI resource, Class<? extends T> clazz);
 	
-	Collection<Model> getStatementsForResources(Class<?> clazz);
+	<T> Collection<Model> getStatementsForResources(Class<? extends T> clazz);
 	
-	Collection<Model> getStatementsForResources(Class<?> clazz, Long offset, Long limit);
+	<T> Collection<Model> getStatementsForResources(Class<? extends T> clazz, Long offset, Long limit);
 }

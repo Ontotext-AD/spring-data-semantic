@@ -29,6 +29,7 @@ import org.springframework.data.semantic.core.SemanticDatabase;
 import org.springframework.data.semantic.core.SemanticOperationsCRUD;
 import org.springframework.data.semantic.mapping.SemanticPersistentEntity;
 import org.springframework.data.semantic.model.Merlot;
+import org.springframework.data.semantic.support.convert.EntityToQueryConverter;
 import org.springframework.data.semantic.support.mapping.SemanticMappingContext;
 import org.springframework.data.semantic.testutils.Utils;
 import org.springframework.data.util.ClassTypeInformation;

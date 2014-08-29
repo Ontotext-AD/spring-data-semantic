@@ -2,17 +2,20 @@ package org.springframework.data.semantic.convert;
 
 import java.util.Date;
 
-import org.openrdf.model.Literal;
+import org.openrdf.model.Value;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.model.impl.ValueFactoryImpl;
 import org.springframework.core.convert.converter.Converter;
 
-public class ObjectToLiteralConverter implements Converter<Object, Literal> {
+public class ObjectToLiteralConverter implements Converter<Object, Value> {
 
 	private final ValueFactory factory = ValueFactoryImpl.getInstance();
 	
 	@Override
-	public Literal convert(Object source) {
+	public Value convert(Object source) {
+		if(source instanceof Value){
+			return (Value) source;
+		}
 		if(source instanceof Date){
 			return factory.createLiteral((Date) source);
 		}

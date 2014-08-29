@@ -19,13 +19,17 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.data.semantic.convert.SemanticEntityConverter;
 import org.springframework.data.semantic.convert.SemanticEntityInstantiator;
 import org.springframework.data.semantic.convert.SemanticEntityPersister;
+import org.springframework.data.semantic.convert.SemanticEntityRemover;
 import org.springframework.data.semantic.core.RDFState;
 import org.springframework.data.semantic.core.SemanticDatabase;
 import org.springframework.data.semantic.core.SemanticOperationsCRUD;
 import org.springframework.data.semantic.mapping.SemanticPersistentEntity;
+import org.springframework.data.semantic.support.convert.EntityToQueryConverter;
+import org.springframework.data.semantic.support.convert.EntityToStatementsConverter;
 import org.springframework.data.semantic.support.convert.SemanticEntityConverterImpl;
 import org.springframework.data.semantic.support.convert.SemanticEntityInstantiatorImpl;
 import org.springframework.data.semantic.support.convert.SemanticEntityPersisterImpl;
+import org.springframework.data.semantic.support.convert.SemanticEntityRemoverImpl;
 import org.springframework.data.semantic.support.convert.SemanticSourceStateTransmitter;
 import org.springframework.data.semantic.support.convert.access.DelegatingFieldAccessorFactory;
 import org.springframework.data.semantic.support.convert.access.listener.DelegatingFieldAccessListenerFactory;
@@ -45,6 +49,7 @@ public class SemanticTemplateCRUD implements SemanticOperationsCRUD, Initializin
 	
 	private SemanticTemplateStatementsCollector statementsCollector;
 	private SemanticEntityPersister entityPersister;
+	private SemanticEntityRemover entityRemover;
 	
 	private SemanticEntityInstantiator entityInstantiator;
 	private DelegatingFieldAccessorFactory delegatingFieldAxsorFactory;
@@ -53,6 +58,7 @@ public class SemanticTemplateCRUD implements SemanticOperationsCRUD, Initializin
 	private SemanticSourceStateTransmitter sourceStateTransmitter;
 	private SemanticEntityConverter entityConverter;
 	private EntityToQueryConverter entityToQueryConverter;
+	private EntityToStatementsConverter entityToStatementsConverter;
 	
 	private Logger logger = LoggerFactory.getLogger(SemanticTemplateCRUD.class);
 	
@@ -73,14 +79,15 @@ public class SemanticTemplateCRUD implements SemanticOperationsCRUD, Initializin
 				this.entityInstantiator = new SemanticEntityInstantiatorImpl();
 				this.mappingContext = new SemanticMappingContext(semanticDB.getNamespaces(), this.semanticDB.getDefaultNamespace());
 				this.entityToQueryConverter = new EntityToQueryConverter(this.mappingContext);
+				this.entityToStatementsConverter = new EntityToStatementsConverter(mappingContext);
 				this.statementsCollector = new SemanticTemplateStatementsCollector(this.semanticDB, this.conversionService, this.mappingContext, this.entityToQueryConverter);
 				this.delegatingFieldAxsorFactory = new DelegatingFieldAccessorFactory(this.statementsCollector, this);
 				this.delegatingFieldAccessListenerFactory = new DelegatingFieldAccessListenerFactory(this.statementsCollector, this);
 				this.sesFactory = new SemanticEntityStateFactory(this.mappingContext, this.delegatingFieldAxsorFactory, this.delegatingFieldAccessListenerFactory, this.semanticDB);
 				this.sourceStateTransmitter = new SemanticSourceStateTransmitter(this.sesFactory);
-				this.entityConverter = new SemanticEntityConverterImpl(this.mappingContext, this.conversionService, this.entityInstantiator, this.sourceStateTransmitter);
+				this.entityConverter = new SemanticEntityConverterImpl(this.mappingContext, this.conversionService, this.entityInstantiator, this.sourceStateTransmitter, this.entityToStatementsConverter);
 				this.entityPersister = new SemanticEntityPersisterImpl(this.entityConverter);
-				
+				this.entityRemover = new SemanticEntityRemoverImpl(this.semanticDB, this.entityToStatementsConverter);
 				
 			} catch (RepositoryException e) {
 				throw ExceptionTranslator.translateExceptionIfPossible(e);
@@ -113,12 +120,6 @@ public class SemanticTemplateCRUD implements SemanticOperationsCRUD, Initializin
 		SemanticPersistentEntity<T> persistentEntity = (SemanticPersistentEntity<T>) this.mappingContext.getPersistentEntity(entity.getClass());
 		Model dbState = this.statementsCollector.getStatementsForResource(persistentEntity.getResourceId(entity), entity.getClass());
 		return this.entityPersister.persistEntity(entity, new RDFState(dbState));
-	}
-
-	@Override
-	public void delete(Object entity) {
-		// TODO Auto-generated method stub
-		
 	}
 	
 	@Override
@@ -165,6 +166,27 @@ public class SemanticTemplateCRUD implements SemanticOperationsCRUD, Initializin
 			logger.error(e.getMessage(), e);
 		}
 		return false;
+	}
+
+	@Override
+	public <T> void delete(URI resourceId, Class<? extends T> clazz) {
+		T entity = this.find(resourceId, clazz);
+		this.delete(entity);
+		
+	}
+
+	@Override
+	public <T> void delete(T entity) {
+		@SuppressWarnings("unchecked")
+		SemanticPersistentEntity<T> persistentEntity = (SemanticPersistentEntity<T>) this.mappingContext.getPersistentEntity(entity.getClass());
+		this.entityRemover.delete(persistentEntity, entity);
+		
+	}
+
+	@Override
+	public <T> void deleteAll(Class<? extends T> clazz) {
+		//TODO
+		throw new UnsupportedOperationException();
 	}
 
 

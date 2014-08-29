@@ -18,7 +18,6 @@ import org.springframework.data.semantic.core.RDFState;
 import org.springframework.data.semantic.mapping.MappingPolicy;
 import org.springframework.data.semantic.mapping.SemanticPersistentEntity;
 import org.springframework.data.semantic.mapping.SemanticPersistentProperty;
-import org.springframework.data.semantic.support.EntityToStatementsConverter;
 import org.springframework.data.semantic.support.mapping.SemanticMappingContext;
 import org.springframework.data.semantic.support.mapping.SemanticPersistentEntityImpl;
 
@@ -36,12 +35,12 @@ public class SemanticEntityConverterImpl implements SemanticEntityConverter {
 	
 	
 	
-	public SemanticEntityConverterImpl(SemanticMappingContext mappingContext, ConversionService conversionService, SemanticEntityInstantiator entityInstantiator, SemanticSourceStateTransmitter sourceStateTransmitter){
+	public SemanticEntityConverterImpl(SemanticMappingContext mappingContext, ConversionService conversionService, SemanticEntityInstantiator entityInstantiator, SemanticSourceStateTransmitter sourceStateTransmitter, EntityToStatementsConverter toStatementsConverter){
 		this.mappingContext = mappingContext;
 		this.conversionService = conversionService;
 		this.entityInstantiator = entityInstantiator;
 		this.sourceStateTransmitter = sourceStateTransmitter;
-		this.toStatementsConverter = new EntityToStatementsConverter(mappingContext);
+		this.toStatementsConverter = toStatementsConverter;
 	}
 
 	@Override
@@ -67,14 +66,12 @@ public class SemanticEntityConverterImpl implements SemanticEntityConverter {
 	@Override
 	public void write(Object source, RDFState dbStatements) {
 		final SemanticPersistentEntityImpl<?> persistentEntity = mappingContext.getPersistentEntity(source.getClass());
-		final URI resourceId = persistentEntity.getResourceId(source);
-		
 		final BeanWrapper<Object> wrapper = BeanWrapper.<Object>create(source, conversionService);
-        RDFState currentState = toStatementsConverter.convertEntityToStatements(resourceId, persistentEntity, source);
+        RDFState currentState = toStatementsConverter.convertEntityToStatements(persistentEntity, source);
 		if (dbStatements != null && !dbStatements.isEmpty()) {
 			//TODO optimize conversion of alias statements to actual statements
 			Object dbObject = read(source.getClass(), dbStatements);
-			RDFState dbState = toStatementsConverter.convertEntityToStatements(resourceId, persistentEntity, dbObject);
+			RDFState dbState = toStatementsConverter.convertEntityToStatements(persistentEntity, dbObject);
 			dbState.getCurrentStatements().removeAll(currentState.getCurrentStatements());
         	currentState.setDeleteStatements(dbState.getCurrentStatements());
         }

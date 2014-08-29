@@ -1,4 +1,4 @@
-package org.springframework.data.semantic.support;
+package org.springframework.data.semantic.support.convert;
 
 import static org.junit.Assert.assertEquals;
 
@@ -12,6 +12,7 @@ import org.openrdf.model.impl.URIImpl;
 import org.springframework.data.semantic.mapping.SemanticPersistentEntity;
 import org.springframework.data.semantic.model.ModelEntity;
 import org.springframework.data.semantic.model.ModelEntityCollector;
+import org.springframework.data.semantic.support.convert.EntityToQueryConverter;
 import org.springframework.data.semantic.support.mapping.SemanticMappingContext;
 import org.springframework.data.util.ClassTypeInformation;
 

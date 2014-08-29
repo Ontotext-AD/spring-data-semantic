@@ -1,4 +1,4 @@
-package org.springframework.data.semantic.repository.support;
+package org.springframework.data.semantic.support.repository;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -83,31 +83,30 @@ public class SemanticRepositoryImpl<T> implements SemanticRepository<T> {
 
 	@Override
 	public long count() {
-		return operations.count(clazz);
+		return this.operations.count(clazz);
 	}
 
 	@Override
 	public void delete(URI id) {
-		// TODO Auto-generated method stub
-		
+		operations.delete(id, clazz);
 	}
 
 	@Override
 	public void delete(T entity) {
-		// TODO Auto-generated method stub
+		this.operations.delete(entity);
 		
 	}
 
 	@Override
 	public void delete(Iterable<? extends T> entities) {
-		// TODO Auto-generated method stub
-		
+		for(T entity : entities){
+			delete(entity);
+		}
 	}
 
 	@Override
 	public void deleteAll() {
-		// TODO Auto-generated method stub
-		
+		this.operations.deleteAll(clazz);
 	}
 	
 	

@@ -18,6 +18,7 @@ import org.springframework.data.semantic.core.SemanticOperationsStatementsCollec
 import org.springframework.data.semantic.mapping.MappingPolicy;
 import org.springframework.data.semantic.mapping.SemanticPersistentEntity;
 import org.springframework.data.semantic.mapping.SemanticPersistentProperty;
+import org.springframework.data.semantic.support.convert.EntityToQueryConverter;
 import org.springframework.data.semantic.support.mapping.SemanticMappingContext;
 import org.springframework.data.semantic.support.mapping.SemanticPersistentEntityImpl;
 
@@ -59,7 +60,7 @@ public class SemanticTemplateStatementsCollector implements SemanticOperationsSt
 	}	
 
 	@Override
-	public Model getStatementsForResource(URI resource, Class<?> clazz) {
+	public <T> Model getStatementsForResource(URI resource, Class<? extends T> clazz) {
 		try {
 			return semanticDB.getGraphQueryResults(
 					entityToQueryConverter.getGraphQueryForResource(resource, getPersistentEntity(clazz)));
@@ -69,12 +70,12 @@ public class SemanticTemplateStatementsCollector implements SemanticOperationsSt
 	}
 
 	@Override
-	public Collection<Model> getStatementsForResources(Class<?> clazz) {
+	public <T> Collection<Model> getStatementsForResources(Class<? extends T> clazz) {
 		return getStatementsForResources(clazz, null, null);
 	}
 
 	@Override
-	public Collection<Model> getStatementsForResources(Class<?> clazz, Long offset, Long limit) {
+	public <T> Collection<Model> getStatementsForResources(Class<? extends T> clazz, Long offset, Long limit) {
 			try {
 				SemanticPersistentEntity<?> persistentEntity = mappingContext.getPersistentEntity(clazz);
 				Model results = semanticDB.getGraphQueryResults(entityToQueryConverter.getGraphQueryForEntityClass(persistentEntity), offset, limit);

@@ -160,5 +160,33 @@ public class TestSemanticRepository {
 		assertNotNull(dateEntity);
 		assertEquals(date, dateEntity.getDate());
 	}
+	
+	@Test
+	public void testDelete(){
+		ModelEntity toDelete = new ModelEntity();
+		toDelete.setUri(MODEL_ENTITY.ENTITY_FIVE);
+		toDelete.setName("Model Entity Five");
+		
+		modelEntityRepository.save(toDelete);
+		assertTrue(modelEntityRepository.exists(MODEL_ENTITY.ENTITY_FIVE));
+		
+		modelEntityRepository.delete(MODEL_ENTITY.ENTITY_FIVE);
+		
+		assertFalse(modelEntityRepository.exists(MODEL_ENTITY.ENTITY_FIVE));
+	}
+	
+	@Test
+	public void testDeleteEntity(){
+		ModelEntity toDelete = new ModelEntity();
+		toDelete.setUri(MODEL_ENTITY.ENTITY_FIVE);
+		toDelete.setName("Model Entity Five");
+		
+		toDelete = modelEntityRepository.save(toDelete);
+		assertTrue(modelEntityRepository.exists(MODEL_ENTITY.ENTITY_FIVE));
+		
+		modelEntityRepository.delete(toDelete);
+		
+		assertFalse(modelEntityRepository.exists(MODEL_ENTITY.ENTITY_FIVE));
+	}
 
 }

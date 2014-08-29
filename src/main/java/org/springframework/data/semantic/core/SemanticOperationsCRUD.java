@@ -17,7 +17,20 @@ public interface SemanticOperationsCRUD {
      * from all indexes and then deleted.
      * @param entity
      */
-    void delete(Object entity);
+    <T> void delete(URI resourceId, Class<? extends T> clazz);
+    
+    /**
+     * Removes the given statements from the rdf store, the entity is first removed
+     * from all indexes and then deleted.
+     * @param entity
+     */
+    <T> void delete(T entity);
+    
+    /**
+     * Removes the statements for all entities of the given class.
+     * @param clazz
+     */
+    <T> void deleteAll(Class<? extends T> clazz);
     
     /**
      * Retrieves an entity of the given type T that is identified by the given {@link URI}.

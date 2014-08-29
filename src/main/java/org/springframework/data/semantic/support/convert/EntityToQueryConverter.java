@@ -1,4 +1,4 @@
-package org.springframework.data.semantic.support;
+package org.springframework.data.semantic.support.convert;
 
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -9,6 +9,7 @@ import org.springframework.data.mapping.AssociationHandler;
 import org.springframework.data.mapping.PropertyHandler;
 import org.springframework.data.semantic.mapping.SemanticPersistentEntity;
 import org.springframework.data.semantic.mapping.SemanticPersistentProperty;
+import org.springframework.data.semantic.support.ValueUtils;
 import org.springframework.data.semantic.support.mapping.SemanticMappingContext;
 import org.springframework.util.StringUtils;
 

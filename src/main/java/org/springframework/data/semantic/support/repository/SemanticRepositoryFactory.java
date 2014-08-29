@@ -1,4 +1,4 @@
-package org.springframework.data.semantic.repository.support;
+package org.springframework.data.semantic.support.repository;
 
 import java.io.Serializable;
 
