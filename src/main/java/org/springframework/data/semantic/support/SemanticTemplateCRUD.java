@@ -4,6 +4,8 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
+import net.sf.ehcache.CacheManager;
+
 import org.openrdf.model.Model;
 import org.openrdf.model.URI;
 import org.openrdf.query.BindingSet;
@@ -16,6 +18,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.semantic.cache.EntityCache;
 import org.springframework.data.semantic.convert.SemanticEntityConverter;
 import org.springframework.data.semantic.convert.SemanticEntityInstantiator;
 import org.springframework.data.semantic.convert.SemanticEntityPersister;
@@ -24,6 +27,8 @@ import org.springframework.data.semantic.core.RDFState;
 import org.springframework.data.semantic.core.SemanticDatabase;
 import org.springframework.data.semantic.core.SemanticOperationsCRUD;
 import org.springframework.data.semantic.mapping.SemanticPersistentEntity;
+import org.springframework.data.semantic.support.cache.EhCacheEntityCache;
+import org.springframework.data.semantic.support.cache.EmptyEntityCache;
 import org.springframework.data.semantic.support.convert.EntityToQueryConverter;
 import org.springframework.data.semantic.support.convert.EntityToStatementsConverter;
 import org.springframework.data.semantic.support.convert.SemanticEntityConverterImpl;
@@ -60,6 +65,8 @@ public class SemanticTemplateCRUD implements SemanticOperationsCRUD, Initializin
 	private EntityToQueryConverter entityToQueryConverter;
 	private EntityToStatementsConverter entityToStatementsConverter;
 	
+	private EntityCache entityCache;
+	
 	private Logger logger = LoggerFactory.getLogger(SemanticTemplateCRUD.class);
 	
 	public SemanticTemplateCRUD(SemanticDatabase semanticDB, ConversionService conversionService){
@@ -88,6 +95,9 @@ public class SemanticTemplateCRUD implements SemanticOperationsCRUD, Initializin
 				this.entityConverter = new SemanticEntityConverterImpl(this.mappingContext, this.conversionService, this.entityInstantiator, this.sourceStateTransmitter, this.entityToStatementsConverter);
 				this.entityPersister = new SemanticEntityPersisterImpl(this.entityConverter);
 				this.entityRemover = new SemanticEntityRemoverImpl(this.semanticDB, this.entityToStatementsConverter);
+				if(this.entityCache != null){
+					this.entityCache.clearAll();
+				}
 				
 			} catch (RepositoryException e) {
 				throw ExceptionTranslator.translateExceptionIfPossible(e);
@@ -108,8 +118,14 @@ public class SemanticTemplateCRUD implements SemanticOperationsCRUD, Initializin
 	}
 	
 	public void afterPropertiesSet() throws Exception {
-		// TODO Auto-generated method stub
-		
+		if(applicationContext.getBeanNamesForType(CacheManager.class).length != 0){
+			this.entityCache = new EhCacheEntityCache(this.mappingContext, applicationContext.getBean(CacheManager.class));
+			logger.info("Using EhcacheEntityCache for second level caching.");
+		}
+		else{
+			logger.info("EntityCache is not configured. No caching will be applied.");
+			this.entityCache = new EmptyEntityCache();
+		}
 	}
 	
 	
@@ -118,8 +134,11 @@ public class SemanticTemplateCRUD implements SemanticOperationsCRUD, Initializin
 	public <T> T save(T entity) {
 		@SuppressWarnings("unchecked")
 		SemanticPersistentEntity<T> persistentEntity = (SemanticPersistentEntity<T>) this.mappingContext.getPersistentEntity(entity.getClass());
-		Model dbState = this.statementsCollector.getStatementsForResource(persistentEntity.getResourceId(entity), entity.getClass());
-		return this.entityPersister.persistEntity(entity, new RDFState(dbState));
+		URI id = persistentEntity.getResourceId(entity);
+		Model dbState = this.statementsCollector.getStatementsForResource(id, entity.getClass());
+		entity = this.entityPersister.persistEntity(entity, new RDFState(dbState));
+		entityCache.put(entity);
+		return entity;
 	}
 	
 	@Override
@@ -134,12 +153,16 @@ public class SemanticTemplateCRUD implements SemanticOperationsCRUD, Initializin
 
 	@Override
 	public <T> T find(URI resourceId, Class<? extends T> clazz) {
-		try{
-			return createEntity(this.statementsCollector.getStatementsForResource(resourceId, clazz), clazz);
-		} catch (DataAccessException e){
-			logger.error(e.getMessage(), e);
+		T entity = entityCache.get(resourceId, clazz);
+		if(entity == null){
+			try{
+				entity = createEntity(this.statementsCollector.getStatementsForResource(resourceId, clazz), clazz);
+				entityCache.put(entity);
+			} catch (DataAccessException e){
+				logger.error(e.getMessage(), e);
+			}
 		}
-		return null;
+		return entity;
 	}
 
 	
@@ -160,6 +183,10 @@ public class SemanticTemplateCRUD implements SemanticOperationsCRUD, Initializin
 
 	@Override
 	public <T> boolean exists(URI resourceId, Class<? extends T> clazz) {
+		T entity = entityCache.get(resourceId, clazz);
+		if(entity != null){
+			return true;
+		}
 		try {
 			return this.semanticDB.getBooleanQueryResult(entityToQueryConverter.getQueryForResourceExistence(resourceId, this.mappingContext.getPersistentEntity(clazz)));
 		} catch (Exception e) {
@@ -179,6 +206,7 @@ public class SemanticTemplateCRUD implements SemanticOperationsCRUD, Initializin
 	public <T> void delete(T entity) {
 		@SuppressWarnings("unchecked")
 		SemanticPersistentEntity<T> persistentEntity = (SemanticPersistentEntity<T>) this.mappingContext.getPersistentEntity(entity.getClass());
+		entityCache.remove(entity);
 		this.entityRemover.delete(persistentEntity, entity);
 		
 	}

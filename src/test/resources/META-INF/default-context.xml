@@ -12,5 +12,15 @@
 	<semantic:config semantic-database-ref="lcie" />
 	
 	<semantic:semantic-database id="lcie" url="target/repositories/data-test" configFile="classpath:META-INF/config/data-memory.ttl"/>
+	
+	<bean id="ehcache" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean">
+		<property name="shared">
+			<value>true</value>
+		</property>
+		<property name="configLocation">
+			<value>META-INF/ehcache.xml</value>
+		</property>
+	</bean>
+	
 		
 </beans>
