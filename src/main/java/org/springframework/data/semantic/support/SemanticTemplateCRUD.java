@@ -1,8 +1,10 @@
 package org.springframework.data.semantic.support;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import net.sf.ehcache.CacheManager;
 
@@ -92,7 +94,7 @@ public class SemanticTemplateCRUD implements SemanticOperationsCRUD, Initializin
 				this.delegatingFieldAccessListenerFactory = new DelegatingFieldAccessListenerFactory(this.statementsCollector, this);
 				this.sesFactory = new SemanticEntityStateFactory(this.mappingContext, this.delegatingFieldAxsorFactory, this.delegatingFieldAccessListenerFactory, this.semanticDB);
 				this.sourceStateTransmitter = new SemanticSourceStateTransmitter(this.sesFactory);
-				this.entityConverter = new SemanticEntityConverterImpl(this.mappingContext, this.conversionService, this.entityInstantiator, this.sourceStateTransmitter, this.entityToStatementsConverter);
+				this.entityConverter = new SemanticEntityConverterImpl(this.mappingContext, this.conversionService, this.entityInstantiator, this.sourceStateTransmitter, this.entityToStatementsConverter, this.semanticDB);
 				this.entityPersister = new SemanticEntityPersisterImpl(this.entityConverter);
 				this.entityRemover = new SemanticEntityRemoverImpl(this.semanticDB, this.entityToStatementsConverter);
 				if(this.entityCache != null){
@@ -139,6 +141,19 @@ public class SemanticTemplateCRUD implements SemanticOperationsCRUD, Initializin
 		entity = this.entityPersister.persistEntity(entity, new RDFState(dbState));
 		entityCache.put(entity);
 		return entity;
+	}
+	
+	@Override
+	public <T> Iterable<T> save(Iterable<T> entities) {
+		Map<T, RDFState> entityToExistingState = new HashMap<T, RDFState>();
+		for(T entity : entities){
+			@SuppressWarnings("unchecked")
+			SemanticPersistentEntity<T> persistentEntity = (SemanticPersistentEntity<T>) this.mappingContext.getPersistentEntity(entity.getClass());
+			URI id = persistentEntity.getResourceId(entity);
+			Model dbState = this.statementsCollector.getStatementsForResource(id, entity.getClass());
+			entityToExistingState.put(entity, new RDFState(dbState));
+		}
+		return this.entityPersister.persistEntities(entityToExistingState);
 	}
 	
 	@Override
@@ -216,6 +231,8 @@ public class SemanticTemplateCRUD implements SemanticOperationsCRUD, Initializin
 		//TODO
 		throw new UnsupportedOperationException();
 	}
+
+	
 
 
 	

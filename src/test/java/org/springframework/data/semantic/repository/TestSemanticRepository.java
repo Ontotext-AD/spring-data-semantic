@@ -3,6 +3,7 @@ package org.springframework.data.semantic.repository;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
@@ -76,6 +77,27 @@ public class TestSemanticRepository {
 		//System.out.println(statementsForResource);
 		WineBody rubin = wineRepository.findOne(WINE.RUBIN);
 		assertNotNull(rubin);
+	}
+	
+	@Test
+	public void testSaveMultiple(){
+		assertNull(wineRepository.findOne(WINE.GAMZA));
+		assertNull(wineRepository.findOne(WINE.KADARKA));
+		
+		WineBody gamza = new WineBody();
+		gamza.setLabel("Gamza");
+		gamza.setUri(WINE.GAMZA);
+		
+		WineBody kadarka = new WineBody();
+		kadarka.setLabel("Kadarka");
+		kadarka.setUri(WINE.KADARKA);
+		
+		Iterable<WineBody> newWineBodies = wineRepository.save(Arrays.asList(gamza, kadarka));
+		assertNotNull(newWineBodies);
+		assertTrue(newWineBodies.iterator().hasNext());
+		
+		assertNotNull(wineRepository.findOne(WINE.GAMZA));
+		assertNotNull(wineRepository.findOne(WINE.KADARKA));
 	}
 	
 	@Test

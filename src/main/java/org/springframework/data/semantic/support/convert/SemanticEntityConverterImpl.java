@@ -2,6 +2,8 @@ package org.springframework.data.semantic.support.convert;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.openrdf.model.URI;
@@ -14,7 +16,9 @@ import org.springframework.data.mapping.context.MappingContext;
 import org.springframework.data.mapping.model.BeanWrapper;
 import org.springframework.data.semantic.convert.SemanticEntityConverter;
 import org.springframework.data.semantic.convert.SemanticEntityInstantiator;
+import org.springframework.data.semantic.convert.state.EntityState;
 import org.springframework.data.semantic.core.RDFState;
+import org.springframework.data.semantic.core.SemanticDatabase;
 import org.springframework.data.semantic.mapping.MappingPolicy;
 import org.springframework.data.semantic.mapping.SemanticPersistentEntity;
 import org.springframework.data.semantic.mapping.SemanticPersistentProperty;
@@ -32,15 +36,17 @@ public class SemanticEntityConverterImpl implements SemanticEntityConverter {
 	private final SemanticEntityInstantiator entityInstantiator;
 	private final SemanticSourceStateTransmitter sourceStateTransmitter;
 	private final EntityToStatementsConverter toStatementsConverter;
+	private final SemanticDatabase semanticDatabase;
 	
 	
 	
-	public SemanticEntityConverterImpl(SemanticMappingContext mappingContext, ConversionService conversionService, SemanticEntityInstantiator entityInstantiator, SemanticSourceStateTransmitter sourceStateTransmitter, EntityToStatementsConverter toStatementsConverter){
+	public SemanticEntityConverterImpl(SemanticMappingContext mappingContext, ConversionService conversionService, SemanticEntityInstantiator entityInstantiator, SemanticSourceStateTransmitter sourceStateTransmitter, EntityToStatementsConverter toStatementsConverter, SemanticDatabase semanticDatabase){
 		this.mappingContext = mappingContext;
 		this.conversionService = conversionService;
 		this.entityInstantiator = entityInstantiator;
 		this.sourceStateTransmitter = sourceStateTransmitter;
 		this.toStatementsConverter = toStatementsConverter;
+		this.semanticDatabase = semanticDatabase;
 	}
 
 	@Override
@@ -75,7 +81,31 @@ public class SemanticEntityConverterImpl implements SemanticEntityConverter {
 			dbState.getCurrentStatements().removeAll(currentState.getCurrentStatements());
         	currentState.setDeleteStatements(dbState.getCurrentStatements());
         }
-        sourceStateTransmitter.copyPropertiesTo(wrapper, currentState);
+		EntityState<Object, RDFState> state = sourceStateTransmitter.copyPropertiesTo(wrapper, currentState);
+		state.persist();
+	}
+	
+	@Override
+	public void write(Map<Object, RDFState> objectsAndState) {
+		RDFState mergedModel = new RDFState();
+		for(Entry<Object, RDFState> entry : objectsAndState.entrySet()){
+			Object source = entry.getKey();
+			RDFState dbStatements = entry.getValue();
+			final SemanticPersistentEntityImpl<?> persistentEntity = mappingContext.getPersistentEntity(source.getClass());
+			final BeanWrapper<Object> wrapper = BeanWrapper.<Object>create(source, conversionService);
+	        RDFState currentState = toStatementsConverter.convertEntityToStatements(persistentEntity, source);
+			if (dbStatements != null && !dbStatements.isEmpty()) {
+				//TODO optimize conversion of alias statements to actual statements
+				Object dbObject = read(source.getClass(), dbStatements);
+				RDFState dbState = toStatementsConverter.convertEntityToStatements(persistentEntity, dbObject);
+				dbState.getCurrentStatements().removeAll(currentState.getCurrentStatements());
+	        	currentState.setDeleteStatements(dbState.getCurrentStatements());
+	        }
+			EntityState<Object, RDFState> state = sourceStateTransmitter.copyPropertiesTo(wrapper, currentState);
+			mergedModel.merge(state.getPersistentState());
+		}
+		semanticDatabase.removeStatement(mergedModel.getDeleteStatements());
+		semanticDatabase.addStatements(mergedModel.getCurrentStatements());
 	}
 
 	@Override

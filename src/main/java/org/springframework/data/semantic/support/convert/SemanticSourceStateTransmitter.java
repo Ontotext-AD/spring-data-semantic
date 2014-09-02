@@ -61,11 +61,11 @@ public class SemanticSourceStateTransmitter {
 		return value;
 	}
 	
-	public void copyPropertiesTo(BeanWrapper<Object> wrapper, RDFState model){
+	public EntityState<Object, RDFState> copyPropertiesTo(BeanWrapper<Object> wrapper, RDFState model){
 		final Object entity = wrapper.getBean();
 		final EntityState<Object, RDFState> state = this.entityStateFactory.getEntityState(entity, false);
 		state.setPersistentState(model);
-		state.persist();
+		return state;
 	}
 
 	public <R> void setProperty(BeanWrapper<R> wrapper, SemanticPersistentProperty property, Object value) {

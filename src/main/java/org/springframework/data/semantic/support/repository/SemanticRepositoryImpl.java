@@ -52,11 +52,7 @@ public class SemanticRepositoryImpl<T> implements SemanticRepository<T> {
 
 	@Override
 	public <S extends T> Iterable<S> save(Iterable<S> entities) {
-		List<S> result = new LinkedList<S>();
-		for(S entity : entities){
-			result.add(save(entity));
-		}
-		return result;
+		return operations.save(entities);
 	}
 
 	@Override

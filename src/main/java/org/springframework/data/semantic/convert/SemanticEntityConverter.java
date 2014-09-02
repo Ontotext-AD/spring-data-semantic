@@ -1,5 +1,7 @@
 package org.springframework.data.semantic.convert;
 
+import java.util.Map;
+
 import org.springframework.data.convert.EntityConverter;
 import org.springframework.data.semantic.core.RDFState;
 import org.springframework.data.semantic.mapping.MappingPolicy;
@@ -16,6 +18,12 @@ public interface SemanticEntityConverter extends EntityConverter<SemanticPersist
 	 * @param persistentEntity
 	 * @return
 	 */
-	public <R> R loadEntity(R entity, RDFState source, MappingPolicy mappingPolicy, SemanticPersistentEntity<R> persistentEntity);
+	<R> R loadEntity(R entity, RDFState source, MappingPolicy mappingPolicy, SemanticPersistentEntity<R> persistentEntity);
+	
+	/**
+	 * Updates the existing state for each entity with the given object's new state.
+	 * @param objectsAndState
+	 */
+	void write(Map<Object, RDFState> objectsAndState);
 	
 }

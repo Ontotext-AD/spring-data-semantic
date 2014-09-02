@@ -5,8 +5,17 @@ import org.openrdf.model.URI;
 
 public interface SemanticOperationsCRUD {
 	
+	/**
+	 * Store the given entities in the rdf store. If the subject {@link URI} of an entity is already present in the store, the statements for it are updated, otherwise
+     * statements are just added. Attached relationships will be cascaded. The operation occurs in a single transaction.
+     * This method is also provided by the appropriate repository.
+	 * @param entities
+	 * @return
+	 */
+	<T> Iterable<T> save(Iterable<T> entities);
+	
 	 /**
-     * Stores the given entity in the rdf store, if the subject {@link URI} is already present in the store, the statements are updated, otherwise
+     * Stores the given entity in the rdf store. If the subject {@link URI} is already present in the store, the statements are updated, otherwise
      * statements are just added. Attached relationships will be cascaded.
      * This method is also provided by the appropriate repository.
      */

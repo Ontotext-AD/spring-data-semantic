@@ -66,5 +66,10 @@ public class RDFState {
 			return false;
 		}
 	}
+	
+	public void merge(RDFState state){
+		this.deleteStatements.addAll(state.getDeleteStatements());
+		this.currentStatements.addAll(state.getCurrentStatements());
+	}
 
 }

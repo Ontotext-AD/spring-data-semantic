@@ -1,5 +1,7 @@
 package org.springframework.data.semantic.convert;
 
+import java.util.Map;
+
 import org.openrdf.model.Statement;
 import org.openrdf.query.GraphQueryResult;
 import org.springframework.data.semantic.core.RDFState;
@@ -18,12 +20,19 @@ public interface SemanticEntityPersister {
 	 * @param type
 	 * @return
 	 */
-	public <T> T createEntityFromState(RDFState statements, Class<T> type);
+	<T> T createEntityFromState(RDFState statements, Class<T> type);
 	
 	/**
 	 * Persist the given entity's state.
 	 * @param entity
 	 * @return
 	 */
-	public <T> T persistEntity(T entity, RDFState existing);
+	<T> T persistEntity(T entity, RDFState existing);
+	
+	/**
+	 * Persist the state of al given entities.
+	 * @param entitiesToExistingState
+	 * @return
+	 */
+	<T> Iterable<T> persistEntities(Map<T, RDFState> entitiesToExistingState);
 }

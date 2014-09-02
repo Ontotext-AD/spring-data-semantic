@@ -17,6 +17,8 @@ public class WINE extends VOCABULARY {
 	public static final URI WHITE_WINE = create("WhiteWine");
 	public static final URI LIGHT = create("Light");
 	public static final URI RUBIN = create("Rubin");
+	public static final URI GAMZA = create("Gamza");
+	public static final URI KADARKA = create("Kadarka");
 	
 	private static URI create(String localName){
 		return create(NAMESPACE, localName);

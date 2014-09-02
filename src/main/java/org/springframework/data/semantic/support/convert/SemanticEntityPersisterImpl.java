@@ -1,5 +1,7 @@
 package org.springframework.data.semantic.support.convert;
 
+import java.util.Map;
+
 import org.springframework.data.semantic.convert.SemanticEntityConverter;
 import org.springframework.data.semantic.convert.SemanticEntityPersister;
 import org.springframework.data.semantic.core.RDFState;
@@ -19,8 +21,7 @@ public class SemanticEntityPersisterImpl implements SemanticEntityPersister{
 		if (statements.isEmpty()) {
             return null;
         }
-		return entityConverter.read(type, statements); 
-		//TODO add at this point caching of entities		
+		return entityConverter.read(type, statements);
 	}
 
 
@@ -28,7 +29,15 @@ public class SemanticEntityPersisterImpl implements SemanticEntityPersister{
 	public <T> T persistEntity(T entity, RDFState dbState) {
 		entityConverter.write(entity, dbState);
 		return entity;
-		//TODO invalidate cache if applicable
+	}
+
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public <T> Iterable<T> persistEntities(
+			Map<T, RDFState> entitiesToExistingState) {
+		entityConverter.write((Map<Object, RDFState>) entitiesToExistingState);
+		return entitiesToExistingState.keySet();
 	}
 
 }
