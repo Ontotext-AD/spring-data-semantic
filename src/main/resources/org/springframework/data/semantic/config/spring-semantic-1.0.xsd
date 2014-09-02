@@ -74,7 +74,7 @@
 					<xsd:attribute name="username" type="xsd:string" use="optional" />
 					<xsd:attribute name="password" type="xsd:string" use="optional" />
 					<xsd:attribute name="configFile" type="xsd:string" default="classpath:META-INF/config/data.ttl"/>
-					<xsd:attribute name="maxConnections" type="xsd:int"	default="50" />
+					<xsd:attribute name="maxConnections" type="xsd:int"	default="200" />
 				</xsd:extension>
 			</xsd:complexContent>
 		</xsd:complexType>
