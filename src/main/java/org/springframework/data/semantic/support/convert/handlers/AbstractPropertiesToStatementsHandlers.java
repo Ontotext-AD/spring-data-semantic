@@ -17,18 +17,15 @@ public abstract class AbstractPropertiesToStatementsHandlers implements Property
 
 	protected RDFState statements;
 	protected Object entity;
-	protected SemanticPersistentEntity<?> persistentEntity;
 	protected SemanticMappingContext mappingContext;
 	protected ObjectToLiteralConverter objectToLiteralConverter;
 	
 	
 	public AbstractPropertiesToStatementsHandlers(RDFState statements,
 			Object entity,
-			SemanticPersistentEntity<?> persistentEntity,
 			SemanticMappingContext mappingContext) {
 		this.statements = statements;
 		this.entity = entity;
-		this.persistentEntity = persistentEntity;
 		this.mappingContext = mappingContext;
 		this.objectToLiteralConverter = new ObjectToLiteralConverter();
 	}
@@ -36,6 +33,7 @@ public abstract class AbstractPropertiesToStatementsHandlers implements Property
 	@SuppressWarnings("unchecked")
 	@Override
 	public void doWithPersistentProperty(SemanticPersistentProperty persistentProperty) {
+		SemanticPersistentEntity<?> persistentEntity = (SemanticPersistentEntity<?>) persistentProperty.getOwner();
 		Object value = persistentProperty.getValue(entity, persistentEntity.getMappingPolicy());
 		if(persistentProperty.shallBePersisted() && value != null){
 			if(persistentProperty.isCollectionLike()){
@@ -63,6 +61,7 @@ public abstract class AbstractPropertiesToStatementsHandlers implements Property
 	@Override
 	public void doWithAssociation(Association<SemanticPersistentProperty> association) {
 		SemanticPersistentProperty persistentProperty = association.getInverse();
+		SemanticPersistentEntity<?> persistentEntity = (SemanticPersistentEntity<?>) persistentProperty.getOwner();
 		Object value = persistentProperty.getValue(entity, persistentEntity.getMappingPolicy());
 		if(value == null){
 			return;
@@ -80,8 +79,9 @@ public abstract class AbstractPropertiesToStatementsHandlers implements Property
 				URI associatedResourceId = associatedEntity.getResourceId(associatedEntityInstance);
 				processStatement(persistentProperty, associatedResourceId);
 				if(persistentProperty.getMappingPolicy().eagerLoad() && !statements.getCurrentStatements().subjects().contains(associatedResourceId)){
-					associatedEntity.doWithProperties(this);
-					associatedEntity.doWithAssociations(this);
+					AbstractPropertiesToStatementsHandlers associationHandler = getInstance(statements, associatedEntityInstance, mappingContext);
+					associatedEntity.doWithProperties(associationHandler);
+					associatedEntity.doWithAssociations(associationHandler);
 				}
 			}
 		}
@@ -90,11 +90,14 @@ public abstract class AbstractPropertiesToStatementsHandlers implements Property
 			URI associatedResourceId = associatedEntity.getResourceId(value);
 			processStatement(persistentProperty, associatedResourceId);
 			if(persistentProperty.getMappingPolicy().eagerLoad() && !statements.getCurrentStatements().subjects().contains(associatedResourceId)){
-				associatedEntity.doWithProperties(this);
-				associatedEntity.doWithAssociations(this);
+				AbstractPropertiesToStatementsHandlers associationHandler = getInstance(statements, value, mappingContext);
+				associatedEntity.doWithProperties(associationHandler);
+				associatedEntity.doWithAssociations(associationHandler);
 			}
 		}
 	}
+	
+	protected abstract AbstractPropertiesToStatementsHandlers getInstance(RDFState statements, Object entity, SemanticMappingContext mappingContext);
 	
 	protected abstract void processStatement(SemanticPersistentProperty property, Object value);
 	

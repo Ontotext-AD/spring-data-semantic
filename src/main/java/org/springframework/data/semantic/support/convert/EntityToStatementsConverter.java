@@ -23,7 +23,7 @@ public class EntityToStatementsConverter {
 	
 	public RDFState convertEntityToStatements(SemanticPersistentEntity<?> persistentEntity, Object entity){
 		RDFState statements = new  RDFState();
-		PropertiesToStatementsHandler handler = new PropertiesToStatementsHandler(persistentEntity.getResourceId(entity), statements, entity, persistentEntity, mappingContext);
+		PropertiesToStatementsHandler handler = new PropertiesToStatementsHandler(statements, entity, mappingContext);
 		persistentEntity.doWithProperties(handler);
 		persistentEntity.doWithAssociations(handler);
 		return statements;
@@ -31,7 +31,7 @@ public class EntityToStatementsConverter {
 	
 	public RDFState convertEntityToDeleteStatements(SemanticPersistentEntity<?> persistentEntity, Object entity){
 		RDFState statements = new  RDFState();
-		PropertiesToDeleteStatementsHandler handler = new PropertiesToDeleteStatementsHandler(persistentEntity.getResourceId(entity), statements, entity, persistentEntity, mappingContext);
+		PropertiesToDeleteStatementsHandler handler = new PropertiesToDeleteStatementsHandler(statements, entity, mappingContext);
 		persistentEntity.doWithProperties(handler);
 		persistentEntity.doWithAssociations(handler);
 		return statements;

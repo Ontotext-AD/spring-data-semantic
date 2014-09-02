@@ -17,14 +17,17 @@ public class PropertiesToStatementsHandler extends AbstractPropertiesToStatement
 	
 	
 	
-	public PropertiesToStatementsHandler(URI resourceId, RDFState statements, Object entity, SemanticPersistentEntity<?> persistentEntity, SemanticMappingContext mappingContext){
-		super(statements, entity, persistentEntity, mappingContext);
-		this.resourceId = resourceId;
+	public PropertiesToStatementsHandler(RDFState statements, Object entity, SemanticMappingContext mappingContext){
+		super(statements, entity, mappingContext);
+		@SuppressWarnings("unchecked")
+		SemanticPersistentEntity<Object> persistentEntity = (SemanticPersistentEntity<Object>) mappingContext.getPersistentEntity(entity.getClass());
+		this.resourceId = persistentEntity.getResourceId(entity);
 	}
 
 	
 	@Override
 	protected void processStatement(SemanticPersistentProperty persistentProperty, Object value){
+		SemanticPersistentEntity<?> persistentEntity = (SemanticPersistentEntity<?>) persistentProperty.getOwner();
 		if(persistentProperty.isContext()){
 			return;
 		}
@@ -46,6 +49,15 @@ public class PropertiesToStatementsHandler extends AbstractPropertiesToStatement
 			}
 		}
 	}
+
+
+	@Override
+	protected AbstractPropertiesToStatementsHandlers getInstance(
+			RDFState statements, Object entity,
+			SemanticMappingContext mappingContext) {
+		return new PropertiesToStatementsHandler(statements, entity, mappingContext);
+	}
+
 
 	
 }

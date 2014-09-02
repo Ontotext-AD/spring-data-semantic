@@ -15,13 +15,16 @@ public class PropertiesToDeleteStatementsHandler extends AbstractPropertiesToSta
 
 	private URI resourceId;
 	
-	public PropertiesToDeleteStatementsHandler(URI resourceId, RDFState statements, Object entity, SemanticPersistentEntity<?> persistentEntity, SemanticMappingContext mappingContext){
-		super(statements, entity, persistentEntity, mappingContext);
-		this.resourceId = resourceId;
+	public PropertiesToDeleteStatementsHandler(RDFState statements, Object entity, SemanticMappingContext mappingContext){
+		super(statements, entity, mappingContext);
+		@SuppressWarnings("unchecked")
+		SemanticPersistentEntity<Object> persistentEntity = (SemanticPersistentEntity<Object>) mappingContext.getPersistentEntity(entity.getClass());
+		this.resourceId = persistentEntity.getResourceId(entity);
 	}
 
 	@Override
 	protected void processStatement(SemanticPersistentProperty persistentProperty, Object value) {
+		SemanticPersistentEntity<?> persistentEntity = (SemanticPersistentEntity<?>) persistentProperty.getOwner();
 		if(persistentProperty.isContext()){
 			return;
 		}
@@ -42,6 +45,13 @@ public class PropertiesToDeleteStatementsHandler extends AbstractPropertiesToSta
 			}
 		}
 		
+	}
+
+	@Override
+	protected AbstractPropertiesToStatementsHandlers getInstance(
+			RDFState statements, Object entity,
+			SemanticMappingContext mappingContext) {
+		return new PropertiesToDeleteStatementsHandler(statements, entity, mappingContext);
 	}
 	
 
