@@ -64,6 +64,13 @@ public class SemanticPersistentPropertyImpl extends
 		this.mappingContext = mappingContext;
 	}
 
+	@Override
+	public String getAliasPredicate() {
+		if(aliasPredicate == null){
+			aliasPredicate = "urn:"+getOwner().getType().getSimpleName().toLowerCase()+":field:"+field.getName();
+		}
+		return aliasPredicate;
+	}
 	
 	public String getBindingName(){
 		if(bindingName == null){
@@ -186,14 +193,6 @@ public class SemanticPersistentPropertyImpl extends
 	@Override
 	public boolean isContext() {
 		return annotations.containsKey(Context.class);
-	}
-
-	@Override
-	public String getAliasPredicate() {
-		if(aliasPredicate == null){
-			aliasPredicate = "urn:field:"+field.getName();
-		}
-		return aliasPredicate;
 	}
 
 	@Override

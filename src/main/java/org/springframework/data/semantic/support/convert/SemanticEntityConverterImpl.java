@@ -143,7 +143,7 @@ public class SemanticEntityConverterImpl implements SemanticEntityConverter {
                                 RDFState associatedEntityState = new RDFState(source.getCurrentStatements().filter(associatedEntityURI, null, null));
                                 final BeanWrapper<Object> associatedWrapper = BeanWrapper.<Object>create(associatedEntity, conversionService);
                                 sourceStateTransmitter.copyPropertiesFrom(associatedWrapper, associatedEntityState, associatedPersistentEntity, mappingPolicy);
-                                cascadeFetch(associatedPersistentEntity, associatedWrapper, associatedEntityState, mappingPolicy);
+                                cascadeFetch(associatedPersistentEntity, associatedWrapper, source, mappingPolicy);
                             }
                 		}
                 	}
@@ -157,7 +157,7 @@ public class SemanticEntityConverterImpl implements SemanticEntityConverter {
             				 RDFState associatedEntityState = new RDFState(source.getCurrentStatements().filter(associatedEntityURI, null, null));
                              final BeanWrapper<Object> associatedWrapper = BeanWrapper.<Object>create(associatedEntity, conversionService);
                              sourceStateTransmitter.copyPropertiesFrom(associatedWrapper, associatedEntityState, associatedPersistentEntity, mappingPolicy);
-                             cascadeFetch(associatedPersistentEntity, associatedWrapper, associatedEntityState, mappingPolicy);
+                             cascadeFetch(associatedPersistentEntity, associatedWrapper, source, mappingPolicy);
                         }
             			sourceStateTransmitter.setProperty(wrapper, property, associatedEntity);
             			
