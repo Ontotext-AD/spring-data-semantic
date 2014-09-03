@@ -47,14 +47,13 @@ public abstract class AbstractPropertiesToStatementsHandlers implements Property
 					}
 					else{
 						values = (Collection<Object>) value;
-						if(values.isEmpty() && !persistentProperty.isOptional() && !allowEmpty()){
-							throw new RequiredPropertyException(persistentProperty);
-						}
-						for(Object val : values){
-							processStatement(persistentProperty, val);
-						}
 					}
-					
+					if(values.isEmpty() && !persistentProperty.isOptional() && !allowEmpty()){
+						throw new RequiredPropertyException(persistentProperty);
+					}
+					for(Object val : values){
+						processStatement(persistentProperty, val);
+					}
 				}
 				else{
 					processStatement(persistentProperty, value);
@@ -75,35 +74,42 @@ public abstract class AbstractPropertiesToStatementsHandlers implements Property
 		SemanticPersistentEntity<?> persistentEntity = (SemanticPersistentEntity<?>) persistentProperty.getOwner();
 		Object value = persistentProperty.getValue(entity, persistentEntity.getMappingPolicy());
 		if(value == null){
-			return;
-		}
-		if(persistentProperty.isCollectionLike()){
-			SemanticPersistentEntity<Object> associatedEntity = (SemanticPersistentEntity<Object>) mappingContext.getPersistentEntity(persistentProperty.getComponentType());
-			Collection<Object> associatedEntityInstances;
-			if(persistentProperty.isArray()){
-				associatedEntityInstances = Arrays.asList((Object[]) value);
-			}
-			else{
-				associatedEntityInstances = (Collection<Object>) value;
-			}
-			for(Object associatedEntityInstance : associatedEntityInstances){
-				URI associatedResourceId = associatedEntity.getResourceId(associatedEntityInstance);
-				processStatement(persistentProperty, associatedResourceId);
-				if(persistentProperty.getMappingPolicy().eagerLoad() && !statements.getCurrentStatements().subjects().contains(associatedResourceId)){
-					AbstractPropertiesToStatementsHandlers associationHandler = getInstance(statements, associatedEntityInstance, mappingContext);
-					associatedEntity.doWithProperties(associationHandler);
-					associatedEntity.doWithAssociations(associationHandler);
-				}
+			if(!persistentProperty.isOptional() && !allowEmpty()){
+				throw new RequiredPropertyException(persistentProperty);
 			}
 		}
 		else{
-			SemanticPersistentEntity<Object> associatedEntity = (SemanticPersistentEntity<Object>) mappingContext.getPersistentEntity(persistentProperty.getType());
-			URI associatedResourceId = associatedEntity.getResourceId(value);
-			processStatement(persistentProperty, associatedResourceId);
-			if(persistentProperty.getMappingPolicy().eagerLoad() && !statements.getCurrentStatements().subjects().contains(associatedResourceId)){
-				AbstractPropertiesToStatementsHandlers associationHandler = getInstance(statements, value, mappingContext);
-				associatedEntity.doWithProperties(associationHandler);
-				associatedEntity.doWithAssociations(associationHandler);
+			if(persistentProperty.isCollectionLike()){
+				SemanticPersistentEntity<Object> associatedEntity = (SemanticPersistentEntity<Object>) mappingContext.getPersistentEntity(persistentProperty.getComponentType());
+				Collection<Object> associatedEntityInstances;
+				if(persistentProperty.isArray()){
+					associatedEntityInstances = Arrays.asList((Object[]) value);
+				}
+				else{
+					associatedEntityInstances = (Collection<Object>) value;
+				}
+				if(associatedEntityInstances.isEmpty() && !persistentProperty.isOptional() && !allowEmpty()){
+					throw new RequiredPropertyException(persistentProperty);
+				}
+				for(Object associatedEntityInstance : associatedEntityInstances){
+					URI associatedResourceId = associatedEntity.getResourceId(associatedEntityInstance);
+					processStatement(persistentProperty, associatedResourceId);
+					if(persistentProperty.getMappingPolicy().eagerLoad() && !statements.getCurrentStatements().subjects().contains(associatedResourceId)){
+						AbstractPropertiesToStatementsHandlers associationHandler = getInstance(statements, associatedEntityInstance, mappingContext);
+						associatedEntity.doWithProperties(associationHandler);
+						associatedEntity.doWithAssociations(associationHandler);
+					}
+				}
+			}
+			else{
+				SemanticPersistentEntity<Object> associatedEntity = (SemanticPersistentEntity<Object>) mappingContext.getPersistentEntity(persistentProperty.getType());
+				URI associatedResourceId = associatedEntity.getResourceId(value);
+				processStatement(persistentProperty, associatedResourceId);
+				if(persistentProperty.getMappingPolicy().eagerLoad() && !statements.getCurrentStatements().subjects().contains(associatedResourceId)){
+					AbstractPropertiesToStatementsHandlers associationHandler = getInstance(statements, value, mappingContext);
+					associatedEntity.doWithProperties(associationHandler);
+					associatedEntity.doWithAssociations(associationHandler);
+				}
 			}
 		}
 	}
