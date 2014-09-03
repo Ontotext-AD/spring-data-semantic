@@ -99,6 +99,9 @@ public class SemanticTemplateCRUD implements SemanticOperationsCRUD, Initializin
 				this.entityRemover = new SemanticEntityRemoverImpl(this.semanticDB, this.entityToStatementsConverter);
 				if(this.entityCache != null){
 					this.entityCache.clearAll();
+					if(applicationContext.getBeanNamesForType(CacheManager.class).length != 0){
+						this.entityCache = new EhCacheEntityCache(this.mappingContext, applicationContext.getBean(CacheManager.class));
+					}
 				}
 				
 			} catch (RepositoryException e) {
@@ -120,7 +123,7 @@ public class SemanticTemplateCRUD implements SemanticOperationsCRUD, Initializin
 	}
 	
 	public void afterPropertiesSet() throws Exception {
-		if(applicationContext.getBeanNamesForType(CacheManager.class).length != 0){
+		if(applicationContext.getBeanNamesForType(CacheManager.class).length != 0 && this.mappingContext != null){
 			this.entityCache = new EhCacheEntityCache(this.mappingContext, applicationContext.getBean(CacheManager.class));
 			logger.info("Using EhcacheEntityCache for second level caching.");
 		}
