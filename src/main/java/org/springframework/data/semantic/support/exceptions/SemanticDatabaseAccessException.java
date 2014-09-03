@@ -1,4 +1,4 @@
-package org.springframework.data.semantic.core;
+package org.springframework.data.semantic.support.exceptions;
 
 public class SemanticDatabaseAccessException extends RuntimeException {
 

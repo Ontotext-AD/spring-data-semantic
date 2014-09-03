@@ -59,5 +59,11 @@ public class PropertiesToStatementsHandler extends AbstractPropertiesToStatement
 	}
 
 
+	@Override
+	protected boolean allowEmpty() {
+		return false;
+	}
+
+
 	
 }

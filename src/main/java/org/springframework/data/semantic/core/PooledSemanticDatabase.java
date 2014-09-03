@@ -38,6 +38,8 @@ import org.springframework.data.semantic.query.BooleanSparqlQuery;
 import org.springframework.data.semantic.query.GraphSparqlQuery;
 import org.springframework.data.semantic.query.TupleSparqlQuery;
 import org.springframework.data.semantic.support.database.SesameConnectionPool;
+import org.springframework.data.semantic.support.exceptions.SemanticDatabaseAccessException;
+import org.springframework.data.semantic.support.exceptions.UncategorizedSemanticDataAccessException;
 
 /**
  * An implementation of {@link SemanticDatabase} that uses connection pooling.

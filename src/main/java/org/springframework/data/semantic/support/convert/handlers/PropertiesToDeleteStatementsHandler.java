@@ -53,6 +53,11 @@ public class PropertiesToDeleteStatementsHandler extends AbstractPropertiesToSta
 			SemanticMappingContext mappingContext) {
 		return new PropertiesToDeleteStatementsHandler(statements, entity, mappingContext);
 	}
+
+	@Override
+	protected boolean allowEmpty() {
+		return true;
+	}
 	
 
 }

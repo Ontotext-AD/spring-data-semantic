@@ -11,6 +11,7 @@ import org.springframework.data.semantic.convert.ObjectToLiteralConverter;
 import org.springframework.data.semantic.core.RDFState;
 import org.springframework.data.semantic.mapping.SemanticPersistentEntity;
 import org.springframework.data.semantic.mapping.SemanticPersistentProperty;
+import org.springframework.data.semantic.support.exceptions.RequiredPropertyException;
 import org.springframework.data.semantic.support.mapping.SemanticMappingContext;
 
 public abstract class AbstractPropertiesToStatementsHandlers implements PropertyHandler<SemanticPersistentProperty>, AssociationHandler<SemanticPersistentProperty>{
@@ -29,30 +30,40 @@ public abstract class AbstractPropertiesToStatementsHandlers implements Property
 		this.mappingContext = mappingContext;
 		this.objectToLiteralConverter = new ObjectToLiteralConverter();
 	}
+	
+	protected abstract boolean allowEmpty();
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public void doWithPersistentProperty(SemanticPersistentProperty persistentProperty) {
 		SemanticPersistentEntity<?> persistentEntity = (SemanticPersistentEntity<?>) persistentProperty.getOwner();
 		Object value = persistentProperty.getValue(entity, persistentEntity.getMappingPolicy());
-		if(persistentProperty.shallBePersisted() && value != null){
-			if(persistentProperty.isCollectionLike()){
-				if(persistentProperty.isArray()){
-					Object[] values = (Object[]) value;
-					for(Object val : values){
-						processStatement(persistentProperty, val);
+		if(persistentProperty.shallBePersisted() && !persistentProperty.isContext()){
+			if(value != null){
+				if(persistentProperty.isCollectionLike()){
+					Collection<Object> values;
+					if(persistentProperty.isArray()){
+						values = Arrays.asList((Object[]) value);
 					}
+					else{
+						values = (Collection<Object>) value;
+						if(values.isEmpty() && !persistentProperty.isOptional() && !allowEmpty()){
+							throw new RequiredPropertyException(persistentProperty);
+						}
+						for(Object val : values){
+							processStatement(persistentProperty, val);
+						}
+					}
+					
 				}
 				else{
-					Iterable<Object> values = (Iterable<Object>) value;
-					for(Object val : values){
-						processStatement(persistentProperty, val);
-					}
+					processStatement(persistentProperty, value);
 				}
-				
 			}
 			else{
-				processStatement(persistentProperty, value);
+				if(!persistentProperty.isOptional() && !allowEmpty()){
+					throw new RequiredPropertyException(persistentProperty);
+				}
 			}
 		}
 	}

@@ -7,6 +7,8 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.dao.support.PersistenceExceptionTranslator;
+import org.springframework.data.semantic.support.exceptions.SemanticDatabaseAccessException;
+import org.springframework.data.semantic.support.exceptions.UncategorizedSemanticDataAccessException;
 
 /**
  * 
