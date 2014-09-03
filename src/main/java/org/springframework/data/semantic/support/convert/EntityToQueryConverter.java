@@ -219,7 +219,7 @@ public class EntityToQueryConverter {
 			handlePersistentProperty(persistentProperty);
 			if(persistentProperty.getMappingPolicy().eagerLoad()){
 				SemanticPersistentEntity<?> associatedPersistentEntity = mappingContext.getPersistentEntity(persistentProperty.getActualType());
-				String associationBinding = "?"+persistentProperty.getName();
+				String associationBinding = persistentProperty.getBindingName();
 				appendPattern(sb, associationBinding, "<"+ValueUtils.RDF_TYPE_PREDICATE+">", "<"+associatedPersistentEntity.getRDFType()+">");
 				PropertiesToPatternsHandler associationHandler = new PropertiesToPatternsHandler(this.sb, associationBinding);
 				associatedPersistentEntity.doWithProperties(associationHandler);
@@ -248,7 +248,7 @@ public class EntityToQueryConverter {
 						subj = "?"+String.valueOf(var)+String.valueOf(i);
 					}
 					if(!predicates.hasNext()){
-						obj = "?"+persistentProperty.getName();
+						obj = persistentProperty.getBindingName();
 					}
 					else{
 						obj = "?"+String.valueOf(var)+String.valueOf(i);
@@ -288,12 +288,12 @@ public class EntityToQueryConverter {
 		
 		private void handlePersistentProperty(SemanticPersistentProperty persistentProperty) {
 			if(isRetrivableProperty(persistentProperty)){
-				appendPattern(sb, binding, "<" + persistentProperty.getAliasPredicate() + ">", "?"+persistentProperty.getName());
+				appendPattern(sb, binding, "<" + persistentProperty.getAliasPredicate() + ">", persistentProperty.getBindingName());
 			}
 		}
 		
 		private void handleAssociation(SemanticPersistentProperty persistentProperty) {
-			String associationBinding = "?"+persistentProperty.getName();
+			String associationBinding = persistentProperty.getBindingName();
 			appendPattern(sb, binding, "<" + persistentProperty.getAliasPredicate() + ">", associationBinding);
 			if(persistentProperty.getMappingPolicy().eagerLoad()){
 				SemanticPersistentEntity<?> associatedPersistentEntity = mappingContext.getPersistentEntity(persistentProperty.getActualType());

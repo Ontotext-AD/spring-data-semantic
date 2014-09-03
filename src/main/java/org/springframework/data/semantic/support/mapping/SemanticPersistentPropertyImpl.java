@@ -43,6 +43,7 @@ public class SemanticPersistentPropertyImpl extends
 	private boolean isIdProperty;
 	private SemanticMappingContext mappingContext;
 	private String aliasPredicate;
+	private String bindingName;
 
 	public SemanticPersistentPropertyImpl(Field field,
 			PropertyDescriptor propertyDescriptor,
@@ -61,6 +62,14 @@ public class SemanticPersistentPropertyImpl extends
 				&& propertyDescriptor.getPropertyType().isAssignableFrom(
 						URI.class);
 		this.mappingContext = mappingContext;
+	}
+
+	
+	public String getBindingName(){
+		if(bindingName == null){
+			bindingName = "?"+getOwner().getType().getSimpleName().toLowerCase()+"_"+getName();
+		}
+		return bindingName;
 	}
 
 	private Map<Class<? extends Annotation>, ? extends Annotation> extractAnnotations(Field field) {
