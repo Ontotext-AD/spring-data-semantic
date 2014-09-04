@@ -44,9 +44,7 @@ public class EhCacheEntityCache implements EntityCache {
 	public <T> void put(T entity) {
 		if(entity != null){
 			Ehcache cache = getCache(entity.getClass());
-			if(entity != null){
-				cache.put(new Element(getId(entity).toString(), entity));
-			}
+			cache.put(new Element(getId(entity).toString(), entity));
 		}
 	}
 
