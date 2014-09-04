@@ -3,6 +3,7 @@ package org.springframework.data.semantic.support.convert.handlers;
 import java.util.Arrays;
 import java.util.Collection;
 
+import org.openrdf.model.Resource;
 import org.openrdf.model.URI;
 import org.springframework.data.mapping.Association;
 import org.springframework.data.mapping.AssociationHandler;
@@ -52,11 +53,11 @@ public abstract class AbstractPropertiesToStatementsHandlers implements Property
 						throw new RequiredPropertyException(persistentProperty);
 					}
 					for(Object val : values){
-						processStatement(persistentProperty, val);
+						processPropertyStatement(persistentProperty, val);
 					}
 				}
 				else{
-					processStatement(persistentProperty, value);
+					processPropertyStatement(persistentProperty, value);
 				}
 			}
 			else{
@@ -93,7 +94,7 @@ public abstract class AbstractPropertiesToStatementsHandlers implements Property
 				}
 				for(Object associatedEntityInstance : associatedEntityInstances){
 					URI associatedResourceId = associatedEntity.getResourceId(associatedEntityInstance);
-					processStatement(persistentProperty, associatedResourceId);
+					processAssociationStatement(persistentProperty, associatedResourceId);
 					if(persistentProperty.getMappingPolicy().eagerLoad() && !statements.getCurrentStatements().subjects().contains(associatedResourceId)){
 						AbstractPropertiesToStatementsHandlers associationHandler = getInstance(statements, associatedEntityInstance, mappingContext);
 						associatedEntity.doWithProperties(associationHandler);
@@ -104,7 +105,7 @@ public abstract class AbstractPropertiesToStatementsHandlers implements Property
 			else{
 				SemanticPersistentEntity<Object> associatedEntity = (SemanticPersistentEntity<Object>) mappingContext.getPersistentEntity(persistentProperty.getType());
 				URI associatedResourceId = associatedEntity.getResourceId(value);
-				processStatement(persistentProperty, associatedResourceId);
+				processAssociationStatement(persistentProperty, associatedResourceId);
 				if(persistentProperty.getMappingPolicy().eagerLoad() && !statements.getCurrentStatements().subjects().contains(associatedResourceId)){
 					AbstractPropertiesToStatementsHandlers associationHandler = getInstance(statements, value, mappingContext);
 					associatedEntity.doWithProperties(associationHandler);
@@ -116,6 +117,8 @@ public abstract class AbstractPropertiesToStatementsHandlers implements Property
 	
 	protected abstract AbstractPropertiesToStatementsHandlers getInstance(RDFState statements, Object entity, SemanticMappingContext mappingContext);
 	
-	protected abstract void processStatement(SemanticPersistentProperty property, Object value);
+	protected abstract void processPropertyStatement(SemanticPersistentProperty property, Object value);
+	
+	protected abstract void processAssociationStatement(SemanticPersistentProperty property, Resource value);
 	
 }

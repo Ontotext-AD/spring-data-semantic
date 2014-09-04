@@ -2,12 +2,14 @@ package org.springframework.data.semantic.support.convert.handlers;
 
 import org.openrdf.model.Resource;
 import org.openrdf.model.URI;
+import org.openrdf.model.Value;
 import org.openrdf.model.impl.ContextStatementImpl;
 import org.openrdf.model.impl.StatementImpl;
 import org.openrdf.model.impl.URIImpl;
 import org.springframework.data.semantic.core.RDFState;
 import org.springframework.data.semantic.mapping.SemanticPersistentEntity;
 import org.springframework.data.semantic.mapping.SemanticPersistentProperty;
+import org.springframework.data.semantic.support.Direction;
 import org.springframework.data.semantic.support.mapping.SemanticMappingContext;
 import org.springframework.data.semantic.support.util.ValueUtils;
 
@@ -26,27 +28,42 @@ public class PropertiesToStatementsHandler extends AbstractPropertiesToStatement
 
 	
 	@Override
-	protected void processStatement(SemanticPersistentProperty persistentProperty, Object value){
+	protected void processPropertyStatement(SemanticPersistentProperty persistentProperty, Object value){
 		SemanticPersistentEntity<?> persistentEntity = (SemanticPersistentEntity<?>) persistentProperty.getOwner();
 		if(persistentProperty.isContext()){
 			return;
 		}
-		else if(persistentProperty.isIdProperty()){
-			if(persistentEntity.hasContextProperty() && persistentEntity.getContextProperty().getValue(entity, persistentProperty.getMappingPolicy()) != null){
-				statements.addStatement(new ContextStatementImpl((URI) value, new URIImpl(ValueUtils.RDF_TYPE_PREDICATE), persistentEntity.getRDFType(), (Resource) persistentEntity.getContextProperty().getValue(entity, persistentProperty.getMappingPolicy())));
-			}
-			else{
-				statements.addStatement(new StatementImpl((URI) value, new URIImpl(ValueUtils.RDF_TYPE_PREDICATE), persistentEntity.getRDFType()));
-			}
+		Resource context = persistentEntity.getContext(entity);
+		if(persistentProperty.isIdProperty()){
+			addStatement((URI) value, new URIImpl(ValueUtils.RDF_TYPE_PREDICATE), persistentEntity.getRDFType(), context);
 		}
 		else{
-			//TODO handle language tags and data types; test if Resource
-			if(persistentEntity.hasContextProperty() && persistentEntity.getContextProperty().getValue(entity, persistentProperty.getMappingPolicy()) != null){
-				statements.addStatement(new ContextStatementImpl(resourceId, persistentProperty.getPredicate().get(0), objectToLiteralConverter.convert(value), (Resource) persistentEntity.getContextProperty().getValue(entity, persistentProperty.getMappingPolicy())));
-			}
-			else{
-				statements.addStatement(new StatementImpl(resourceId, persistentProperty.getPredicate().get(0), objectToLiteralConverter.convert(value)));
-			}
+			addStatement(resourceId, persistentProperty.getPredicate().get(0), objectToLiteralConverter.convert(value), context);
+		}
+	}
+	
+	@Override
+	protected void processAssociationStatement(SemanticPersistentProperty persistentProperty, Resource value) {
+		SemanticPersistentEntity<?> persistentEntity = (SemanticPersistentEntity<?>) persistentProperty.getOwner();
+		Resource context = persistentEntity.getContext(entity);
+		if(Direction.OUTGOING.equals(persistentProperty.getDirection())){
+			addStatement(resourceId, persistentProperty.getPredicate().get(0), value, context);	
+		}
+		else if(Direction.INCOMING.equals(persistentProperty.getDirection())){
+			addStatement(value, persistentProperty.getPredicate().get(0), resourceId, context);
+		}
+		else{
+			addStatement(resourceId, persistentProperty.getPredicate().get(0), value, context);
+			addStatement(value, persistentProperty.getPredicate().get(0), resourceId, context);
+		}
+	}
+	
+	private void addStatement(Resource subject, URI predicate, Value object, Resource context){
+		if(context == null){
+			statements.addStatement(new StatementImpl(subject, predicate, object));
+		}
+		else{
+			statements.addStatement(new ContextStatementImpl(subject, predicate, object, context));
 		}
 	}
 
@@ -63,6 +80,9 @@ public class PropertiesToStatementsHandler extends AbstractPropertiesToStatement
 	protected boolean allowEmpty() {
 		return false;
 	}
+
+
+
 
 
 	

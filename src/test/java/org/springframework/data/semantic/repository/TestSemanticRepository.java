@@ -115,7 +115,7 @@ public class TestSemanticRepository {
 		ModelEntity modelEntity = modelEntityRepository.findOne(MODEL_ENTITY.ENTITY_TWO);
 		modelEntity.getRelated().remove(1);
 		modelEntityRepository.save(modelEntity);
-		assertEquals(count -1, sdb.count());
+		assertEquals(count -2, sdb.count());
 	}
 	
 	@Test

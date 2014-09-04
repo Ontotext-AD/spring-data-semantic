@@ -20,6 +20,7 @@ import org.springframework.data.semantic.annotation.Context;
 import org.springframework.data.semantic.annotation.Datatype;
 import org.springframework.data.semantic.annotation.Fetch;
 import org.springframework.data.semantic.annotation.Language;
+import org.springframework.data.semantic.annotation.RelatedTo;
 import org.springframework.data.semantic.annotation.Language.Languages;
 import org.springframework.data.semantic.annotation.Optional;
 import org.springframework.data.semantic.annotation.Predicate;
@@ -27,6 +28,7 @@ import org.springframework.data.semantic.annotation.ResourceId;
 import org.springframework.data.semantic.mapping.MappingPolicy;
 import org.springframework.data.semantic.mapping.SemanticPersistentEntity;
 import org.springframework.data.semantic.mapping.SemanticPersistentProperty;
+import org.springframework.data.semantic.support.Direction;
 import org.springframework.data.semantic.support.util.ValueUtils;
 
 /**
@@ -237,5 +239,16 @@ public class SemanticPersistentPropertyImpl extends
 	@Override
 	public boolean isOptional() {
 		return annotations.containsKey(Optional.class);
+	}
+
+	@Override
+	public Direction getDirection() {
+		if(isAssociation()){
+			RelatedTo relatedTo = findAnnotation(RelatedTo.class);
+			return relatedTo.dicrection();
+		}
+		else{
+			return Direction.OUTGOING;
+		}
 	}
 }

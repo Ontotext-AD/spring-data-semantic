@@ -1,5 +1,6 @@
 package org.springframework.data.semantic.support.mapping;
 
+import org.openrdf.model.Resource;
 import org.openrdf.model.URI;
 import org.springframework.data.mapping.model.BasicPersistentEntity;
 import org.springframework.data.semantic.annotation.Namespace;
@@ -114,6 +115,14 @@ public class SemanticPersistentEntityImpl<T> extends BasicPersistentEntity<T, Se
 			}
 		}
 		return namespace;
+	}
+
+	@Override
+	public Resource getContext(Object entity) {
+		if(hasContextProperty()){
+			return (Resource) getContextProperty().getValue(entity, getMappingPolicy());
+		}
+		return null;
 	}
 
 }

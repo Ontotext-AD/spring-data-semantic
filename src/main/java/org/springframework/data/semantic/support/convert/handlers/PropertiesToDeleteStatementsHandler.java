@@ -2,12 +2,14 @@ package org.springframework.data.semantic.support.convert.handlers;
 
 import org.openrdf.model.Resource;
 import org.openrdf.model.URI;
+import org.openrdf.model.Value;
 import org.openrdf.model.impl.ContextStatementImpl;
 import org.openrdf.model.impl.StatementImpl;
 import org.openrdf.model.impl.URIImpl;
 import org.springframework.data.semantic.core.RDFState;
 import org.springframework.data.semantic.mapping.SemanticPersistentEntity;
 import org.springframework.data.semantic.mapping.SemanticPersistentProperty;
+import org.springframework.data.semantic.support.Direction;
 import org.springframework.data.semantic.support.mapping.SemanticMappingContext;
 import org.springframework.data.semantic.support.util.ValueUtils;
 
@@ -23,7 +25,7 @@ public class PropertiesToDeleteStatementsHandler extends AbstractPropertiesToSta
 	}
 
 	@Override
-	protected void processStatement(SemanticPersistentProperty persistentProperty, Object value) {
+	protected void processPropertyStatement(SemanticPersistentProperty persistentProperty, Object value) {
 		SemanticPersistentEntity<?> persistentEntity = (SemanticPersistentEntity<?>) persistentProperty.getOwner();
 		if(persistentProperty.isContext()){
 			return;
@@ -46,6 +48,32 @@ public class PropertiesToDeleteStatementsHandler extends AbstractPropertiesToSta
 		}
 		
 	}
+	
+	@Override
+	protected void processAssociationStatement(SemanticPersistentProperty persistentProperty, Resource value) {
+		SemanticPersistentEntity<?> persistentEntity = (SemanticPersistentEntity<?>) persistentProperty.getOwner();
+		Resource context = persistentEntity.getContext(entity);
+		if(Direction.OUTGOING.equals(persistentProperty.getDirection())){
+			deleteStatement(resourceId, persistentProperty.getPredicate().get(0), value, context);	
+		}
+		else if(Direction.INCOMING.equals(persistentProperty.getDirection())){
+			deleteStatement(value, persistentProperty.getPredicate().get(0), resourceId, context);
+		}
+		else{
+			deleteStatement(resourceId, persistentProperty.getPredicate().get(0), value, context);
+			deleteStatement(value, persistentProperty.getPredicate().get(0), resourceId, context);
+		}
+	}
+	
+	private void deleteStatement(Resource subject, URI predicate, Value object, Resource context){
+		if(context == null){
+			statements.deleteStatement(new StatementImpl(subject, predicate, object));
+		}
+		else{
+			statements.deleteStatement(new ContextStatementImpl(subject, predicate, object, context));
+		}
+	}
+	
 
 	@Override
 	protected AbstractPropertiesToStatementsHandlers getInstance(

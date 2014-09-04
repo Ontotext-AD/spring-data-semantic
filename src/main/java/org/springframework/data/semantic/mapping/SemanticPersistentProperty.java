@@ -6,9 +6,12 @@ import org.openrdf.model.URI;
 import org.springframework.data.mapping.PersistentProperty;
 import org.springframework.data.semantic.annotation.Context;
 import org.springframework.data.semantic.annotation.Optional;
+import org.springframework.data.semantic.support.Direction;
 
 public interface SemanticPersistentProperty extends PersistentProperty<SemanticPersistentProperty> {
 
+	Direction getDirection();
+	
 	String getBindingName(); 
 
 	/**
