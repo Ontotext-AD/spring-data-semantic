@@ -27,7 +27,7 @@ import org.springframework.data.semantic.annotation.ResourceId;
 import org.springframework.data.semantic.mapping.MappingPolicy;
 import org.springframework.data.semantic.mapping.SemanticPersistentEntity;
 import org.springframework.data.semantic.mapping.SemanticPersistentProperty;
-import org.springframework.data.semantic.support.ValueUtils;
+import org.springframework.data.semantic.support.util.ValueUtils;
 
 /**
  * 

@@ -1,4 +1,4 @@
-package org.springframework.data.semantic.support;
+package org.springframework.data.semantic.support.util;
 
 import org.openrdf.model.URI;
 import org.openrdf.model.ValueFactory;

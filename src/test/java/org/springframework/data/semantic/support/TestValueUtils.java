@@ -4,6 +4,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
+import org.springframework.data.semantic.support.util.ValueUtils;
 
 public class TestValueUtils {
 	

@@ -8,8 +8,8 @@ import org.openrdf.model.impl.URIImpl;
 import org.springframework.data.semantic.core.RDFState;
 import org.springframework.data.semantic.mapping.SemanticPersistentEntity;
 import org.springframework.data.semantic.mapping.SemanticPersistentProperty;
-import org.springframework.data.semantic.support.ValueUtils;
 import org.springframework.data.semantic.support.mapping.SemanticMappingContext;
+import org.springframework.data.semantic.support.util.ValueUtils;
 
 public class PropertiesToDeleteStatementsHandler extends AbstractPropertiesToStatementsHandlers {
 

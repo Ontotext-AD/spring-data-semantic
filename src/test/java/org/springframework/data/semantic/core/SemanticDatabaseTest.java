@@ -14,7 +14,7 @@ import org.openrdf.model.impl.URIImpl;
 import org.openrdf.query.BindingSet;
 import org.openrdf.repository.RepositoryException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.semantic.support.ValueUtils;
+import org.springframework.data.semantic.support.util.ValueUtils;
 import org.springframework.data.semantic.testutils.Utils;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;

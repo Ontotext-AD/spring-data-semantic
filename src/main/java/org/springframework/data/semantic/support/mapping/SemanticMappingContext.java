@@ -15,7 +15,7 @@ import org.springframework.data.mapping.context.AbstractMappingContext;
 import org.springframework.data.mapping.model.SimpleTypeHolder;
 import org.springframework.data.semantic.annotation.SemanticEntity;
 import org.springframework.data.semantic.mapping.SemanticPersistentProperty;
-import org.springframework.data.semantic.support.ValueUtils;
+import org.springframework.data.semantic.support.util.ValueUtils;
 import org.springframework.data.util.TypeInformation;
 
 /**
