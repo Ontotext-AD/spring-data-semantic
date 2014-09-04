@@ -30,7 +30,7 @@ public class TestSemanticEntityState {
 	
 	@Before
 	public void setUp(){
-		entityState = new SemanticEntityState<Object>(null, sdb, new Object(), Object.class, new MockFieldAccessorFactory(), new MockFieldAccessListenerFactory(), new SemanticPersistentEntityImpl<Object>(ClassTypeInformation.from(Object.class)));
+		entityState = new SemanticEntityState<Object>(null, sdb, new Object(), new MockFieldAccessorFactory(), new MockFieldAccessListenerFactory(), new SemanticPersistentEntityImpl<Object>(ClassTypeInformation.from(Object.class)));
 	}
 	
 	@Test

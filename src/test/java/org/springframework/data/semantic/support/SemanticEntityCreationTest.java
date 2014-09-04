@@ -125,7 +125,7 @@ public class SemanticEntityCreationTest {
 		testEntityType = mappingContext.getPersistentEntity(ClassTypeInformation.from(Merlot.class));
 		ConversionService conversionService = new DefaultConversionService();
 		operations = new SemanticTemplateCRUD(sdb, conversionService);
-		statementsCollector = new SemanticTemplateStatementsCollector(sdb, conversionService, mappingContext, new EntityToQueryConverter(mappingContext));
+		statementsCollector = new SemanticTemplateStatementsCollector(sdb, mappingContext, new EntityToQueryConverter(mappingContext));
 		
 	}
 	

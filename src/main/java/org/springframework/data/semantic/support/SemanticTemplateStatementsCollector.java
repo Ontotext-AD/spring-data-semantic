@@ -12,7 +12,6 @@ import org.openrdf.model.URI;
 import org.openrdf.model.Value;
 import org.openrdf.model.impl.LinkedHashModel;
 import org.openrdf.repository.RepositoryException;
-import org.springframework.core.convert.ConversionService;
 import org.springframework.data.semantic.core.SemanticDatabase;
 import org.springframework.data.semantic.core.SemanticOperationsStatementsCollector;
 import org.springframework.data.semantic.mapping.MappingPolicy;
@@ -29,7 +28,7 @@ public class SemanticTemplateStatementsCollector implements SemanticOperationsSt
 	private EntityToQueryConverter entityToQueryConverter;
 	
 	
-	public SemanticTemplateStatementsCollector(SemanticDatabase semanticDB, ConversionService conversionService, 
+	public SemanticTemplateStatementsCollector(SemanticDatabase semanticDB,
 			SemanticMappingContext mappingContext, EntityToQueryConverter entityToQueryConverter) throws RepositoryException {
 		
 		this.semanticDB = semanticDB;

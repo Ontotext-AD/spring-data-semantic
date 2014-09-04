@@ -162,10 +162,10 @@ public class SemanticPersistentPropertyImpl extends
 	@Override
 	public Object getValue(final Object entity,
 			final MappingPolicy mappingPolicy) {
-		return getValueFromEntity(entity, mappingPolicy);
+		return getValueFromEntity(entity);
 	}
 
-	private Object getValueFromEntity(Object entity, MappingPolicy mappingPolicy) {
+	private Object getValueFromEntity(Object entity) {
 		try {
 			final Field field = getField();
 			if (!field.isAccessible()) {

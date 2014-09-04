@@ -117,12 +117,12 @@ public class SemanticEntityConverterImpl implements SemanticEntityConverter {
             
             sourceStateTransmitter.copyPropertiesFrom(wrapper, source, persistentEntity, mappingPolicy);
             
-            cascadeFetch(persistentEntity, wrapper, source, mappingPolicy);
+            cascadeFetch(persistentEntity, wrapper, source);
         }
         return entity;
 	}
 	
-	private <R> void cascadeFetch(SemanticPersistentEntity<R> persistentEntity, final BeanWrapper<R> wrapper, final RDFState source, final MappingPolicy policy) {
+	private <R> void cascadeFetch(SemanticPersistentEntity<R> persistentEntity, final BeanWrapper<R> wrapper, final RDFState source) {
 		persistentEntity.doWithAssociations(new AssociationHandler<SemanticPersistentProperty>() {
             @Override
             public void doWithAssociation(Association<SemanticPersistentProperty> association) {
@@ -143,7 +143,7 @@ public class SemanticEntityConverterImpl implements SemanticEntityConverter {
                                 RDFState associatedEntityState = new RDFState(source.getCurrentStatements().filter(associatedEntityURI, null, null));
                                 final BeanWrapper<Object> associatedWrapper = BeanWrapper.<Object>create(associatedEntity, conversionService);
                                 sourceStateTransmitter.copyPropertiesFrom(associatedWrapper, associatedEntityState, associatedPersistentEntity, mappingPolicy);
-                                cascadeFetch(associatedPersistentEntity, associatedWrapper, source, mappingPolicy);
+                                cascadeFetch(associatedPersistentEntity, associatedWrapper, source);
                             }
                 		}
                 	}
@@ -157,7 +157,7 @@ public class SemanticEntityConverterImpl implements SemanticEntityConverter {
             				 RDFState associatedEntityState = new RDFState(source.getCurrentStatements().filter(associatedEntityURI, null, null));
                              final BeanWrapper<Object> associatedWrapper = BeanWrapper.<Object>create(associatedEntity, conversionService);
                              sourceStateTransmitter.copyPropertiesFrom(associatedWrapper, associatedEntityState, associatedPersistentEntity, mappingPolicy);
-                             cascadeFetch(associatedPersistentEntity, associatedWrapper, source, mappingPolicy);
+                             cascadeFetch(associatedPersistentEntity, associatedWrapper, source);
                         }
             			sourceStateTransmitter.setProperty(wrapper, property, associatedEntity);
             			

@@ -43,7 +43,6 @@ public class SemanticEntityState<T> implements
 			final RDFState underlyingState,
 			final SemanticDatabase semanticDatabase,
 			final T entity,
-			final Class<? extends T> type,
 			final DelegatingFieldAccessorFactory nodeDelegatingFieldAccessorFactory,
 			final DelegatingFieldAccessListenerFactory delegatingFieldAccessListenerFactory,
 			SemanticPersistentEntity<T> persistentEntity) {
@@ -136,7 +135,7 @@ public class SemanticEntityState<T> implements
 	 private void notifyListeners(final SemanticPersistentProperty field, final Object oldValue, final Object newValue) {
         if (!fieldAccessorListeners.containsKey(field) || fieldAccessorListeners.get(field) == null) return;
         for (final FieldAccessListener listener : fieldAccessorListeners.get(field)) {
-            listener.valueChanged(entity, null, newValue); // todo oldValue
+            listener.valueChanged(entity, oldValue, newValue); // todo oldValue
         }
 	}
 

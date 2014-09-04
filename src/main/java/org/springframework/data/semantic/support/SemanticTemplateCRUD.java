@@ -89,7 +89,7 @@ public class SemanticTemplateCRUD implements SemanticOperationsCRUD, Initializin
 				this.mappingContext = new SemanticMappingContext(semanticDB.getNamespaces(), this.semanticDB.getDefaultNamespace());
 				this.entityToQueryConverter = new EntityToQueryConverter(this.mappingContext);
 				this.entityToStatementsConverter = new EntityToStatementsConverter(mappingContext);
-				this.statementsCollector = new SemanticTemplateStatementsCollector(this.semanticDB, this.conversionService, this.mappingContext, this.entityToQueryConverter);
+				this.statementsCollector = new SemanticTemplateStatementsCollector(this.semanticDB, this.mappingContext, this.entityToQueryConverter);
 				this.delegatingFieldAxsorFactory = new DelegatingFieldAccessorFactory(this.statementsCollector, this);
 				this.delegatingFieldAccessListenerFactory = new DelegatingFieldAccessListenerFactory(this.statementsCollector, this);
 				this.sesFactory = new SemanticEntityStateFactory(this.mappingContext, this.delegatingFieldAxsorFactory, this.delegatingFieldAccessListenerFactory, this.semanticDB);

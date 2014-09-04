@@ -29,7 +29,7 @@ public class SemanticEntityStateFactory implements EntityStateFactory<RDFState>{
 			boolean detachable) {
 		final Class<?> entityType = entity.getClass();
 		SemanticPersistentEntity<?> persistentEntity = mappingContext.getPersistentEntity(entityType);
-		return new SemanticEntityState<R>(new RDFState(), semanticDatabase, entity, (Class<R>) entityType, delegatingFieldAccessorFactory, delegatingFieldAccessListenerFactory, (SemanticPersistentEntity<R>) persistentEntity);
+		return new SemanticEntityState<R>(new RDFState(), semanticDatabase, entity, delegatingFieldAccessorFactory, delegatingFieldAccessListenerFactory, (SemanticPersistentEntity<R>) persistentEntity);
 	}
 	
 }
