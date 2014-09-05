@@ -27,7 +27,13 @@ public interface SemanticPersistentProperty extends PersistentProperty<SemanticP
 	 * 
 	 * @return
 	 */
-	List<URI> getPredicate();
+	URI getPredicate();
+	
+	/**
+	 * Returns the predicate associated with the inverse property from an associated entity. Null otherwise.
+	 * @return
+	 */
+	SemanticPersistentProperty getInverseProperty();
 
 	/**
 	 * Returns a dummy/alias predicate to be used in CONSTRUCT query bindings.

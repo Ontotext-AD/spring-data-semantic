@@ -25,7 +25,7 @@ public class TestNamespaceAnnotation {
 	@Test
 	public void testGetPredicate(){
 		SemanticPersistentProperty pp = pe.getPersistentProperty("name");
-		assertEquals(namespace+"name" , pp.getPredicate().get(0).stringValue());
+		assertEquals(namespace+"name" , pp.getPredicate().stringValue());
 	}
 	
 	@Test

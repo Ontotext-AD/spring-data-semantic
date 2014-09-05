@@ -22,6 +22,12 @@ public @interface RelatedTo {
 	/**
 	 * @return the direction of the relation.
 	 */
-	Direction dicrection() default Direction.OUTGOING ;
+	Direction direction() default Direction.OUTGOING ;
+	
+	/**
+	 * The mapped property from an associated entity.
+	 * @return
+	 */
+	String mappedProperty() default "";
 
 }

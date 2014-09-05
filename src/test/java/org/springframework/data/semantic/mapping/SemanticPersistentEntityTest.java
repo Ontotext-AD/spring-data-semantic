@@ -38,7 +38,7 @@ public class SemanticPersistentEntityTest {
 		final SemanticPersistentProperty nameProperty = testEntityType.getPersistentProperty("name");
 		assertNotNull(nameProperty);
 		assertTrue(nameProperty.hasPredicate());
-		assertEquals(new URIImpl("http://www.w3.org/2004/02/skos/core#prefLabel"), nameProperty.getPredicate().get(0));
+		assertEquals(new URIImpl("http://www.w3.org/2004/02/skos/core#prefLabel"), nameProperty.getPredicate());
 	}
 	
 	@Test

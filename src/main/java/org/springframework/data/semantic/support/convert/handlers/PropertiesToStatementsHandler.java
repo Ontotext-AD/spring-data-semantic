@@ -38,7 +38,7 @@ public class PropertiesToStatementsHandler extends AbstractPropertiesToStatement
 			addStatement((URI) value, new URIImpl(ValueUtils.RDF_TYPE_PREDICATE), persistentEntity.getRDFType(), context);
 		}
 		else{
-			addStatement(resourceId, persistentProperty.getPredicate().get(0), objectToLiteralConverter.convert(value), context);
+			addStatement(resourceId, persistentProperty.getPredicate(), objectToLiteralConverter.convert(value), context);
 		}
 	}
 	
@@ -47,14 +47,26 @@ public class PropertiesToStatementsHandler extends AbstractPropertiesToStatement
 		SemanticPersistentEntity<?> persistentEntity = (SemanticPersistentEntity<?>) persistentProperty.getOwner();
 		Resource context = persistentEntity.getContext(entity);
 		if(Direction.OUTGOING.equals(persistentProperty.getDirection())){
-			addStatement(resourceId, persistentProperty.getPredicate().get(0), value, context);	
+			addStatement(resourceId, persistentProperty.getPredicate(), value, context);	
 		}
 		else if(Direction.INCOMING.equals(persistentProperty.getDirection())){
-			addStatement(value, persistentProperty.getPredicate().get(0), resourceId, context);
+			SemanticPersistentProperty inverseProperty = persistentProperty.getInverseProperty();
+			if(inverseProperty != null){
+				addStatement(value, inverseProperty.getPredicate(), resourceId, context);
+			}
+			else{
+				addStatement(value, persistentProperty.getPredicate(), resourceId, context);
+			}
 		}
 		else{
-			addStatement(resourceId, persistentProperty.getPredicate().get(0), value, context);
-			addStatement(value, persistentProperty.getPredicate().get(0), resourceId, context);
+			addStatement(resourceId, persistentProperty.getPredicate(), value, context);
+			SemanticPersistentProperty inverseProperty = persistentProperty.getInverseProperty();
+			if(inverseProperty != null){
+				addStatement(value, inverseProperty.getPredicate(), resourceId, context);
+			}
+			else{
+				addStatement(value, persistentProperty.getPredicate(), resourceId, context);
+			}
 		}
 	}
 	

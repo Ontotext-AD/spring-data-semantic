@@ -1,8 +1,8 @@
 package org.springframework.data.semantic.model;
 
 import org.openrdf.model.URI;
-import org.springframework.data.annotation.Reference;
 import org.springframework.data.semantic.annotation.Predicate;
+import org.springframework.data.semantic.annotation.RelatedTo;
 import org.springframework.data.semantic.annotation.ResourceId;
 import org.springframework.data.semantic.annotation.SemanticEntity;
 
@@ -12,8 +12,8 @@ public class Merlot {
 	@ResourceId
 	private URI uri;
 	
+	@RelatedTo
 	@Predicate("hasBody")
-	@Reference
 	private WineBody body;
 	
 	@Predicate("hasFlavor")

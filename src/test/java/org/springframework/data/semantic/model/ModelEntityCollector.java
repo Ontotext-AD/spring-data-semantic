@@ -16,7 +16,7 @@ public class ModelEntityCollector {
 	private URI uri;
 	
 	@Fetch
-	@RelatedTo(dicrection=Direction.OUTGOING)
+	@RelatedTo(direction=Direction.OUTGOING)
 	private Collection<ModelEntity> entities;
 
 	/**

@@ -1,6 +1,5 @@
 package org.springframework.data.semantic.support.convert;
 
-import java.util.Iterator;
 import java.util.LinkedList;
 
 import org.openrdf.model.URI;
@@ -9,6 +8,7 @@ import org.springframework.data.mapping.AssociationHandler;
 import org.springframework.data.mapping.PropertyHandler;
 import org.springframework.data.semantic.mapping.SemanticPersistentEntity;
 import org.springframework.data.semantic.mapping.SemanticPersistentProperty;
+import org.springframework.data.semantic.support.Direction;
 import org.springframework.data.semantic.support.mapping.SemanticMappingContext;
 import org.springframework.data.semantic.support.util.ValueUtils;
 import org.springframework.util.StringUtils;
@@ -230,7 +230,7 @@ public class EntityToQueryConverter {
 		
 		public void handlePersistentProperty(SemanticPersistentProperty persistentProperty) {
 			if(isRetrivableProperty(persistentProperty)){
-				Iterator<URI> predicates = persistentProperty.getPredicate().iterator();
+				URI predicate = persistentProperty.getPredicate();
 				String var = "";
 				int i = 0;
 				String subj = "";
@@ -238,29 +238,40 @@ public class EntityToQueryConverter {
 				if(persistentProperty.isOptional()){
 					sb.append("OPTIONAL { ");
 				}
-				while(predicates.hasNext()){
-					String pred = "<"+predicates.next().stringValue()+">";
-					if(var.isEmpty()){
-						subj = binding;
-						var = getVar(processedProps++);
+				String pred = "<"+predicate+">";
+				if(var.isEmpty()){
+					subj = binding;
+					var = getVar(processedProps++);
+				}
+				else{
+					subj = "?"+String.valueOf(var)+String.valueOf(i);
+				}
+				obj = persistentProperty.getBindingName();
+				if(persistentProperty.isAssociation()){
+					if(Direction.INCOMING.equals(persistentProperty.getDirection())){
+						SemanticPersistentProperty associatedProperty = persistentProperty.getInverseProperty();
+						if(associatedProperty != null){
+							pred = "<"+associatedProperty.getPredicate()+">";
+							appendPattern(sb, obj, pred, subj);
+						}
+						else{
+							appendPattern(sb, subj, pred, obj);
+						}
 					}
 					else{
-						subj = "?"+String.valueOf(var)+String.valueOf(i);
+						appendPattern(sb, subj, pred, obj);
 					}
-					if(!predicates.hasNext()){
-						obj = persistentProperty.getBindingName();
-					}
-					else{
-						obj = "?"+String.valueOf(var)+String.valueOf(i);
-					}
+				}
+				else{
 					appendPattern(sb, subj, pred, obj);
-					i++;
 				}
-				if(persistentProperty.isOptional()){
-					sb.append("} ");
-				}
+				i++;
 			}
-		}		
+			if(persistentProperty.isOptional()){
+				sb.append("} ");
+			}
+			
+		}
 	}
 		
 	private class PropertiesToBindingsHandler implements  PropertyHandler<SemanticPersistentProperty>,  AssociationHandler<SemanticPersistentProperty> {

@@ -22,14 +22,14 @@ public class ModelEntity {
 	//@Datatype(XSDDatatype.)
 	@Optional
 	@Language({Languages.en, Languages.de})
-	@Predicate({"http://www.w3.org/2004/02/skos/core#prefLabel"})
+	@Predicate("http://www.w3.org/2004/02/skos/core#prefLabel")
 	private String name;
 	
 	@Context
 	private String graph;
 	
 	@Optional
-	@RelatedTo(dicrection=Direction.BOTH)
+	@RelatedTo(direction=Direction.BOTH)
 	private List<ModelEntity> related;
 
 	/**

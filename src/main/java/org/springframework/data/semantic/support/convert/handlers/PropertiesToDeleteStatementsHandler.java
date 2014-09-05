@@ -40,10 +40,10 @@ public class PropertiesToDeleteStatementsHandler extends AbstractPropertiesToSta
 		}
 		else{
 			if(persistentEntity.hasContextProperty() && persistentEntity.getContextProperty().getValue(entity, persistentProperty.getMappingPolicy()) != null){
-				statements.deleteStatement(new ContextStatementImpl(resourceId, persistentProperty.getPredicate().get(0), objectToLiteralConverter.convert(value), (Resource) persistentEntity.getContextProperty().getValue(entity, persistentProperty.getMappingPolicy())));
+				statements.deleteStatement(new ContextStatementImpl(resourceId, persistentProperty.getPredicate(), objectToLiteralConverter.convert(value), (Resource) persistentEntity.getContextProperty().getValue(entity, persistentProperty.getMappingPolicy())));
 			}
 			else{
-				statements.deleteStatement(new StatementImpl(resourceId, persistentProperty.getPredicate().get(0), objectToLiteralConverter.convert(value)));	
+				statements.deleteStatement(new StatementImpl(resourceId, persistentProperty.getPredicate(), objectToLiteralConverter.convert(value)));	
 			}
 		}
 		
@@ -54,14 +54,26 @@ public class PropertiesToDeleteStatementsHandler extends AbstractPropertiesToSta
 		SemanticPersistentEntity<?> persistentEntity = (SemanticPersistentEntity<?>) persistentProperty.getOwner();
 		Resource context = persistentEntity.getContext(entity);
 		if(Direction.OUTGOING.equals(persistentProperty.getDirection())){
-			deleteStatement(resourceId, persistentProperty.getPredicate().get(0), value, context);	
+			deleteStatement(resourceId, persistentProperty.getPredicate(), value, context);	
 		}
 		else if(Direction.INCOMING.equals(persistentProperty.getDirection())){
-			deleteStatement(value, persistentProperty.getPredicate().get(0), resourceId, context);
+			SemanticPersistentProperty inverseProperty = persistentProperty.getInverseProperty();
+			if(inverseProperty != null){
+				deleteStatement(value, inverseProperty.getPredicate(), resourceId, context);
+			}
+			else{
+				deleteStatement(value, persistentProperty.getPredicate(), resourceId, context);
+			}
 		}
 		else{
-			deleteStatement(resourceId, persistentProperty.getPredicate().get(0), value, context);
-			deleteStatement(value, persistentProperty.getPredicate().get(0), resourceId, context);
+			deleteStatement(resourceId, persistentProperty.getPredicate(), value, context);
+			SemanticPersistentProperty inverseProperty = persistentProperty.getInverseProperty();
+			if(inverseProperty != null){
+				deleteStatement(value, inverseProperty.getPredicate(), resourceId, context);
+			}
+			else{
+				deleteStatement(value, persistentProperty.getPredicate(), resourceId, context);
+			}
 		}
 	}
 	

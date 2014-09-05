@@ -18,6 +18,6 @@ public @interface Predicate {
 	/**
 	 * @return the predicate to be used.
 	 */
-	String[] value();
+	String value();
 
 }

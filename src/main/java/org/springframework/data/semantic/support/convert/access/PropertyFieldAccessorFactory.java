@@ -29,13 +29,13 @@ public class PropertyFieldAccessorFactory implements FieldAccessorFactory {
 	
 	public static class PropertyFieldAccessor implements FieldAccessor {
 		private SemanticPersistentProperty property;
-		private List<URI> predicates;
+		private URI predicate;
 		private Class<?> fieldType;
 		private SemanticTemplateStatementsCollector template;
 		
 		public PropertyFieldAccessor(SemanticPersistentProperty property, SemanticTemplateStatementsCollector template){
 			this.property = property;
-			this.predicates = property.getPredicate();
+			this.predicate = property.getPredicate();
 			this.fieldType = property.getType();
 			this.template = template;
 		}

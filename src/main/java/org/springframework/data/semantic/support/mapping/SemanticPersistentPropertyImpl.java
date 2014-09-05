@@ -30,6 +30,7 @@ import org.springframework.data.semantic.mapping.SemanticPersistentEntity;
 import org.springframework.data.semantic.mapping.SemanticPersistentProperty;
 import org.springframework.data.semantic.support.Direction;
 import org.springframework.data.semantic.support.util.ValueUtils;
+import org.springframework.util.StringUtils;
 
 /**
  * 
@@ -100,23 +101,32 @@ public class SemanticPersistentPropertyImpl extends
 	}
 
 	@Override
-	public List<URI> getPredicate() {
+	public URI getPredicate() {
 		if (hasPredicate()) {
-			List<URI> predicates = new LinkedList<URI>();
-			for(String defPredicate : getAnnotation(Predicate.class).value()){
-				predicates.add(mappingContext.resolveURI(defPredicate));
-			}
-			return predicates;
+			return mappingContext.resolveURI(getAnnotation(Predicate.class).value());
 		} else {
 			if(this.getOwner() instanceof SemanticPersistentEntity){
 				SemanticPersistentEntity<?> persistentEntity = (SemanticPersistentEntity<?>) this.getOwner();
 				URI namespace = persistentEntity.getNamespace();
 				if(namespace != null){
-					return Arrays.asList(ValueUtils.createUri(namespace.stringValue(), field.getName()));
+					return ValueUtils.createUri(namespace.stringValue(), field.getName());
 				}
 			}
-			return Arrays.asList(mappingContext.resolveURI(field.getName()));
+			return mappingContext.resolveURI(field.getName());
 		}
+	}
+	
+	@Override
+	public SemanticPersistentProperty getInverseProperty() {
+		if(this.isAssociation()){
+			RelatedTo relatedTo = findAnnotation(RelatedTo.class);
+			String mappedProperty = relatedTo.mappedProperty();
+			if(StringUtils.hasText(mappedProperty)){
+				SemanticPersistentEntity<?> associatedEntity = mappingContext.getPersistentEntity(this.getActualType());
+				return associatedEntity.getPersistentProperty(mappedProperty);
+			}
+		}
+		return null;
 	}
 
 	@Override
@@ -210,7 +220,7 @@ public class SemanticPersistentPropertyImpl extends
 	
 	@Override
 	public boolean shallBePersisted() {
-		return super.shallBePersisted() && (getPredicate().size() == 1);
+		return super.shallBePersisted();
 	}
 
 	@Override
@@ -245,10 +255,12 @@ public class SemanticPersistentPropertyImpl extends
 	public Direction getDirection() {
 		if(isAssociation()){
 			RelatedTo relatedTo = findAnnotation(RelatedTo.class);
-			return relatedTo.dicrection();
+			return relatedTo.direction();
 		}
 		else{
 			return Direction.OUTGOING;
 		}
 	}
+
+	
 }
