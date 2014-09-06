@@ -199,7 +199,6 @@ public class EntityToQueryConverter {
 
 		private StringBuilder sb;
 		private String binding;
-		private int processedProps = 0;
 
 		PropertiesToPatternsHandler(StringBuilder sb, String binding){
 			this.sb = sb;
@@ -231,21 +230,13 @@ public class EntityToQueryConverter {
 		public void handlePersistentProperty(SemanticPersistentProperty persistentProperty) {
 			if(isRetrivableProperty(persistentProperty)){
 				URI predicate = persistentProperty.getPredicate();
-				String var = "";
-				int i = 0;
 				String subj = "";
 				String obj = "";
 				if(persistentProperty.isOptional()){
 					sb.append("OPTIONAL { ");
 				}
 				String pred = "<"+predicate+">";
-				if(var.isEmpty()){
-					subj = binding;
-					var = getVar(processedProps++);
-				}
-				else{
-					subj = "?"+String.valueOf(var)+String.valueOf(i);
-				}
+				subj = binding;
 				obj = persistentProperty.getBindingName();
 				if(persistentProperty.isAssociation()){
 					if(Direction.INCOMING.equals(persistentProperty.getDirection())){
@@ -265,7 +256,6 @@ public class EntityToQueryConverter {
 				else{
 					appendPattern(sb, subj, pred, obj);
 				}
-				i++;
 			}
 			if(persistentProperty.isOptional()){
 				sb.append("} ");
