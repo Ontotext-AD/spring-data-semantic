@@ -8,8 +8,26 @@ import org.openrdf.model.impl.ValueFactoryImpl;
 import org.springframework.core.convert.converter.Converter;
 
 public class ObjectToLiteralConverter implements Converter<Object, Value> {
+	
+	private static ObjectToLiteralConverter INSTANCE;
 
-	private final ValueFactory factory = ValueFactoryImpl.getInstance();
+	private final ValueFactory factory; 
+	
+	private ObjectToLiteralConverter() {
+		super();
+		factory = ValueFactoryImpl.getInstance();
+	}
+	
+	public static ObjectToLiteralConverter getInstance(){
+		if(INSTANCE == null){
+			synchronized (ObjectToLiteralConverter.class) {
+				if(INSTANCE == null){
+					INSTANCE = new ObjectToLiteralConverter();
+				}
+			}
+		}
+		return INSTANCE;
+	}
 	
 	@Override
 	public Value convert(Object source) {

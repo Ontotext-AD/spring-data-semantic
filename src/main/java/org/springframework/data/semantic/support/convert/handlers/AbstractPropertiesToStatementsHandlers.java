@@ -29,7 +29,7 @@ public abstract class AbstractPropertiesToStatementsHandlers implements Property
 		this.statements = statements;
 		this.entity = entity;
 		this.mappingContext = mappingContext;
-		this.objectToLiteralConverter = new ObjectToLiteralConverter();
+		this.objectToLiteralConverter = ObjectToLiteralConverter.getInstance();
 	}
 	
 	protected abstract boolean allowEmpty();

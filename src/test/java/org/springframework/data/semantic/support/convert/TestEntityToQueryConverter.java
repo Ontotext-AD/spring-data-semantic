@@ -3,6 +3,7 @@ package org.springframework.data.semantic.support.convert;
 import static org.junit.Assert.assertEquals;
 
 import java.util.Arrays;
+import java.util.HashMap;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -52,13 +53,13 @@ public class TestEntityToQueryConverter {
 	
 	@Test
 	public void TestBindingCreation(){
-		String queryBindings = entityToQueryConverter.getPropertyBindings(resource, testEntityType);
+		String queryBindings = entityToQueryConverter.getPropertyBindings(resource, testEntityType, new HashMap<String, Object>());
 		assertEquals(expectedBindings, queryBindings);
 	}
 
 	@Test
 	public void TestPatternCreation(){
-		String queryPattern = entityToQueryConverter.getPropertyPatterns(resource, testEntityType);
+		String queryPattern = entityToQueryConverter.getPropertyPatterns(resource, testEntityType, new HashMap<String, Object>());
 		assertEquals(expectedPattern, queryPattern);
 	}
 	
@@ -70,13 +71,13 @@ public class TestEntityToQueryConverter {
 	
 	@Test
 	public void TestBindingCreationEagerLoad(){
-		String queryBindings = entityToQueryConverter.getPropertyBindings(collectionResource, testCollectionType);
+		String queryBindings = entityToQueryConverter.getPropertyBindings(collectionResource, testCollectionType, new HashMap<String, Object>());
 		assertEquals(expectedBindingsEager, queryBindings);
 	}
 	
 	@Test
 	public void TestPatternCreationEagerLoad(){
-		String queryPattern = entityToQueryConverter.getPropertyPatterns(collectionResource, testCollectionType);
+		String queryPattern = entityToQueryConverter.getPropertyPatterns(collectionResource, testCollectionType, new HashMap<String, Object>());
 		assertEquals(expectedPatternEager, queryPattern);
 	}
 	

@@ -1,5 +1,8 @@
 package org.springframework.data.semantic.core;
 
+import java.util.Collection;
+import java.util.Map;
+
 import org.openrdf.model.Model;
 import org.openrdf.model.URI;
 
@@ -77,5 +80,13 @@ public interface SemanticOperationsCRUD {
 	 * @return
 	 */
 	<T> boolean exists(URI resourceId, Class<? extends T> clazz);
+	
+	/**
+	 * Retrieve a collection of entities of the given type that fulfill the parameter requirements.
+	 * @param clazz
+	 * @param parameterToValue
+	 * @return
+	 */
+	<T> Collection<T> findByProperty(Class<? extends T> clazz, Map<String, Object> parameterToValue);
 	
 }

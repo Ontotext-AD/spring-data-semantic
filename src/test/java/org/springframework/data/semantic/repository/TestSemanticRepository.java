@@ -210,5 +210,13 @@ public class TestSemanticRepository {
 		
 		assertFalse(modelEntityRepository.exists(MODEL_ENTITY.ENTITY_FIVE));
 	}
+	
+	@Test
+	public void testFindBySimpleProperty(){
+		List<ModelEntity> entities = modelEntityRepository.findByName("Model Entity One");
+		assertNotNull(entities);
+		assertFalse(entities.isEmpty());
+		assertEquals(MODEL_ENTITY.ENTITY_ONE, entities.get(0).getUri());
+	}
 
 }

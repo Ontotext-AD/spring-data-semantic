@@ -235,6 +235,17 @@ public class SemanticTemplateCRUD implements SemanticOperationsCRUD, Initializin
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
+	public <T> Collection<T> findByProperty(Class<? extends T> clazz,
+			Map<String, Object> parameterToValue) {
+		Collection<Model> statementsPerEntity = this.statementsCollector.getStatementsForResourcesAndProperties(clazz, parameterToValue, null, null);
+		List<T> results = new LinkedList<T>();
+		for(Model statements : statementsPerEntity){
+			results.add(createEntity(statements, clazz));
+		}
+		return results;
+	}
+
 	
 
 

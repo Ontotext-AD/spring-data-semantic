@@ -1,11 +1,16 @@
 package org.springframework.data.semantic.support.convert;
 
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
 
 import org.openrdf.model.URI;
+import org.openrdf.model.Value;
 import org.springframework.data.mapping.Association;
 import org.springframework.data.mapping.AssociationHandler;
 import org.springframework.data.mapping.PropertyHandler;
+import org.springframework.data.semantic.convert.ObjectToLiteralConverter;
 import org.springframework.data.semantic.mapping.SemanticPersistentEntity;
 import org.springframework.data.semantic.mapping.SemanticPersistentProperty;
 import org.springframework.data.semantic.support.Direction;
@@ -57,13 +62,25 @@ public class EntityToQueryConverter {
 	 * @return
 	 */
 	public String getGraphQueryForResource(URI uri, SemanticPersistentEntity<?> entity){
+		return getGraphQueryForResource(uri, entity, new HashMap<String, Object>());
+	}
+	
+	/**
+	 * Create a graph query retrieving the molecule of an entity. 
+	 * Only 'retrievable' {@link #isRetrivableProperty(SemanticPersistentProperty)} properties will be fetched
+	 * @param uri - the uri of the entity
+	 * @param entity - the container which holds the information about that entity
+	 * @param propertiesToValues - the properties with their required values
+	 * @return
+	 */
+	public String getGraphQueryForResource(URI uri, SemanticPersistentEntity<?> entity, Map<String, Object> propertyToValue){
 		StringBuilder sb = new StringBuilder();
 		
 		sb.append("CONSTRUCT { ");
-		sb.append(getPropertyBindings(uri, entity));
+		sb.append(getPropertyBindings(uri, entity, propertyToValue));
 		sb.append(" }\n");
 		sb.append("WHERE { ");
-		sb.append(getPropertyPatterns(uri, entity));
+		sb.append(getPropertyPatterns(uri, entity, propertyToValue));
 		sb.append(" }");
 		
 		return sb.toString();
@@ -89,13 +106,17 @@ public class EntityToQueryConverter {
 	}
 	
 	public String getGraphQueryForEntityClass(SemanticPersistentEntity<?> entity){
+		return getGraphQueryForEntityClass(entity, new HashMap<String, Object>());
+	}
+	
+	public String getGraphQueryForEntityClass(SemanticPersistentEntity<?> entity, Map<String, Object> propertyToValue){
 		StringBuilder sb = new StringBuilder();
 		
 		sb.append("CONSTRUCT { ");
-		sb.append(getPropertyBindings(null, entity));
+		sb.append(getPropertyBindings(null, entity, propertyToValue));
 		sb.append(" }\n");
 		sb.append("WHERE { ");
-		sb.append(getPropertyPatterns(null, entity));
+		sb.append(getPropertyPatterns(null, entity, propertyToValue));
 		sb.append(" }");
 		
 		return sb.toString();
@@ -107,18 +128,18 @@ public class EntityToQueryConverter {
 	 * @param entity - the container holding the information about the entity's structure
 	 * @return
 	 */
-	protected String getPropertyBindings(URI uri, SemanticPersistentEntity<?> entity){
+	protected String getPropertyBindings(URI uri, SemanticPersistentEntity<?> entity, Map<String, Object> propertyToValue){
 		StringBuilder sb = new StringBuilder();
-		String binding;
+		String subjectBinding;
 		if(uri != null){
-			binding = "<"+uri+">";
+			subjectBinding = "<"+uri+">";
 		}
 		else{
-			binding = "?"+entity.getRDFType().getLocalName();
+			subjectBinding = "?"+entity.getRDFType().getLocalName();
 			
 		}
-		appendPattern(sb, binding, "a", "<"+entity.getRDFType()+">");
-		PropertiesToBindingsHandler handler = new PropertiesToBindingsHandler(sb, binding);
+		appendPattern(sb, subjectBinding, "a", "<"+entity.getRDFType()+">");
+		PropertiesToBindingsHandler handler = new PropertiesToBindingsHandler(sb, subjectBinding, propertyToValue);
 		entity.doWithProperties(handler);
 		entity.doWithAssociations(handler);
 		return sb.toString();
@@ -145,11 +166,11 @@ public class EntityToQueryConverter {
 	 */
 	protected String getPropertyPattern(URI uri, SemanticPersistentEntity<?> entity, SemanticPersistentProperty property){
 		StringBuilder sb = new StringBuilder();
-		new PropertiesToPatternsHandler(sb, "<"+uri+">").doWithPersistentProperty(property);
+		new PropertiesToPatternsHandler(sb, "<"+uri+">", new HashMap<String, Object>()).doWithPersistentProperty(property);
 		return sb.toString();
 	}
 	
-	protected String getPropertyPatterns(URI uri, SemanticPersistentEntity<?> entity){
+	protected String getPropertyPatterns(URI uri, SemanticPersistentEntity<?> entity, Map<String, Object> propertyToValue){
 		StringBuilder sb = new StringBuilder();
 		/*SemanticPersistentProperty contextP = entity.getContextProperty();
 		if(contextP != null){
@@ -165,7 +186,7 @@ public class EntityToQueryConverter {
 			binding = "?"+entity.getRDFType().getLocalName();
 		}
 		appendPattern(sb, binding, "<"+ValueUtils.RDF_TYPE_PREDICATE+">", "<"+entity.getRDFType()+">");
-		PropertiesToPatternsHandler handler = new PropertiesToPatternsHandler(sb, binding);
+		PropertiesToPatternsHandler handler = new PropertiesToPatternsHandler(sb, binding, propertyToValue);
 		entity.doWithProperties(handler);
 		entity.doWithAssociations(handler);
 		return sb.toString();
@@ -199,10 +220,14 @@ public class EntityToQueryConverter {
 
 		private StringBuilder sb;
 		private String binding;
+		private Map<String, Object> propertyToValue;
+		private ObjectToLiteralConverter objectToLiteralConverter;
 
-		PropertiesToPatternsHandler(StringBuilder sb, String binding){
+		PropertiesToPatternsHandler(StringBuilder sb, String binding, Map<String, Object> propertyToValue){
 			this.sb = sb;
 			this.binding = binding;
+			this.propertyToValue = propertyToValue;
+			this.objectToLiteralConverter = ObjectToLiteralConverter.getInstance();
 		}
 
 		@Override
@@ -215,12 +240,13 @@ public class EntityToQueryConverter {
 		public void doWithAssociation(
 				Association<SemanticPersistentProperty> association) {
 			SemanticPersistentProperty persistentProperty = association.getInverse();
+			//TODO handle existing value in propertyToValue
 			handlePersistentProperty(persistentProperty);
 			if(persistentProperty.getMappingPolicy().eagerLoad()){
 				SemanticPersistentEntity<?> associatedPersistentEntity = mappingContext.getPersistentEntity(persistentProperty.getActualType());
 				String associationBinding = persistentProperty.getBindingName();
 				appendPattern(sb, associationBinding, "<"+ValueUtils.RDF_TYPE_PREDICATE+">", "<"+associatedPersistentEntity.getRDFType()+">");
-				PropertiesToPatternsHandler associationHandler = new PropertiesToPatternsHandler(this.sb, associationBinding);
+				PropertiesToPatternsHandler associationHandler = new PropertiesToPatternsHandler(this.sb, associationBinding, new HashMap<String, Object>());
 				associatedPersistentEntity.doWithProperties(associationHandler);
 				associatedPersistentEntity.doWithAssociations(associationHandler);
 			}
@@ -232,12 +258,24 @@ public class EntityToQueryConverter {
 				URI predicate = persistentProperty.getPredicate();
 				String subj = "";
 				String obj = "";
+				String pred = "<"+predicate+">";
+				subj = binding;
+				Object objectValue = this.propertyToValue.get(persistentProperty.getName());
+				if(objectValue != null){
+					if(objectValue instanceof Collection<?>){
+						//TODO
+					}
+					else{
+						Value val = this.objectToLiteralConverter.convert(objectValue);
+						obj = val instanceof URI ? "<"+val.toString()+">" : val.toString();
+					}
+				}
+				else{
+					obj = persistentProperty.getBindingName();
+				}
 				if(persistentProperty.isOptional()){
 					sb.append("OPTIONAL { ");
 				}
-				String pred = "<"+predicate+">";
-				subj = binding;
-				obj = persistentProperty.getBindingName();
 				if(persistentProperty.isAssociation()){
 					if(Direction.INCOMING.equals(persistentProperty.getDirection())){
 						SemanticPersistentProperty associatedProperty = persistentProperty.getInverseProperty();
@@ -268,10 +306,14 @@ public class EntityToQueryConverter {
 
 		private StringBuilder sb;
 		private String binding;
+		private Map<String, Object> propertyToValue;
+		private ObjectToLiteralConverter objectToLiteralConverter;
 		
-		PropertiesToBindingsHandler(StringBuilder sb, String binding){
+		PropertiesToBindingsHandler(StringBuilder sb, String binding, Map<String, Object> propertyToValue){
 			this.sb = sb;
 			this.binding = binding;
+			this.propertyToValue = propertyToValue;
+			this.objectToLiteralConverter = ObjectToLiteralConverter.getInstance();
 		}
 		
 		@Override
@@ -289,17 +331,36 @@ public class EntityToQueryConverter {
 		
 		private void handlePersistentProperty(SemanticPersistentProperty persistentProperty) {
 			if(isRetrivableProperty(persistentProperty)){
-				appendPattern(sb, binding, "<" + persistentProperty.getAliasPredicate() + ">", persistentProperty.getBindingName());
+				Object objectValue = propertyToValue.get(persistentProperty.getName());
+				if(objectValue != null){
+					if(objectValue instanceof Collection<?>){
+						//TODO
+					}
+					else{
+						Value val = this.objectToLiteralConverter.convert(objectValue);
+						if(val instanceof URI){
+							appendPattern(sb, binding, "<" + persistentProperty.getAliasPredicate() + ">", "<"+val.toString()+">");
+						}
+						else{
+							appendPattern(sb, binding, "<" + persistentProperty.getAliasPredicate() + ">", val.toString());
+						}
+					}
+				}
+				else{
+					appendPattern(sb, binding, "<" + persistentProperty.getAliasPredicate() + ">", persistentProperty.getBindingName());
+				}
+				
 			}
 		}
 		
 		private void handleAssociation(SemanticPersistentProperty persistentProperty) {
 			String associationBinding = persistentProperty.getBindingName();
+			//handle value in propertyToValue
 			appendPattern(sb, binding, "<" + persistentProperty.getAliasPredicate() + ">", associationBinding);
 			if(persistentProperty.getMappingPolicy().eagerLoad()){
 				SemanticPersistentEntity<?> associatedPersistentEntity = mappingContext.getPersistentEntity(persistentProperty.getActualType());
 				appendPattern(sb, associationBinding, "a", "<"+associatedPersistentEntity.getRDFType()+">");
-				PropertiesToBindingsHandler associationHandler = new PropertiesToBindingsHandler(this.sb, associationBinding);
+				PropertiesToBindingsHandler associationHandler = new PropertiesToBindingsHandler(this.sb, associationBinding, new HashMap<String, Object>());
 				associatedPersistentEntity.doWithProperties(associationHandler);
 				associatedPersistentEntity.doWithAssociations(associationHandler);
 			}

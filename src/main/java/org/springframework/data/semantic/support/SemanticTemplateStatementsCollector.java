@@ -75,40 +75,57 @@ public class SemanticTemplateStatementsCollector implements SemanticOperationsSt
 
 	@Override
 	public <T> Collection<Model> getStatementsForResources(Class<? extends T> clazz, Long offset, Long limit) {
-			try {
-				SemanticPersistentEntity<?> persistentEntity = mappingContext.getPersistentEntity(clazz);
-				Model results = semanticDB.getGraphQueryResults(entityToQueryConverter.getGraphQueryForEntityClass(persistentEntity), offset, limit);
-				Set<Resource> subjects = results.filter(null, null, persistentEntity.getRDFType()).subjects();
-				Map<Resource, Resource> resourceToSubject = new HashMap<Resource, Resource>();
-				Map<Resource, Model> subjectToModel = new HashMap<Resource, Model>();
-				for(Statement statement : results){
-					Resource subject = statement.getSubject();
-					if(subjects.contains(subject)){
-						Value object = statement.getObject();
-						if(object instanceof Resource){
-							resourceToSubject.put((Resource) object, subject);
-						}
-						Model statementsForSubject = subjectToModel.get(subject);
-						if(statementsForSubject == null){
-							statementsForSubject = new LinkedHashModel();
-							subjectToModel.put(subject, statementsForSubject);
-						}
-						statementsForSubject.add(statement);
-					}
-					else{
-						Value object = statement.getObject();
-						Resource entityId = resourceToSubject.get(subject);
-						if(object instanceof Resource){
-							resourceToSubject.put((Resource) object, entityId); 
-						}
-						Model statementsForSubject = subjectToModel.get(entityId);
-						statementsForSubject.add(statement);
-					}
+		try {
+			SemanticPersistentEntity<?> persistentEntity = mappingContext.getPersistentEntity(clazz);
+			Model results = semanticDB.getGraphQueryResults(entityToQueryConverter.getGraphQueryForEntityClass(persistentEntity), offset, limit);
+			return assembleModels(persistentEntity, results);
+		} catch (Exception e) {
+			throw ExceptionTranslator.translateExceptionIfPossible(e);
+		}
+	}
+
+	@Override
+	public <T> Collection<Model> getStatementsForResourcesAndProperties(
+			Class<? extends T> clazz, Map<String, Object> parameterToValue,
+			Long offset, Long limit) {
+		try {
+			SemanticPersistentEntity<?> persistentEntity = mappingContext.getPersistentEntity(clazz);
+			Model results = semanticDB.getGraphQueryResults(entityToQueryConverter.getGraphQueryForEntityClass(persistentEntity, parameterToValue), offset, limit);
+			return assembleModels(persistentEntity, results);
+		} catch (Exception e) {
+			throw ExceptionTranslator.translateExceptionIfPossible(e);
+		}
+	}
+	
+	private <T> Collection<Model> assembleModels(SemanticPersistentEntity<T> persistentEntity, Model allStatements){
+		Set<Resource> subjects = allStatements.filter(null, null, persistentEntity.getRDFType()).subjects();
+		Map<Resource, Resource> resourceToSubject = new HashMap<Resource, Resource>();
+		Map<Resource, Model> subjectToModel = new HashMap<Resource, Model>();
+		for(Statement statement : allStatements){
+			Resource subject = statement.getSubject();
+			if(subjects.contains(subject)){
+				Value object = statement.getObject();
+				if(object instanceof Resource){
+					resourceToSubject.put((Resource) object, subject);
 				}
-				return subjectToModel.values();
-			} catch (Exception e) {
-				throw ExceptionTranslator.translateExceptionIfPossible(e);
+				Model statementsForSubject = subjectToModel.get(subject);
+				if(statementsForSubject == null){
+					statementsForSubject = new LinkedHashModel();
+					subjectToModel.put(subject, statementsForSubject);
+				}
+				statementsForSubject.add(statement);
 			}
+			else{
+				Value object = statement.getObject();
+				Resource entityId = resourceToSubject.get(subject);
+				if(object instanceof Resource){
+					resourceToSubject.put((Resource) object, entityId); 
+				}
+				Model statementsForSubject = subjectToModel.get(entityId);
+				statementsForSubject.add(statement);
+			}
+		}
+		return subjectToModel.values();
 	}
 	
 	
