@@ -25,6 +25,11 @@ public class ModelEntity {
 	@Predicate("http://www.w3.org/2004/02/skos/core#prefLabel")
 	private String name;
 	
+	@Optional
+	@Language({Languages.en, Languages.de})
+	@Predicate("http://www.w3.org/2004/02/skos/core#altLabel")
+	private List<String> synonyms;
+	
 	@Context
 	private String graph;
 	
@@ -86,6 +91,14 @@ public class ModelEntity {
 	 */
 	public void setGraph(String graph) {
 		this.graph = graph;
+	}
+
+	public List<String> getSynonyms() {
+		return synonyms;
+	}
+
+	public void setSynonyms(List<String> synonyms) {
+		this.synonyms = synonyms;
 	}
 	
 	

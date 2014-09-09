@@ -218,5 +218,13 @@ public class TestSemanticRepository {
 		assertFalse(entities.isEmpty());
 		assertEquals(MODEL_ENTITY.ENTITY_ONE, entities.get(0).getUri());
 	}
+	
+	@Test
+	public void testFindByCollectionProperty(){
+		List<ModelEntity> entities = modelEntityRepository.findBySynonyms(Arrays.asList("Model Entity Eins", "Model Entity Uno"));
+		assertNotNull(entities);
+		assertFalse(entities.isEmpty());
+		assertEquals(MODEL_ENTITY.ENTITY_ONE, entities.get(0).getUri());
+	}
 
 }

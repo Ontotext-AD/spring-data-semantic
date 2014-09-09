@@ -7,5 +7,7 @@ import org.springframework.data.semantic.model.ModelEntity;
 public interface ModelEntityRepository extends SemanticRepository<ModelEntity> {
 	
 	List<ModelEntity> findByName(String name);
+	
+	List<ModelEntity> findBySynonyms(List<String> synonyms);
 
 }

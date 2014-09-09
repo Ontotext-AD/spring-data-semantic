@@ -1,5 +1,6 @@
 package org.springframework.data.semantic.support.convert.handlers;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -52,6 +53,7 @@ public class PropertiesToPatternsHandler extends AbstractPropertiesToQueryHandle
 
 	}
 	
+	@SuppressWarnings("unchecked")
 	public void handlePersistentProperty(SemanticPersistentProperty persistentProperty) {
 		if(isRetrivableProperty(persistentProperty)){
 			URI predicate = persistentProperty.getPredicate();
@@ -62,30 +64,40 @@ public class PropertiesToPatternsHandler extends AbstractPropertiesToQueryHandle
 			Object objectValue = this.propertyToValue.get(persistentProperty.getName());
 			Boolean optional = persistentProperty.isOptional() && (objectValue == null);
 			if(objectValue != null){
-				if(objectValue instanceof Collection<?>){
-					//TODO
+				if(objectValue instanceof Collection<?> || objectValue.getClass().isArray()){
+					if(objectValue.getClass().isArray()){
+						objectValue = Arrays.asList((Object[])objectValue);
+					}
+					for (Object o : (Collection<Object>) objectValue){
+						Value val = this.objectToLiteralConverter.convert(o);
+						obj = val instanceof URI ? "<"+val.toString()+">" : val.toString();
+						addPattern(persistentProperty, optional, subj, pred, obj);
+					}
 				}
 				else{
 					Value val = this.objectToLiteralConverter.convert(objectValue);
 					obj = val instanceof URI ? "<"+val.toString()+">" : val.toString();
+					addPattern(persistentProperty, optional, subj, pred, obj);
 				}
 			}
 			else{
 				obj = persistentProperty.getBindingName();
+				addPattern(persistentProperty, optional, subj, pred, obj);
 			}
-			if(optional){
-				sb.append("OPTIONAL { ");
-			}
-			if(persistentProperty.isAssociation()){
-				if(Direction.INCOMING.equals(persistentProperty.getDirection())){
-					SemanticPersistentProperty associatedProperty = persistentProperty.getInverseProperty();
-					if(associatedProperty != null){
-						pred = "<"+associatedProperty.getPredicate()+">";
-						appendPattern(sb, obj, pred, subj);
-					}
-					else{
-						appendPattern(sb, subj, pred, obj);
-					}
+			
+		}
+	}
+	
+	private void addPattern(SemanticPersistentProperty persistentProperty, Boolean optional, String subj, String pred, String obj){
+		if(optional){
+			sb.append("OPTIONAL { ");
+		}
+		if(persistentProperty.isAssociation()){
+			if(Direction.INCOMING.equals(persistentProperty.getDirection())){
+				SemanticPersistentProperty associatedProperty = persistentProperty.getInverseProperty();
+				if(associatedProperty != null){
+					pred = "<"+associatedProperty.getPredicate()+">";
+					appendPattern(sb, obj, pred, subj);
 				}
 				else{
 					appendPattern(sb, subj, pred, obj);
@@ -94,9 +106,12 @@ public class PropertiesToPatternsHandler extends AbstractPropertiesToQueryHandle
 			else{
 				appendPattern(sb, subj, pred, obj);
 			}
-			if(optional){
-				sb.append("} ");
-			}
+		}
+		else{
+			appendPattern(sb, subj, pred, obj);
+		}
+		if(optional){
+			sb.append("} ");
 		}
 	}
 }

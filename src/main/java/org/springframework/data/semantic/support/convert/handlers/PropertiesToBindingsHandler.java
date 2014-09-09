@@ -1,5 +1,6 @@
 package org.springframework.data.semantic.support.convert.handlers;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -40,21 +41,25 @@ public class PropertiesToBindingsHandler extends AbstractPropertiesToQueryHandle
 		
 	}
 	
+	@SuppressWarnings("unchecked")
 	private void handlePersistentProperty(SemanticPersistentProperty persistentProperty) {
 		if(isRetrivableProperty(persistentProperty)){
 			Object objectValue = propertyToValue.get(persistentProperty.getName());
 			if(objectValue != null){
-				if(objectValue instanceof Collection<?>){
-					//TODO
+				if(objectValue instanceof Collection<?> || objectValue.getClass().isArray()){
+					if(objectValue.getClass().isArray()){
+						objectValue = Arrays.asList((Object[]) objectValue);
+					}
+					for(Object o : (Collection<Object>) objectValue){
+						Value val = this.objectToLiteralConverter.convert(o);
+						String obj = val instanceof URI ? "<"+val+">" : val.toString();
+						appendPattern(sb, binding, "<" + persistentProperty.getAliasPredicate() + ">", obj);
+					}
 				}
 				else{
 					Value val = this.objectToLiteralConverter.convert(objectValue);
-					if(val instanceof URI){
-						appendPattern(sb, binding, "<" + persistentProperty.getAliasPredicate() + ">", "<"+val.toString()+">");
-					}
-					else{
-						appendPattern(sb, binding, "<" + persistentProperty.getAliasPredicate() + ">", val.toString());
-					}
+					String obj = val instanceof URI ? "<"+val+">" : val.toString();
+					appendPattern(sb, binding, "<" + persistentProperty.getAliasPredicate() + ">", obj);
 				}
 			}
 			else{
