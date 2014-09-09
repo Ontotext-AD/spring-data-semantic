@@ -32,7 +32,16 @@ public interface SemanticDatabase {
 	
 	//public Query prepareQuery(String source, QueryLanguage ql);
 	
+	/**
+	 * Count all statements in the semantic database.
+	 * @return
+	 */
 	long count();
+	
+	/**
+	 * Remove all statements in the semantic database.
+	 */
+	void clear();
 	
 	/**
 	 * Return a default {@link Namespace} to be used for creating {@link URI}s from class and property names when not explicitly provided.

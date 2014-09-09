@@ -393,5 +393,30 @@ public class PooledSemanticDatabase implements SemanticDatabase{
 		return size;
 	}
 
+	@Override
+	public void clear() {
+		RepositoryConnection con = connectionPool.getConnection();
+		try {
+			 con.remove(null, null, null, new Resource[0]);
+			 con.commit();
+		} catch (RepositoryException e) {
+			try {
+				con.rollback();
+			} catch (RepositoryException e1) {
+				logger.error(e.getMessage(),e);
+				throw new SemanticDatabaseAccessException(e);
+			}
+			logger.error(e.getMessage(),e);
+			throw new SemanticDatabaseAccessException(e);
+		} finally{
+			try {
+				con.close();
+			} catch (RepositoryException e) {
+				logger.error(e.getMessage(),e);
+				throw new SemanticDatabaseAccessException(e);
+			}
+		}
+	}
+
 
 }
