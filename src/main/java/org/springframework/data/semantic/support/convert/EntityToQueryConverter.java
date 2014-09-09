@@ -1,19 +1,15 @@
 package org.springframework.data.semantic.support.convert;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
 import org.openrdf.model.URI;
-import org.openrdf.model.Value;
-import org.springframework.data.mapping.Association;
-import org.springframework.data.mapping.AssociationHandler;
-import org.springframework.data.mapping.PropertyHandler;
-import org.springframework.data.semantic.convert.ObjectToLiteralConverter;
 import org.springframework.data.semantic.mapping.SemanticPersistentEntity;
 import org.springframework.data.semantic.mapping.SemanticPersistentProperty;
-import org.springframework.data.semantic.support.Direction;
+import org.springframework.data.semantic.support.convert.handlers.AbstractPropertiesToQueryHandler;
+import org.springframework.data.semantic.support.convert.handlers.PropertiesToBindingsHandler;
+import org.springframework.data.semantic.support.convert.handlers.PropertiesToPatternsHandler;
 import org.springframework.data.semantic.support.mapping.SemanticMappingContext;
 import org.springframework.data.semantic.support.util.ValueUtils;
 import org.springframework.util.StringUtils;
@@ -138,8 +134,8 @@ public class EntityToQueryConverter {
 			subjectBinding = "?"+entity.getRDFType().getLocalName();
 			
 		}
-		appendPattern(sb, subjectBinding, "a", "<"+entity.getRDFType()+">");
-		PropertiesToBindingsHandler handler = new PropertiesToBindingsHandler(sb, subjectBinding, propertyToValue);
+		AbstractPropertiesToQueryHandler.appendPattern(sb, subjectBinding, "a", "<"+entity.getRDFType()+">");
+		PropertiesToBindingsHandler handler = new PropertiesToBindingsHandler(sb, subjectBinding, propertyToValue, this.mappingContext);
 		entity.doWithProperties(handler);
 		entity.doWithAssociations(handler);
 		return sb.toString();
@@ -153,7 +149,7 @@ public class EntityToQueryConverter {
 	 */
 	protected static String getPropertyBinding(URI uri, SemanticPersistentProperty property){
 		StringBuilder sb = new StringBuilder();
-		appendPattern(sb, "<"+uri+">", "<" + property.getAliasPredicate() + ">", "?"+property.getName());
+		AbstractPropertiesToQueryHandler.appendPattern(sb, "<"+uri+">", "<" + property.getAliasPredicate() + ">", "?"+property.getName());
 		return sb.toString();
 	}
 	
@@ -166,7 +162,7 @@ public class EntityToQueryConverter {
 	 */
 	protected String getPropertyPattern(URI uri, SemanticPersistentEntity<?> entity, SemanticPersistentProperty property){
 		StringBuilder sb = new StringBuilder();
-		new PropertiesToPatternsHandler(sb, "<"+uri+">", new HashMap<String, Object>()).doWithPersistentProperty(property);
+		new PropertiesToPatternsHandler(sb, "<"+uri+">", new HashMap<String, Object>(), this.mappingContext).doWithPersistentProperty(property);
 		return sb.toString();
 	}
 	
@@ -185,20 +181,11 @@ public class EntityToQueryConverter {
 		else{
 			binding = "?"+entity.getRDFType().getLocalName();
 		}
-		appendPattern(sb, binding, "<"+ValueUtils.RDF_TYPE_PREDICATE+">", "<"+entity.getRDFType()+">");
-		PropertiesToPatternsHandler handler = new PropertiesToPatternsHandler(sb, binding, propertyToValue);
+		AbstractPropertiesToQueryHandler.appendPattern(sb, binding, "<"+ValueUtils.RDF_TYPE_PREDICATE+">", "<"+entity.getRDFType()+">");
+		PropertiesToPatternsHandler handler = new PropertiesToPatternsHandler(sb, binding, propertyToValue, this.mappingContext);
 		entity.doWithProperties(handler);
 		entity.doWithAssociations(handler);
 		return sb.toString();
-	}
-	
-	private static void appendPattern(StringBuilder sb, String subj, String pred, String varName){
-		sb.append(subj);
-		sb.append(" ");
-		sb.append(pred);
-		sb.append(" ");
-		sb.append(varName);
-		sb.append(" . ");
 	}
 	
 	protected String getVar(int input){
@@ -215,172 +202,7 @@ public class EntityToQueryConverter {
 		return StringUtils.collectionToDelimitedString(var, "");
 	}
 	
-	private class PropertiesToPatternsHandler 
-	implements PropertyHandler<SemanticPersistentProperty>, AssociationHandler<SemanticPersistentProperty>{
-
-		private StringBuilder sb;
-		private String binding;
-		private Map<String, Object> propertyToValue;
-		private ObjectToLiteralConverter objectToLiteralConverter;
-
-		PropertiesToPatternsHandler(StringBuilder sb, String binding, Map<String, Object> propertyToValue){
-			this.sb = sb;
-			this.binding = binding;
-			this.propertyToValue = propertyToValue;
-			this.objectToLiteralConverter = ObjectToLiteralConverter.getInstance();
-		}
-
-		@Override
-		public void doWithPersistentProperty(
-				SemanticPersistentProperty persistentProperty) {
-			handlePersistentProperty(persistentProperty);
-		}
-
-		@Override
-		public void doWithAssociation(
-				Association<SemanticPersistentProperty> association) {
-			SemanticPersistentProperty persistentProperty = association.getInverse();
-			//TODO handle existing value in propertyToValue
-			handlePersistentProperty(persistentProperty);
-			if(persistentProperty.getMappingPolicy().eagerLoad()){
-				SemanticPersistentEntity<?> associatedPersistentEntity = mappingContext.getPersistentEntity(persistentProperty.getActualType());
-				String associationBinding = persistentProperty.getBindingName();
-				appendPattern(sb, associationBinding, "<"+ValueUtils.RDF_TYPE_PREDICATE+">", "<"+associatedPersistentEntity.getRDFType()+">");
-				PropertiesToPatternsHandler associationHandler = new PropertiesToPatternsHandler(this.sb, associationBinding, new HashMap<String, Object>());
-				associatedPersistentEntity.doWithProperties(associationHandler);
-				associatedPersistentEntity.doWithAssociations(associationHandler);
-			}
-
-		}
-		
-		public void handlePersistentProperty(SemanticPersistentProperty persistentProperty) {
-			if(isRetrivableProperty(persistentProperty)){
-				URI predicate = persistentProperty.getPredicate();
-				String subj = "";
-				String obj = "";
-				String pred = "<"+predicate+">";
-				subj = binding;
-				Object objectValue = this.propertyToValue.get(persistentProperty.getName());
-				if(objectValue != null){
-					if(objectValue instanceof Collection<?>){
-						//TODO
-					}
-					else{
-						Value val = this.objectToLiteralConverter.convert(objectValue);
-						obj = val instanceof URI ? "<"+val.toString()+">" : val.toString();
-					}
-				}
-				else{
-					obj = persistentProperty.getBindingName();
-				}
-				if(persistentProperty.isOptional()){
-					sb.append("OPTIONAL { ");
-				}
-				if(persistentProperty.isAssociation()){
-					if(Direction.INCOMING.equals(persistentProperty.getDirection())){
-						SemanticPersistentProperty associatedProperty = persistentProperty.getInverseProperty();
-						if(associatedProperty != null){
-							pred = "<"+associatedProperty.getPredicate()+">";
-							appendPattern(sb, obj, pred, subj);
-						}
-						else{
-							appendPattern(sb, subj, pred, obj);
-						}
-					}
-					else{
-						appendPattern(sb, subj, pred, obj);
-					}
-				}
-				else{
-					appendPattern(sb, subj, pred, obj);
-				}
-			}
-			if(persistentProperty.isOptional()){
-				sb.append("} ");
-			}
-			
-		}
-	}
-		
-	private class PropertiesToBindingsHandler implements  PropertyHandler<SemanticPersistentProperty>,  AssociationHandler<SemanticPersistentProperty> {
-
-		private StringBuilder sb;
-		private String binding;
-		private Map<String, Object> propertyToValue;
-		private ObjectToLiteralConverter objectToLiteralConverter;
-		
-		PropertiesToBindingsHandler(StringBuilder sb, String binding, Map<String, Object> propertyToValue){
-			this.sb = sb;
-			this.binding = binding;
-			this.propertyToValue = propertyToValue;
-			this.objectToLiteralConverter = ObjectToLiteralConverter.getInstance();
-		}
-		
-		@Override
-		public void doWithPersistentProperty(
-				SemanticPersistentProperty persistentProperty) {
-			handlePersistentProperty(persistentProperty);			
-		}
-		
-		@Override
-		public void doWithAssociation(
-				Association<SemanticPersistentProperty> association) {
-			handleAssociation(association.getInverse());
-			
-		}
-		
-		private void handlePersistentProperty(SemanticPersistentProperty persistentProperty) {
-			if(isRetrivableProperty(persistentProperty)){
-				Object objectValue = propertyToValue.get(persistentProperty.getName());
-				if(objectValue != null){
-					if(objectValue instanceof Collection<?>){
-						//TODO
-					}
-					else{
-						Value val = this.objectToLiteralConverter.convert(objectValue);
-						if(val instanceof URI){
-							appendPattern(sb, binding, "<" + persistentProperty.getAliasPredicate() + ">", "<"+val.toString()+">");
-						}
-						else{
-							appendPattern(sb, binding, "<" + persistentProperty.getAliasPredicate() + ">", val.toString());
-						}
-					}
-				}
-				else{
-					appendPattern(sb, binding, "<" + persistentProperty.getAliasPredicate() + ">", persistentProperty.getBindingName());
-				}
-				
-			}
-		}
-		
-		private void handleAssociation(SemanticPersistentProperty persistentProperty) {
-			String associationBinding = persistentProperty.getBindingName();
-			//handle value in propertyToValue
-			appendPattern(sb, binding, "<" + persistentProperty.getAliasPredicate() + ">", associationBinding);
-			if(persistentProperty.getMappingPolicy().eagerLoad()){
-				SemanticPersistentEntity<?> associatedPersistentEntity = mappingContext.getPersistentEntity(persistentProperty.getActualType());
-				appendPattern(sb, associationBinding, "a", "<"+associatedPersistentEntity.getRDFType()+">");
-				PropertiesToBindingsHandler associationHandler = new PropertiesToBindingsHandler(this.sb, associationBinding, new HashMap<String, Object>());
-				associatedPersistentEntity.doWithProperties(associationHandler);
-				associatedPersistentEntity.doWithAssociations(associationHandler);
-			}
-		}
-	}
 	
-	/**
-	 * if a SemanticPersistentProperty should be included in the query which retrieves the object
-	 * @param persistentProperty
-	 * @return
-	 */
-	private static boolean isRetrivableProperty(SemanticPersistentProperty persistentProperty) {
-		//TODO do not include properties which are to be lazy loaded or are attached (always retrieved from the repository)
-		return 
-				!persistentProperty.isIdProperty() && 
-				!persistentProperty.isTransient() && 
-				!persistentProperty.isContext() /*&&
-				persistentProperty.getMappingPolicy().eagerLoad() && 
-				persistentProperty.getMappingPolicy().useDirty()*/;				
-	}
 	
 	
 
