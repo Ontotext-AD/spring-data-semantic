@@ -246,6 +246,11 @@ public class SemanticTemplateCRUD implements SemanticOperationsCRUD, Initializin
 		return results;
 	}
 
+	@Override
+	public SemanticMappingContext getSemanticMappingContext() {
+		return this.mappingContext;
+	}
+
 	
 
 

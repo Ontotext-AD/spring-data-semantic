@@ -5,8 +5,11 @@ import java.util.Map;
 
 import org.openrdf.model.Model;
 import org.openrdf.model.URI;
+import org.springframework.data.semantic.support.mapping.SemanticMappingContext;
 
 public interface SemanticOperationsCRUD {
+	
+	SemanticMappingContext getSemanticMappingContext();
 	
 	/**
 	 * Store the given entities in the rdf store. If the subject {@link URI} of an entity is already present in the store, the statements for it are updated, otherwise
@@ -88,5 +91,7 @@ public interface SemanticOperationsCRUD {
 	 * @return
 	 */
 	<T> Collection<T> findByProperty(Class<? extends T> clazz, Map<String, Object> parameterToValue);
+	
+	
 	
 }

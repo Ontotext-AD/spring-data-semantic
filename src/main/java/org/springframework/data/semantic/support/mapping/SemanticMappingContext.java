@@ -47,6 +47,10 @@ public class SemanticMappingContext  extends AbstractMappingContext<SemanticPers
 		}
 		this.defaultNS = defaultNS;
 	}
+	
+	public boolean isSemanticPersistentEntity(Class<?> clazz){
+		return clazz.isAnnotationPresent(SemanticEntity.class);
+	}
 
 	@Override
 	protected <T> SemanticPersistentEntityImpl<T> createPersistentEntity(

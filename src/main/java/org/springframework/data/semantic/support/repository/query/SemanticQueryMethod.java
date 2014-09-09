@@ -1,10 +1,15 @@
 package org.springframework.data.semantic.support.repository.query;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
+import org.openrdf.model.URI;
 import org.springframework.data.repository.core.RepositoryMetadata;
 import org.springframework.data.repository.query.Parameter;
 import org.springframework.data.repository.query.ParameterAccessor;
@@ -12,6 +17,7 @@ import org.springframework.data.repository.query.ParametersParameterAccessor;
 import org.springframework.data.repository.query.QueryMethod;
 import org.springframework.data.repository.query.RepositoryQuery;
 import org.springframework.data.semantic.core.SemanticOperationsCRUD;
+import org.springframework.data.semantic.mapping.SemanticPersistentEntity;
 
 public class SemanticQueryMethod extends QueryMethod {
 
@@ -57,7 +63,7 @@ public class SemanticQueryMethod extends QueryMethod {
 		private Map<String, Object> resolveParameters(Map<Parameter, Object> parameters) {
 	        Map<String, Object> params = new HashMap<String, Object>();
 	        for (Map.Entry<Parameter, Object> entry : parameters.entrySet()) {
-	            params.put(getParameterName(entry.getKey()), entry.getValue());
+	        	params.put(getParameterName(entry.getKey()), resolveValue(entry.getValue()));
 	        }
 	        return params;
 	    }
@@ -72,6 +78,37 @@ public class SemanticQueryMethod extends QueryMethod {
 	        String[] paramNames = methodNameParams.split("And|Or");
 	        return paramNames[parameter.getIndex()].toLowerCase();
 	    }
+		
+		private Object resolveValue(Object value){
+			if(value instanceof Collection<?> || value.getClass().isArray()){
+				Collection<?> values;
+				if(value.getClass().isArray()){
+					values = Arrays.asList(value);
+				}
+				else{
+					values = (Collection<?>) value;
+				}
+				if(!values.isEmpty()){
+					Object firstValue = values.iterator().next();
+					if(operations.getSemanticMappingContext().isSemanticPersistentEntity(firstValue.getClass())){
+						SemanticPersistentEntity<?> persistentEntity = operations.getSemanticMappingContext().getPersistentEntity(firstValue.getClass());
+						List<URI> ids = new ArrayList<URI>(values.size());
+						for(Object o : values){
+							ids.add(persistentEntity.getResourceId(o));
+						}
+						return ids;
+					}
+				}
+				
+			}
+			else{
+				if(operations.getSemanticMappingContext().isSemanticPersistentEntity(value.getClass())){
+					SemanticPersistentEntity<?> persistentEntity = operations.getSemanticMappingContext().getPersistentEntity(value.getClass());
+	        		return persistentEntity.getResourceId(value);
+				}
+			}
+			return value;
+		}
 
 	    private Map<Parameter, Object> getParameterValues(ParameterAccessor accessor) {
 	        Map<Parameter,Object> parameters=new LinkedHashMap<Parameter, Object>();

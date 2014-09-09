@@ -15,11 +15,13 @@ import org.springframework.data.semantic.support.repository.query.SemanticQueryM
 
 public class SemanticRepositoryFactory extends RepositoryFactorySupport{
 	
+	private final SemanticOperationsCRUD operations;
+	
 	public SemanticRepositoryFactory(SemanticOperationsCRUD operations){
 		this.operations = operations;
 	}
 	
-	private final SemanticOperationsCRUD operations;
+	
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override

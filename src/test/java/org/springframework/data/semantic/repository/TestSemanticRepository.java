@@ -226,5 +226,27 @@ public class TestSemanticRepository {
 		assertFalse(entities.isEmpty());
 		assertEquals(MODEL_ENTITY.ENTITY_ONE, entities.get(0).getUri());
 	}
+	
+	@Test
+	public void testFindByAssociation(){
+		ModelEntity modelEntityThree = new ModelEntity();
+		modelEntityThree.setUri(MODEL_ENTITY.ENTITY_THREE);
+		List<ModelEntity> entities = modelEntityRepository.findByRelated(Arrays.asList(modelEntityThree));
+		assertNotNull(entities);
+		assertEquals(2, entities.size());
+		for(ModelEntity entity : entities){
+			assertTrue(entity.getUri().equals(MODEL_ENTITY.ENTITY_ONE) || entity.getUri().equals(MODEL_ENTITY.ENTITY_TWO));
+		}
+	}
+	
+	@Test
+	public void testFindByAssociationURI(){
+		List<ModelEntity> entities = modelEntityRepository.findByRelated(MODEL_ENTITY.ENTITY_THREE);
+		assertNotNull(entities);
+		assertEquals(2, entities.size());
+		for(ModelEntity entity : entities){
+			assertTrue(entity.getUri().equals(MODEL_ENTITY.ENTITY_ONE) || entity.getUri().equals(MODEL_ENTITY.ENTITY_TWO));
+		}
+	}
 
 }
