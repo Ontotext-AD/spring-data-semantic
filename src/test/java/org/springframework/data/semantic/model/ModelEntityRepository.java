@@ -16,5 +16,7 @@ public interface ModelEntityRepository extends SemanticRepository<ModelEntity> {
 	List<ModelEntity> findByRelated(List<ModelEntity> related);
 	
 	List<ModelEntity> findByRelated(URI related);
+	
+	ModelEntity findOneByRelated(URI related);
 
 }
