@@ -19,6 +19,7 @@ public class PropertiesToBindingsHandler extends AbstractPropertiesToQueryHandle
 	private String binding;
 	private Map<String, Object> propertyToValue;
 	private ObjectToLiteralConverter objectToLiteralConverter;
+	private int depth;
 	
 	public PropertiesToBindingsHandler(StringBuilder sb, String binding, Map<String, Object> propertyToValue, SemanticMappingContext mappingContext){
 		super(mappingContext);
@@ -26,6 +27,16 @@ public class PropertiesToBindingsHandler extends AbstractPropertiesToQueryHandle
 		this.binding = binding;
 		this.propertyToValue = propertyToValue;
 		this.objectToLiteralConverter = ObjectToLiteralConverter.getInstance();
+		this.depth = 0;
+	}
+	
+	public PropertiesToBindingsHandler(StringBuilder sb, String binding, Map<String, Object> propertyToValue, SemanticMappingContext mappingContext, int depth){
+		super(mappingContext);
+		this.sb = sb;
+		this.binding = binding;
+		this.propertyToValue = propertyToValue;
+		this.objectToLiteralConverter = ObjectToLiteralConverter.getInstance();
+		this.depth = depth;
 	}
 	
 	@Override
@@ -37,7 +48,9 @@ public class PropertiesToBindingsHandler extends AbstractPropertiesToQueryHandle
 	@Override
 	public void doWithAssociation(
 			Association<SemanticPersistentProperty> association) {
-		handleAssociation(association.getInverse());
+		if(depth < 50){
+			handleAssociation(association.getInverse());
+		}
 		
 	}
 	
@@ -76,7 +89,7 @@ public class PropertiesToBindingsHandler extends AbstractPropertiesToQueryHandle
 		if(persistentProperty.getMappingPolicy().eagerLoad()){
 			SemanticPersistentEntity<?> associatedPersistentEntity = mappingContext.getPersistentEntity(persistentProperty.getActualType());
 			appendPattern(sb, associationBinding, "a", "<"+associatedPersistentEntity.getRDFType()+">");
-			PropertiesToBindingsHandler associationHandler = new PropertiesToBindingsHandler(this.sb, associationBinding, new HashMap<String, Object>(), this.mappingContext);
+			PropertiesToBindingsHandler associationHandler = new PropertiesToBindingsHandler(this.sb, associationBinding, new HashMap<String, Object>(), this.mappingContext, ++this.depth);
 			associatedPersistentEntity.doWithProperties(associationHandler);
 			associatedPersistentEntity.doWithAssociations(associationHandler);
 		}

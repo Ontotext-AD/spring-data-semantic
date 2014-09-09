@@ -21,6 +21,7 @@ public class PropertiesToPatternsHandler extends AbstractPropertiesToQueryHandle
 	private String binding;
 	private Map<String, Object> propertyToValue;
 	private ObjectToLiteralConverter objectToLiteralConverter;
+	private int depth;
 
 	public PropertiesToPatternsHandler(StringBuilder sb, String binding, Map<String, Object> propertyToValue, SemanticMappingContext mappingContext){
 		super(mappingContext);
@@ -28,6 +29,16 @@ public class PropertiesToPatternsHandler extends AbstractPropertiesToQueryHandle
 		this.binding = binding;
 		this.propertyToValue = propertyToValue;
 		this.objectToLiteralConverter = ObjectToLiteralConverter.getInstance();
+		this.depth = 0;
+	}
+	
+	public PropertiesToPatternsHandler(StringBuilder sb, String binding, Map<String, Object> propertyToValue, SemanticMappingContext mappingContext, int depth){
+		super(mappingContext);
+		this.sb = sb;
+		this.binding = binding;
+		this.propertyToValue = propertyToValue;
+		this.objectToLiteralConverter = ObjectToLiteralConverter.getInstance();
+		this.depth = depth;
 	}
 
 	@Override
@@ -39,6 +50,12 @@ public class PropertiesToPatternsHandler extends AbstractPropertiesToQueryHandle
 	@Override
 	public void doWithAssociation(
 			Association<SemanticPersistentProperty> association) {
+		if(depth < 50){
+			handleAssociation(association);
+		}
+	}
+	
+	public void handleAssociation(Association<SemanticPersistentProperty> association){
 		SemanticPersistentProperty persistentProperty = association.getInverse();
 		//TODO handle existing value in propertyToValue
 		handlePersistentProperty(persistentProperty);
@@ -46,11 +63,10 @@ public class PropertiesToPatternsHandler extends AbstractPropertiesToQueryHandle
 			SemanticPersistentEntity<?> associatedPersistentEntity = mappingContext.getPersistentEntity(persistentProperty.getActualType());
 			String associationBinding = persistentProperty.getBindingName();
 			appendPattern(sb, associationBinding, "<"+ValueUtils.RDF_TYPE_PREDICATE+">", "<"+associatedPersistentEntity.getRDFType()+">");
-			PropertiesToPatternsHandler associationHandler = new PropertiesToPatternsHandler(this.sb, associationBinding, new HashMap<String, Object>(), this.mappingContext);
+			PropertiesToPatternsHandler associationHandler = new PropertiesToPatternsHandler(this.sb, associationBinding, new HashMap<String, Object>(), this.mappingContext, ++this.depth);
 			associatedPersistentEntity.doWithProperties(associationHandler);
 			associatedPersistentEntity.doWithAssociations(associationHandler);
 		}
-
 	}
 	
 	@SuppressWarnings("unchecked")
