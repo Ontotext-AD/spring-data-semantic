@@ -8,7 +8,7 @@ import org.springframework.data.semantic.support.model.SemanticResource;
 
 public class SemanticResourceUtils {
 	
-	public static List<URI> extractResourceIds(Iterable<SemanticResource> resources){
+	public static List<URI> extractResourceIds(Iterable<? extends SemanticResource> resources){
 		List<URI> ids = new LinkedList<URI>();
 		for(SemanticResource resource : resources){
 			ids.add(resource.getId());
