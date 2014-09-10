@@ -160,7 +160,7 @@ public class SemanticTemplateCRUD implements SemanticOperationsCRUD, Initializin
 	}
 	
 	@Override
-	public <T> Iterable<T> findAll(Class<? extends T> clazz) {
+	public <T> List<T> findAll(Class<? extends T> clazz) {
 		Collection<Model> statementsPerEntity = this.statementsCollector.getStatementsForResources(clazz);
 		List<T> results = new LinkedList<T>();
 		for(Model statements : statementsPerEntity){

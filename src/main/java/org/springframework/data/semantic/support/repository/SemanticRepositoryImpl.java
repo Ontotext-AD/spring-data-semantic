@@ -29,12 +29,12 @@ public class SemanticRepositoryImpl<T> implements SemanticRepository<T> {
 	}
 
 	@Override
-	public Iterable<T> findAll() {
+	public List<T> findAll() {
 		return this.operations.findAll(clazz);
 	}
 	
 	@Override
-	public Iterable<T> findAll(Sort sort) {
+	public List<T> findAll(Sort sort) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -66,7 +66,7 @@ public class SemanticRepositoryImpl<T> implements SemanticRepository<T> {
 	}
 
 	@Override
-	public Iterable<T> findAll(Iterable<URI> ids) {
+	public List<T> findAll(Iterable<URI> ids) {
 		List<T> result = new LinkedList<T>();
 		for(URI id : ids){
 			T entity = this.operations.find(id, clazz);

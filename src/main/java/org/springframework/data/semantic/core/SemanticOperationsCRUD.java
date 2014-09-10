@@ -1,6 +1,7 @@
 package org.springframework.data.semantic.core;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import org.openrdf.model.Model;
@@ -59,7 +60,7 @@ public interface SemanticOperationsCRUD {
      * @param clazz
      * @return
      */
-    <T> Iterable<T> findAll(Class<? extends T> clazz);
+    <T> List<T> findAll(Class<? extends T> clazz);
     
     /**
      * Create a new entity form the given {@link Class} and {@link Model}.
