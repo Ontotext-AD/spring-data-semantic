@@ -1,5 +1,6 @@
 package org.springframework.data.semantic.support.convert;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
 import java.util.Arrays;
@@ -13,7 +14,6 @@ import org.openrdf.model.impl.URIImpl;
 import org.springframework.data.semantic.mapping.SemanticPersistentEntity;
 import org.springframework.data.semantic.model.ModelEntity;
 import org.springframework.data.semantic.model.ModelEntityCollector;
-import org.springframework.data.semantic.support.convert.EntityToQueryConverter;
 import org.springframework.data.semantic.support.mapping.SemanticMappingContext;
 import org.springframework.data.util.ClassTypeInformation;
 
@@ -54,36 +54,60 @@ public class TestEntityToQueryConverter {
 	@Test
 	public void TestBindingCreation(){
 		String queryBindings = entityToQueryConverter.getPropertyBindings(resource, testEntityType, new HashMap<String, Object>());
-		assertEquals(expectedBindings, queryBindings);
+		String[] expected = expectedBindings.split(" \\. ");
+		String[] resultBindings = queryBindings.split(" \\. ");
+		Arrays.sort(expected);
+		Arrays.sort(resultBindings);
+		assertArrayEquals(expected, resultBindings);
 	}
 
 	@Test
 	public void TestPatternCreation(){
 		String queryPattern = entityToQueryConverter.getPropertyPatterns(resource, testEntityType, new HashMap<String, Object>());
-		assertEquals(expectedPattern, queryPattern);
+		String[] expected = expectedPattern.split(" \\. ");
+		String[] resultPattern = queryPattern.split(" \\. ");
+		Arrays.sort(expected);
+		Arrays.sort(resultPattern);
+		assertArrayEquals(expected, resultPattern);
 	}
 	
 	@Test
 	public void TestGraphQueryCreation(){
 		String query = entityToQueryConverter.getGraphQueryForResource(resource, testEntityType);
-		assertEquals(expectedQuery.replaceAll("\\s+", " "), query.replaceAll("\\s+", " "));
+		String[] expected = expectedQuery.replaceAll("\\s+", " ").split(" \\. ");
+		String[] resultBindings = query.replaceAll("\\s+", " ").split(" \\. ");
+		Arrays.sort(expected);
+		Arrays.sort(resultBindings);
+		assertArrayEquals(expected, resultBindings);
 	}
 	
 	@Test
 	public void TestBindingCreationEagerLoad(){
 		String queryBindings = entityToQueryConverter.getPropertyBindings(collectionResource, testCollectionType, new HashMap<String, Object>());
-		assertEquals(expectedBindingsEager, queryBindings);
+		String[] expected = expectedBindingsEager.split(" \\. ");
+		String[] resultBindings = queryBindings.split(" \\. ");
+		Arrays.sort(expected);
+		Arrays.sort(resultBindings);
+		assertArrayEquals(expected, resultBindings);
 	}
 	
 	@Test
 	public void TestPatternCreationEagerLoad(){
 		String queryPattern = entityToQueryConverter.getPropertyPatterns(collectionResource, testCollectionType, new HashMap<String, Object>());
-		assertEquals(expectedPatternEager, queryPattern);
+		String[] expected = expectedPatternEager.split(" \\. ");
+		String[] resultPattern = queryPattern.split(" \\. ");
+		Arrays.sort(expected);
+		Arrays.sort(resultPattern);
+		assertArrayEquals(expected, resultPattern);
 	}
 	
 	@Test
 	public void TestGraphQueryCreationEagerLoad(){
 		String query = entityToQueryConverter.getGraphQueryForResource(collectionResource, testCollectionType);
-		assertEquals(expectedQueryEager.replaceAll("\\s+", " "), query.replaceAll("\\s+", " "));
+		String[] expected = expectedQueryEager.replaceAll("\\s+", " ").split(" \\. ");
+		String[] resultBindings = query.replaceAll("\\s+", " ").split(" \\. ");
+		Arrays.sort(expected);
+		Arrays.sort(resultBindings);
+		assertArrayEquals(expected, resultBindings);
 	}
 }
