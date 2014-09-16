@@ -3,8 +3,11 @@ package org.springframework.data.semantic.support.convert;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
+import java.text.Collator;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Locale;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -37,6 +40,8 @@ public class TestEntityToQueryConverter {
 	
 	private EntityToQueryConverter entityToQueryConverter;
 	
+	private LocaleIndipendentStringComparator comparator = new LocaleIndipendentStringComparator();
+	
 	
 	@Before
 	public void setup(){
@@ -56,8 +61,8 @@ public class TestEntityToQueryConverter {
 		String queryBindings = entityToQueryConverter.getPropertyBindings(resource, testEntityType, new HashMap<String, Object>());
 		String[] expected = expectedBindings.replaceAll("\\s+", " ").split(" \\. ");
 		String[] resultBindings = queryBindings.replaceAll("\\s+", " ").split(" \\. ");
-		Arrays.sort(expected);
-		Arrays.sort(resultBindings);
+		Arrays.sort(expected, comparator);
+		Arrays.sort(resultBindings, comparator);
 		assertArrayEquals(expected, resultBindings);
 	}
 
@@ -66,8 +71,8 @@ public class TestEntityToQueryConverter {
 		String queryPattern = entityToQueryConverter.getPropertyPatterns(resource, testEntityType, new HashMap<String, Object>());
 		String[] expected = expectedPattern.replaceAll("\\s+|\\{|\\}", " ").split(" \\. ");
 		String[] resultPattern = queryPattern.replaceAll("\\s+|\\{|\\}", " ").split(" \\. ");
-		Arrays.sort(expected);
-		Arrays.sort(resultPattern);
+		Arrays.sort(expected, comparator);
+		Arrays.sort(resultPattern, comparator);
 		System.out.println(Arrays.asList(expected));
 		System.out.println(Arrays.asList(resultPattern));
 		assertArrayEquals(expected, resultPattern);
@@ -78,8 +83,8 @@ public class TestEntityToQueryConverter {
 		String query = entityToQueryConverter.getGraphQueryForResource(resource, testEntityType);
 		String[] expected = expectedQuery.replaceAll("\\s+|\\{|\\}", " ").split(" \\. ");
 		String[] resultBindings = query.replaceAll("\\s+|\\{|\\}", " ").split(" \\. ");
-		Arrays.sort(expected);
-		Arrays.sort(resultBindings);
+		Arrays.sort(expected, comparator);
+		Arrays.sort(resultBindings, comparator);
 		assertArrayEquals(expected, resultBindings);
 	}
 	
@@ -88,8 +93,8 @@ public class TestEntityToQueryConverter {
 		String queryBindings = entityToQueryConverter.getPropertyBindings(collectionResource, testCollectionType, new HashMap<String, Object>());
 		String[] expected = expectedBindingsEager.replaceAll("\\s+", " ").split(" \\. ");
 		String[] resultBindings = queryBindings.replaceAll("\\s+", " ").split(" \\. ");
-		Arrays.sort(expected);
-		Arrays.sort(resultBindings);
+		Arrays.sort(expected, comparator);
+		Arrays.sort(resultBindings, comparator);
 		assertArrayEquals(expected, resultBindings);
 	}
 	
@@ -98,8 +103,8 @@ public class TestEntityToQueryConverter {
 		String queryPattern = entityToQueryConverter.getPropertyPatterns(collectionResource, testCollectionType, new HashMap<String, Object>());
 		String[] expected = expectedPatternEager.replaceAll("\\s+|\\{|\\}", " ").split(" \\. ");
 		String[] resultPattern = queryPattern.replaceAll("\\s+|\\{|\\}", " ").split(" \\. ");
-		Arrays.sort(expected);
-		Arrays.sort(resultPattern);
+		Arrays.sort(expected, comparator);
+		Arrays.sort(resultPattern, comparator);
 		assertArrayEquals(expected, resultPattern);
 	}
 	
@@ -111,5 +116,16 @@ public class TestEntityToQueryConverter {
 		Arrays.sort(expected);
 		Arrays.sort(resultBindings);
 		assertArrayEquals(expected, resultBindings);
+	}
+	
+	private class LocaleIndipendentStringComparator implements Comparator<String> {
+
+		private Collator collator = Collator.getInstance(Locale.US);
+		
+		@Override
+		public int compare(String o1, String o2) {
+			return this.collator.compare(o1, o2);
+		}
+		
 	}
 }
