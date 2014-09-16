@@ -64,8 +64,8 @@ public class TestEntityToQueryConverter {
 	@Test
 	public void TestPatternCreation(){
 		String queryPattern = entityToQueryConverter.getPropertyPatterns(resource, testEntityType, new HashMap<String, Object>());
-		String[] expected = expectedPattern.replaceAll("\\s+", " ").split(" \\. ");
-		String[] resultPattern = queryPattern.replaceAll("\\s+", " ").split(" \\. ");
+		String[] expected = expectedPattern.replaceAll("\\s+|\\{|\\}", " ").split(" \\. ");
+		String[] resultPattern = queryPattern.replaceAll("\\s+|\\{|\\}", " ").split(" \\. ");
 		Arrays.sort(expected);
 		Arrays.sort(resultPattern);
 		assertArrayEquals(expected, resultPattern);
@@ -74,8 +74,8 @@ public class TestEntityToQueryConverter {
 	@Test
 	public void TestGraphQueryCreation(){
 		String query = entityToQueryConverter.getGraphQueryForResource(resource, testEntityType);
-		String[] expected = expectedQuery.replaceAll("\\s+", " ").split(" \\. ");
-		String[] resultBindings = query.replaceAll("\\s+", " ").split(" \\. ");
+		String[] expected = expectedQuery.replaceAll("\\s+|\\{|\\}", " ").split(" \\. ");
+		String[] resultBindings = query.replaceAll("\\s+|\\{|\\}", " ").split(" \\. ");
 		Arrays.sort(expected);
 		Arrays.sort(resultBindings);
 		assertArrayEquals(expected, resultBindings);
@@ -94,8 +94,8 @@ public class TestEntityToQueryConverter {
 	@Test
 	public void TestPatternCreationEagerLoad(){
 		String queryPattern = entityToQueryConverter.getPropertyPatterns(collectionResource, testCollectionType, new HashMap<String, Object>());
-		String[] expected = expectedPatternEager.replaceAll("\\s+", " ").split(" \\. ");
-		String[] resultPattern = queryPattern.replaceAll("\\s+", " ").split(" \\. ");
+		String[] expected = expectedPatternEager.replaceAll("\\s+|\\{|\\}", " ").split(" \\. ");
+		String[] resultPattern = queryPattern.replaceAll("\\s+|\\{|\\}", " ").split(" \\. ");
 		Arrays.sort(expected);
 		Arrays.sort(resultPattern);
 		assertArrayEquals(expected, resultPattern);
@@ -104,8 +104,8 @@ public class TestEntityToQueryConverter {
 	@Test
 	public void TestGraphQueryCreationEagerLoad(){
 		String query = entityToQueryConverter.getGraphQueryForResource(collectionResource, testCollectionType);
-		String[] expected = expectedQueryEager.replaceAll("\\s+", " ").split(" \\. ");
-		String[] resultBindings = query.replaceAll("\\s+", " ").split(" \\. ");
+		String[] expected = expectedQueryEager.replaceAll("\\s+|\\{|\\}", " ").split(" \\. ");
+		String[] resultBindings = query.replaceAll("\\s+|\\{|\\}", " ").split(" \\. ");
 		Arrays.sort(expected);
 		Arrays.sort(resultBindings);
 		assertArrayEquals(expected, resultBindings);
