@@ -48,7 +48,7 @@ public class TestEntityToQueryConverter {
 	
 	@Test
 	public void TestGetVar(){
-		assertEquals("bay", entityToQueryConverter.getVar(700));
+		assertEquals("bay", entityToQueryConverter.getVar(700)); 
 	}
 	
 	@Test
