@@ -86,7 +86,17 @@ public class SemanticPersistentEntityImpl<T> extends BasicPersistentEntity<T, Se
 
 	@Override
 	public URI getResourceId(Object entity) {
-		return (URI) getIdProperty().getValue(entity, null);
+		Object value = getIdProperty().getValue(entity, null);
+		if(value instanceof URI){
+			return (URI) value;
+		}
+		URI namespace = getNamespace();
+		if(namespace != null){
+			return ValueUtils.createUri(namespace.stringValue(), value.toString());
+		}
+		else{
+			return mappingContext.resolveURI(value.toString());
+		}
 	}
 
 	@Override

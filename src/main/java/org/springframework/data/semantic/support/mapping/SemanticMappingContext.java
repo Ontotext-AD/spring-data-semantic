@@ -14,6 +14,7 @@ import org.openrdf.model.impl.URIImpl;
 import org.springframework.data.mapping.context.AbstractMappingContext;
 import org.springframework.data.mapping.model.SimpleTypeHolder;
 import org.springframework.data.semantic.annotation.SemanticEntity;
+import org.springframework.data.semantic.mapping.SemanticPersistentEntity;
 import org.springframework.data.semantic.mapping.SemanticPersistentProperty;
 import org.springframework.data.semantic.support.util.ValueUtils;
 import org.springframework.data.util.TypeInformation;
@@ -23,7 +24,7 @@ import org.springframework.data.util.TypeInformation;
  * @author konstantin.pentchev
  *
  */
-public class SemanticMappingContext  extends AbstractMappingContext<SemanticPersistentEntityImpl<?>, SemanticPersistentProperty>{
+public class SemanticMappingContext  extends AbstractMappingContext<SemanticPersistentEntity<?>, SemanticPersistentProperty>{
 	private static Set<Class<?>> simpleTypes = new HashSet<Class<?>>();
 	static {
 		simpleTypes.add(URI.class);
@@ -53,7 +54,7 @@ public class SemanticMappingContext  extends AbstractMappingContext<SemanticPers
 	}
 
 	@Override
-	protected <T> SemanticPersistentEntityImpl<T> createPersistentEntity(
+	protected <T> SemanticPersistentEntity<T> createPersistentEntity(
 			TypeInformation<T> typeInformation) {
 		final Class<T> type = typeInformation.getType();
         if (type.isAnnotationPresent(SemanticEntity.class)) {
@@ -65,7 +66,7 @@ public class SemanticMappingContext  extends AbstractMappingContext<SemanticPers
 	@Override
 	protected SemanticPersistentProperty createPersistentProperty(Field field,
 			PropertyDescriptor descriptor,
-			SemanticPersistentEntityImpl<?> owner,
+			SemanticPersistentEntity<?> owner,
 			SimpleTypeHolder simpleTypeHolder) {
 		return new SemanticPersistentPropertyImpl(field, descriptor, owner, simpleTypeHolder, this);
 	}

@@ -8,7 +8,7 @@ import org.springframework.data.semantic.annotation.SemanticEntity;
 public class SemanticResource {
 	
 	@ResourceId
-	public URI id;
+	private URI id;
 
 	public URI getId() {
 		return id;

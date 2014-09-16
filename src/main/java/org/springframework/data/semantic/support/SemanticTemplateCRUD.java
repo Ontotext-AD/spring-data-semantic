@@ -251,6 +251,12 @@ public class SemanticTemplateCRUD implements SemanticOperationsCRUD, Initializin
 		return this.mappingContext;
 	}
 
+	public SemanticDatabase getSemanticDB() {
+		return semanticDB;
+	}
+	
+	
+
 	
 
 

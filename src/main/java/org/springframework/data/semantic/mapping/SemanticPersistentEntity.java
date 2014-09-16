@@ -2,7 +2,7 @@ package org.springframework.data.semantic.mapping;
 
 import org.openrdf.model.Resource;
 import org.openrdf.model.URI;
-import org.springframework.data.mapping.PersistentEntity;
+import org.springframework.data.mapping.model.MutablePersistentEntity;
 import org.springframework.data.semantic.core.RDFState;
 
 /**
@@ -11,7 +11,7 @@ import org.springframework.data.semantic.core.RDFState;
  *
  * @param <T>
  */
-public interface SemanticPersistentEntity<T> extends PersistentEntity<T, SemanticPersistentProperty> {
+public interface SemanticPersistentEntity<T> extends MutablePersistentEntity<T, SemanticPersistentProperty> {
 	
 	
 	Resource getContext(Object entity);

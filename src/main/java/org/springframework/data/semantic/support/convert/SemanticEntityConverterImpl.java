@@ -71,7 +71,7 @@ public class SemanticEntityConverterImpl implements SemanticEntityConverter {
 
 	@Override
 	public void write(Object source, RDFState dbStatements) {
-		final SemanticPersistentEntityImpl<?> persistentEntity = mappingContext.getPersistentEntity(source.getClass());
+		final SemanticPersistentEntity<?> persistentEntity = mappingContext.getPersistentEntity(source.getClass());
 		final BeanWrapper<Object> wrapper = BeanWrapper.<Object>create(source, conversionService);
         RDFState currentState = toStatementsConverter.convertEntityToStatements(persistentEntity, source);
 		if (dbStatements != null && !dbStatements.isEmpty()) {
@@ -91,7 +91,7 @@ public class SemanticEntityConverterImpl implements SemanticEntityConverter {
 		for(Entry<Object, RDFState> entry : objectsAndState.entrySet()){
 			Object source = entry.getKey();
 			RDFState dbStatements = entry.getValue();
-			final SemanticPersistentEntityImpl<?> persistentEntity = mappingContext.getPersistentEntity(source.getClass());
+			final SemanticPersistentEntity<?> persistentEntity = mappingContext.getPersistentEntity(source.getClass());
 			final BeanWrapper<Object> wrapper = BeanWrapper.<Object>create(source, conversionService);
 	        RDFState currentState = toStatementsConverter.convertEntityToStatements(persistentEntity, source);
 			if (dbStatements != null && !dbStatements.isEmpty()) {

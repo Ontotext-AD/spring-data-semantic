@@ -4,7 +4,6 @@ import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -20,10 +19,10 @@ import org.springframework.data.semantic.annotation.Context;
 import org.springframework.data.semantic.annotation.Datatype;
 import org.springframework.data.semantic.annotation.Fetch;
 import org.springframework.data.semantic.annotation.Language;
-import org.springframework.data.semantic.annotation.RelatedTo;
 import org.springframework.data.semantic.annotation.Language.Languages;
 import org.springframework.data.semantic.annotation.Optional;
 import org.springframework.data.semantic.annotation.Predicate;
+import org.springframework.data.semantic.annotation.RelatedTo;
 import org.springframework.data.semantic.annotation.ResourceId;
 import org.springframework.data.semantic.mapping.MappingPolicy;
 import org.springframework.data.semantic.mapping.SemanticPersistentEntity;
@@ -61,9 +60,7 @@ public class SemanticPersistentPropertyImpl extends
 			SimpleTypeHolder simpleTypeHolder, SemanticMappingContext mappingContext) {
 		super(field, propertyDescriptor, owner, simpleTypeHolder);
 		annotations = extractAnnotations(field);
-		isIdProperty = annotations.containsKey(ResourceId.class)
-				&& propertyDescriptor.getPropertyType().isAssignableFrom(
-						URI.class);
+		isIdProperty = annotations.containsKey(ResourceId.class);
 		this.mappingContext = mappingContext;
 	}
 
