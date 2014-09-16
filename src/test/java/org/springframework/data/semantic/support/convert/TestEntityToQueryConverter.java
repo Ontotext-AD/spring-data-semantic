@@ -54,8 +54,8 @@ public class TestEntityToQueryConverter {
 	@Test
 	public void TestBindingCreation(){
 		String queryBindings = entityToQueryConverter.getPropertyBindings(resource, testEntityType, new HashMap<String, Object>());
-		String[] expected = expectedBindings.split(" \\. ");
-		String[] resultBindings = queryBindings.split(" \\. ");
+		String[] expected = expectedBindings.replaceAll("\\s+", " ").split(" \\. ");
+		String[] resultBindings = queryBindings.replaceAll("\\s+", " ").split(" \\. ");
 		Arrays.sort(expected);
 		Arrays.sort(resultBindings);
 		assertArrayEquals(expected, resultBindings);
@@ -64,8 +64,8 @@ public class TestEntityToQueryConverter {
 	@Test
 	public void TestPatternCreation(){
 		String queryPattern = entityToQueryConverter.getPropertyPatterns(resource, testEntityType, new HashMap<String, Object>());
-		String[] expected = expectedPattern.split(" \\. ");
-		String[] resultPattern = queryPattern.split(" \\. ");
+		String[] expected = expectedPattern.replaceAll("\\s+", " ").split(" \\. ");
+		String[] resultPattern = queryPattern.replaceAll("\\s+", " ").split(" \\. ");
 		Arrays.sort(expected);
 		Arrays.sort(resultPattern);
 		assertArrayEquals(expected, resultPattern);
@@ -84,8 +84,8 @@ public class TestEntityToQueryConverter {
 	@Test
 	public void TestBindingCreationEagerLoad(){
 		String queryBindings = entityToQueryConverter.getPropertyBindings(collectionResource, testCollectionType, new HashMap<String, Object>());
-		String[] expected = expectedBindingsEager.split(" \\. ");
-		String[] resultBindings = queryBindings.split(" \\. ");
+		String[] expected = expectedBindingsEager.replaceAll("\\s+", " ").split(" \\. ");
+		String[] resultBindings = queryBindings.replaceAll("\\s+", " ").split(" \\. ");
 		Arrays.sort(expected);
 		Arrays.sort(resultBindings);
 		assertArrayEquals(expected, resultBindings);
@@ -94,8 +94,8 @@ public class TestEntityToQueryConverter {
 	@Test
 	public void TestPatternCreationEagerLoad(){
 		String queryPattern = entityToQueryConverter.getPropertyPatterns(collectionResource, testCollectionType, new HashMap<String, Object>());
-		String[] expected = expectedPatternEager.split(" \\. ");
-		String[] resultPattern = queryPattern.split(" \\. ");
+		String[] expected = expectedPatternEager.replaceAll("\\s+", " ").split(" \\. ");
+		String[] resultPattern = queryPattern.replaceAll("\\s+", " ").split(" \\. ");
 		Arrays.sort(expected);
 		Arrays.sort(resultPattern);
 		assertArrayEquals(expected, resultPattern);
