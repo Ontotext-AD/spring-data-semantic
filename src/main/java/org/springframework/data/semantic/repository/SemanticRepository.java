@@ -27,6 +27,5 @@ public interface SemanticRepository<T> extends PagingAndSortingRepository<T, URI
 	 * @see org.springframework.data.repository.CrudRepository#findAll(java.lang.Iterable)
 	 */
 	List<T> findAll(Iterable<URI> ids);
-
-
+	
 }

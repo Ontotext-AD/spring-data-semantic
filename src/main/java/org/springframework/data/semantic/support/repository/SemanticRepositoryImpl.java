@@ -104,7 +104,7 @@ public class SemanticRepositoryImpl<T> implements SemanticRepository<T> {
 	public void deleteAll() {
 		this.operations.deleteAll(clazz);
 	}
-	
+
 	
 
 }
