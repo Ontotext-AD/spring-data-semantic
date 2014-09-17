@@ -79,9 +79,8 @@ public class SemanticPersistentEntityImpl<T> extends BasicPersistentEntity<T, Se
 
 	@Override
 	public void setPersistentState(Object entity, RDFState statements) {
-		SemanticPersistentProperty idProperty = getIdProperty();
 		URI subjectId = (URI) statements.getCurrentStatements().subjects().iterator().next();
-		idProperty.setValue(entity, subjectId);
+		setResourceId(entity, subjectId);
 	}
 
 	@Override
@@ -107,7 +106,13 @@ public class SemanticPersistentEntityImpl<T> extends BasicPersistentEntity<T, Se
 	@Override
 	public void setResourceId(Object entity, URI id) {
 		SemanticPersistentProperty idProperty = getIdProperty();
-		idProperty.setValue(entity, id);
+		Class<?> propertyType = idProperty.getActualType();
+		if(URI.class.isAssignableFrom(propertyType)){
+			idProperty.setValue(entity, id);
+		}
+		else{
+			idProperty.setValue(entity, id.getLocalName());
+		}
 	}
 
 	@Override
