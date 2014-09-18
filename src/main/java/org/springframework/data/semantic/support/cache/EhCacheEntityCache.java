@@ -1,8 +1,12 @@
 package org.springframework.data.semantic.support.cache;
 
+import java.io.Serializable;
+
+import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.Element;
+import net.sf.ehcache.config.CacheConfiguration;
 
 import org.openrdf.model.URI;
 import org.springframework.data.semantic.cache.EntityCache;
@@ -42,7 +46,7 @@ public class EhCacheEntityCache implements EntityCache {
 
 	@Override
 	public <T> void put(T entity) {
-		if(entity != null){
+		if(entity != null && entity instanceof Serializable){
 			Ehcache cache = getCache(entity.getClass());
 			cache.put(new Element(getId(entity).toString(), entity));
 		}
@@ -68,11 +72,11 @@ public class EhCacheEntityCache implements EntityCache {
 		String cacheName = clazz.getSimpleName();
 		Ehcache cache = cacheManager.getCache(cacheName);
 		if(cache == null){
-			cacheManager.addCache(cacheName);
+			CacheConfiguration config = new CacheConfiguration(cacheName, 1000).copyOnRead(true).copyOnWrite(true);
+			cache = new Cache(config);
+			cacheManager.addCache(cache);
 		}
-		return cacheManager.getCache(cacheName);
+		return cache;
 	}
-
-
 
 }
