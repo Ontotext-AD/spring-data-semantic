@@ -4,6 +4,7 @@ import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -28,6 +29,7 @@ import org.springframework.data.semantic.mapping.MappingPolicy;
 import org.springframework.data.semantic.mapping.SemanticPersistentEntity;
 import org.springframework.data.semantic.mapping.SemanticPersistentProperty;
 import org.springframework.data.semantic.support.Direction;
+import org.springframework.data.semantic.support.MappingPolicyImpl;
 import org.springframework.data.semantic.support.util.ValueUtils;
 import org.springframework.util.StringUtils;
 
@@ -206,12 +208,11 @@ public class SemanticPersistentPropertyImpl extends
 
 	@Override
 	public MappingPolicy getMappingPolicy() {
-		if (!annotations.containsKey(Fetch.class)){
-            //return MappingPolicy.DEFAULT_POLICY;
-			return MappingPolicy.LAZY_LOAD_POLICY;
+		if (annotations.containsKey(Fetch.class)){
+            return new MappingPolicyImpl(Arrays.asList(((Fetch) annotations.get(Fetch.class)).value()));
 		}
         else {
-        	return MappingPolicy.DEFAULT_POLICY;
+        	return MappingPolicyImpl.DEFAULT_POLICY;
         }
 	}
 	

@@ -22,6 +22,8 @@ import org.springframework.data.semantic.model.DateEntity;
 import org.springframework.data.semantic.model.DateEntityRepository;
 import org.springframework.data.semantic.model.ModelEntity;
 import org.springframework.data.semantic.model.ModelEntityCollector;
+import org.springframework.data.semantic.model.ModelEntityCollectorCascadeAll;
+import org.springframework.data.semantic.model.ModelEntityCollectorCascadeAllRepository;
 import org.springframework.data.semantic.model.ModelEntityCollectorRepository;
 import org.springframework.data.semantic.model.ModelEntityRepository;
 import org.springframework.data.semantic.model.WineBody;
@@ -45,6 +47,9 @@ public class TestSemanticRepository {
 	
 	@Autowired
 	private ModelEntityCollectorRepository modelEntityCollectorRepository;
+	
+	@Autowired
+	private ModelEntityCollectorCascadeAllRepository modelEntityCascadeAllRepository;
 
 	@Autowired
 	private SemanticDatabase sdb;
@@ -160,13 +165,37 @@ public class TestSemanticRepository {
 	
 	@Test
 	public void testEagerLoad(){
-		ModelEntityCollector collector = modelEntityCollectorRepository.findOne(MODEL_ENTITY.COLLECTOR);
+		ModelEntityCollector collector = modelEntityCollectorRepository.findOne(MODEL_ENTITY.COLLECTOR_ONE);
 		assertNotNull(collector);
 		assertFalse(collector.getEntities().isEmpty());
 		for(ModelEntity modelEntity : collector.getEntities()){
 			assertNotNull(modelEntity.getName());
 			assertFalse(modelEntity.getRelated().isEmpty());
 		}
+	}
+	
+	@Test
+	public void testEagerSaveFail(){
+		ModelEntityCollector collector = new ModelEntityCollector();
+		collector.setUri(MODEL_ENTITY.COLLECTOR_TWO);
+		ModelEntity entity = new ModelEntity();
+		entity.setName("new entity");
+		entity.setUri(MODEL_ENTITY.ENTITY_NOT_EXISTS_TWO);
+		collector.setEntities(Arrays.asList(entity));
+		assertNotNull(modelEntityCollectorRepository.save(collector));
+		assertNull(modelEntityRepository.findOne(MODEL_ENTITY.ENTITY_NOT_EXISTS_TWO));
+	}
+	
+	@Test
+	public void testEagerSaveSuccess(){
+		ModelEntityCollectorCascadeAll collector = new ModelEntityCollectorCascadeAll();
+		collector.setUri(MODEL_ENTITY.COLLECTOR_TWO);
+		ModelEntity entity = new ModelEntity();
+		entity.setName("new entity");
+		entity.setUri(MODEL_ENTITY.ENTITY_NOT_EXISTS_TWO);
+		collector.setEntities(Arrays.asList(entity));
+		assertNotNull(modelEntityCascadeAllRepository.save(collector));
+		assertNotNull(modelEntityRepository.findOne(MODEL_ENTITY.ENTITY_NOT_EXISTS_TWO));
 	}
 	
 	@Test

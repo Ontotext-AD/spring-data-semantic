@@ -12,6 +12,7 @@ import org.springframework.data.semantic.convert.ObjectToLiteralConverter;
 import org.springframework.data.semantic.core.RDFState;
 import org.springframework.data.semantic.mapping.SemanticPersistentEntity;
 import org.springframework.data.semantic.mapping.SemanticPersistentProperty;
+import org.springframework.data.semantic.support.Cascade;
 import org.springframework.data.semantic.support.exceptions.RequiredPropertyException;
 import org.springframework.data.semantic.support.mapping.SemanticMappingContext;
 
@@ -95,7 +96,7 @@ public abstract class AbstractPropertiesToStatementsHandlers implements Property
 				for(Object associatedEntityInstance : associatedEntityInstances){
 					URI associatedResourceId = associatedEntity.getResourceId(associatedEntityInstance);
 					processAssociationStatement(persistentProperty, associatedResourceId);
-					if(persistentProperty.getMappingPolicy().eagerLoad() && !statements.getCurrentStatements().subjects().contains(associatedResourceId)){
+					if(persistentProperty.getMappingPolicy().shouldCascade(Cascade.SAVE) && !statements.getCurrentStatements().subjects().contains(associatedResourceId)){
 						AbstractPropertiesToStatementsHandlers associationHandler = getInstance(statements, associatedEntityInstance, mappingContext);
 						associatedEntity.doWithProperties(associationHandler);
 						associatedEntity.doWithAssociations(associationHandler);
@@ -106,7 +107,7 @@ public abstract class AbstractPropertiesToStatementsHandlers implements Property
 				SemanticPersistentEntity<Object> associatedEntity = (SemanticPersistentEntity<Object>) mappingContext.getPersistentEntity(persistentProperty.getType());
 				URI associatedResourceId = associatedEntity.getResourceId(value);
 				processAssociationStatement(persistentProperty, associatedResourceId);
-				if(persistentProperty.getMappingPolicy().eagerLoad() && !statements.getCurrentStatements().subjects().contains(associatedResourceId)){
+				if(persistentProperty.getMappingPolicy().shouldCascade(Cascade.SAVE) && !statements.getCurrentStatements().subjects().contains(associatedResourceId)){
 					AbstractPropertiesToStatementsHandlers associationHandler = getInstance(statements, value, mappingContext);
 					associatedEntity.doWithProperties(associationHandler);
 					associatedEntity.doWithAssociations(associationHandler);

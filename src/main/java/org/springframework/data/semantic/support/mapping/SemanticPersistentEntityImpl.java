@@ -9,6 +9,7 @@ import org.springframework.data.semantic.core.RDFState;
 import org.springframework.data.semantic.mapping.MappingPolicy;
 import org.springframework.data.semantic.mapping.SemanticPersistentEntity;
 import org.springframework.data.semantic.mapping.SemanticPersistentProperty;
+import org.springframework.data.semantic.support.MappingPolicyImpl;
 import org.springframework.data.semantic.support.util.ValueUtils;
 import org.springframework.data.util.TypeInformation;
 import org.springframework.util.StringUtils;
@@ -40,7 +41,7 @@ public class SemanticPersistentEntityImpl<T> extends BasicPersistentEntity<T, Se
 
 	@Override
 	public MappingPolicy getMappingPolicy() {
-		return MappingPolicy.DEFAULT_POLICY;
+		return MappingPolicyImpl.DEFAULT_POLICY;
 	}
 
 	@Override

@@ -14,9 +14,13 @@ public class MODEL_ENTITY extends VOCABULARY {
 	
 	public final static URI ENTITY_NOT_EXISTS = create("entity:33");
 	
+	public final static URI ENTITY_NOT_EXISTS_TWO = create("entity:66");
+	
 	public final static URI ENTITY_FIVE = create("entity:5");
 	
-	public final static URI COLLECTOR = create("collector:1");
+	public final static URI COLLECTOR_ONE = create("collector:1");
+	
+	public final static URI COLLECTOR_TWO = create("collector:2");
 
 	private static URI create(String localName){
 		return create(NAMESPACE, localName);

@@ -22,6 +22,7 @@ import org.springframework.data.semantic.core.SemanticDatabase;
 import org.springframework.data.semantic.mapping.MappingPolicy;
 import org.springframework.data.semantic.mapping.SemanticPersistentEntity;
 import org.springframework.data.semantic.mapping.SemanticPersistentProperty;
+import org.springframework.data.semantic.support.Cascade;
 import org.springframework.data.semantic.support.mapping.SemanticMappingContext;
 import org.springframework.data.semantic.support.mapping.SemanticPersistentEntityImpl;
 
@@ -112,13 +113,11 @@ public class SemanticEntityConverterImpl implements SemanticEntityConverter {
 	public <R> R loadEntity(R entity, RDFState source,
 			MappingPolicy mappingPolicy,
 			SemanticPersistentEntity<R> persistentEntity) {
-		if (mappingPolicy.eagerLoad()) {
-            final BeanWrapper<R> wrapper = BeanWrapper.<R>create(entity, conversionService);
-            
-            sourceStateTransmitter.copyPropertiesFrom(wrapper, source, persistentEntity, mappingPolicy);
-            
-            cascadeFetch(persistentEntity, wrapper, source);
-        }
+		
+		final BeanWrapper<R> wrapper = BeanWrapper.<R>create(entity, conversionService);
+        sourceStateTransmitter.copyPropertiesFrom(wrapper, source, persistentEntity, mappingPolicy);
+        cascadeFetch(persistentEntity, wrapper, source);
+        
         return entity;
 	}
 	
@@ -139,7 +138,7 @@ public class SemanticEntityConverterImpl implements SemanticEntityConverter {
                 			URI associatedEntityURI = (URI) associatedEntityId;
                 			Object associatedEntity = entityInstantiator.createInstance(associatedPersistentEntity, (URI) associatedEntityId);
                 			associationValuesList.add(associatedEntity);
-                			if (mappingPolicy.eagerLoad()) {
+                			if (mappingPolicy.shouldCascade(Cascade.GET)) {
                                 RDFState associatedEntityState = new RDFState(source.getCurrentStatements().filter(associatedEntityURI, null, null));
                                 final BeanWrapper<Object> associatedWrapper = BeanWrapper.<Object>create(associatedEntity, conversionService);
                                 sourceStateTransmitter.copyPropertiesFrom(associatedWrapper, associatedEntityState, associatedPersistentEntity, mappingPolicy);
@@ -153,7 +152,7 @@ public class SemanticEntityConverterImpl implements SemanticEntityConverter {
             		if(!associatedEntityIds.isEmpty()){
             			URI associatedEntityURI = (URI) associatedEntityIds.iterator().next();
             			Object associatedEntity = entityInstantiator.createInstance(associatedPersistentEntity, associatedEntityURI);
-            			if (mappingPolicy.eagerLoad()) {
+            			if (mappingPolicy.shouldCascade(Cascade.GET)) {
             				 RDFState associatedEntityState = new RDFState(source.getCurrentStatements().filter(associatedEntityURI, null, null));
                              final BeanWrapper<Object> associatedWrapper = BeanWrapper.<Object>create(associatedEntity, conversionService);
                              sourceStateTransmitter.copyPropertiesFrom(associatedWrapper, associatedEntityState, associatedPersistentEntity, mappingPolicy);

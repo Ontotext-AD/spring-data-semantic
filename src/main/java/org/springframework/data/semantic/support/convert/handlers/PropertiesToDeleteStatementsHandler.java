@@ -9,6 +9,7 @@ import org.openrdf.model.impl.URIImpl;
 import org.springframework.data.semantic.core.RDFState;
 import org.springframework.data.semantic.mapping.SemanticPersistentEntity;
 import org.springframework.data.semantic.mapping.SemanticPersistentProperty;
+import org.springframework.data.semantic.support.Cascade;
 import org.springframework.data.semantic.support.Direction;
 import org.springframework.data.semantic.support.mapping.SemanticMappingContext;
 import org.springframework.data.semantic.support.util.ValueUtils;
@@ -75,6 +76,13 @@ public class PropertiesToDeleteStatementsHandler extends AbstractPropertiesToSta
 				deleteStatement(value, persistentProperty.getPredicate(), resourceId, context);
 			}
 		}
+		if(persistentProperty.getMappingPolicy().shouldCascade(Cascade.DELETE)){
+			cascadeDelete();
+		}
+	}
+	
+	private void cascadeDelete(){
+		//TODO
 	}
 	
 	private void deleteStatement(Resource subject, URI predicate, Value object, Resource context){

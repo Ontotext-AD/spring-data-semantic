@@ -11,6 +11,7 @@ import org.springframework.data.mapping.Association;
 import org.springframework.data.semantic.convert.ObjectToLiteralConverter;
 import org.springframework.data.semantic.mapping.SemanticPersistentEntity;
 import org.springframework.data.semantic.mapping.SemanticPersistentProperty;
+import org.springframework.data.semantic.support.Cascade;
 import org.springframework.data.semantic.support.Direction;
 import org.springframework.data.semantic.support.mapping.SemanticMappingContext;
 import org.springframework.data.semantic.support.util.ValueUtils;
@@ -59,7 +60,7 @@ public class PropertiesToPatternsHandler extends AbstractPropertiesToQueryHandle
 		SemanticPersistentProperty persistentProperty = association.getInverse();
 		//TODO handle existing value in propertyToValue
 		handlePersistentProperty(persistentProperty);
-		if(persistentProperty.getMappingPolicy().eagerLoad()){
+		if(persistentProperty.getMappingPolicy().shouldCascade(Cascade.GET)){
 			SemanticPersistentEntity<?> associatedPersistentEntity = mappingContext.getPersistentEntity(persistentProperty.getActualType());
 			String associationBinding = persistentProperty.getBindingName();
 			appendPattern(sb, associationBinding, "<"+ValueUtils.RDF_TYPE_PREDICATE+">", "<"+associatedPersistentEntity.getRDFType()+">");

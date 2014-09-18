@@ -11,6 +11,7 @@ import org.springframework.data.mapping.Association;
 import org.springframework.data.semantic.convert.ObjectToLiteralConverter;
 import org.springframework.data.semantic.mapping.SemanticPersistentEntity;
 import org.springframework.data.semantic.mapping.SemanticPersistentProperty;
+import org.springframework.data.semantic.support.Cascade;
 import org.springframework.data.semantic.support.mapping.SemanticMappingContext;
 
 public class PropertiesToBindingsHandler extends AbstractPropertiesToQueryHandler {
@@ -86,7 +87,7 @@ public class PropertiesToBindingsHandler extends AbstractPropertiesToQueryHandle
 		String associationBinding = persistentProperty.getBindingName();
 		//handle value in propertyToValue
 		appendPattern(sb, binding, "<" + persistentProperty.getAliasPredicate() + ">", associationBinding);
-		if(persistentProperty.getMappingPolicy().eagerLoad()){
+		if(persistentProperty.getMappingPolicy().shouldCascade(Cascade.GET)){
 			SemanticPersistentEntity<?> associatedPersistentEntity = mappingContext.getPersistentEntity(persistentProperty.getActualType());
 			appendPattern(sb, associationBinding, "a", "<"+associatedPersistentEntity.getRDFType()+">");
 			PropertiesToBindingsHandler associationHandler = new PropertiesToBindingsHandler(this.sb, associationBinding, new HashMap<String, Object>(), this.mappingContext, ++this.depth);
