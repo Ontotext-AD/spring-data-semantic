@@ -66,12 +66,12 @@ public class SemanticPersistentEntityImpl<T> extends BasicPersistentEntity<T, Se
 				rdfType = mappingContext.resolveURI(type);
 			}
 			else{
-				URI namespace = getNamespace();
-				if(namespace == null){
+				URI ns = getNamespace();
+				if(ns == null){
 					rdfType = mappingContext.resolveURIDefaultNS(getType().getSimpleName());
 				}
 				else{
-					rdfType = ValueUtils.createUri(namespace.stringValue(), getType().getSimpleName());
+					rdfType = ValueUtils.createUri(ns.stringValue(), getType().getSimpleName());
 				}
 			}
 		}
@@ -90,9 +90,9 @@ public class SemanticPersistentEntityImpl<T> extends BasicPersistentEntity<T, Se
 		if(value instanceof URI){
 			return (URI) value;
 		}
-		URI namespace = getNamespace();
-		if(namespace != null){
-			return ValueUtils.createUri(namespace.stringValue(), value.toString());
+		URI ns = getNamespace();
+		if(ns != null){
+			return ValueUtils.createUri(ns.stringValue(), value.toString());
 		}
 		else{
 			return mappingContext.resolveURI(value.toString());

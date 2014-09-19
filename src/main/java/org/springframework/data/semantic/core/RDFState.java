@@ -59,12 +59,7 @@ public class RDFState {
 	}
 	
 	public boolean isEmpty(){
-		if((currentStatements == null || currentStatements.isEmpty()) && (deleteStatements == null || deleteStatements.isEmpty())){
-			return true;
-		}
-		else{
-			return false;
-		}
+		return (currentStatements == null || currentStatements.isEmpty()) && (deleteStatements == null || deleteStatements.isEmpty());
 	}
 	
 	public void merge(RDFState state){

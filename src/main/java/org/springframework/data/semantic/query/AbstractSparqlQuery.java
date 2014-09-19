@@ -253,12 +253,7 @@ public abstract class AbstractSparqlQuery extends AbstractQuery {
 		}
 		else if(o.getClass().equals(this.getClass())){
 			AbstractSparqlQuery q2 = (AbstractSparqlQuery) o;
-			if(q2.str.equals(this.str) && (q2.sameAs == this.sameAs) && (q2.includeInferred == this.includeInferred) && (q2.limit == this.limit) && (q2.offset == this.offset)){
-				return true;
-			}
-			else{
-				return false;
-			}
+			return q2.str.equals(this.str) && (q2.sameAs == this.sameAs) && (q2.includeInferred == this.includeInferred) && (q2.limit == this.limit) && (q2.offset == this.offset);
 		}
 		else{
 			return false;
