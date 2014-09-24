@@ -241,7 +241,9 @@ public class SemanticTemplateCRUD implements SemanticOperationsCRUD, Initializin
 		Collection<Model> statementsPerEntity = this.statementsCollector.getStatementsForResourcesAndProperties(clazz, parameterToValue, null, null);
 		List<T> results = new LinkedList<T>();
 		for(Model statements : statementsPerEntity){
-			results.add(createEntity(statements, clazz));
+			T entity = createEntity(statements, clazz);
+			//TODO set required values
+			results.add(entity);
 		}
 		return results;
 	}

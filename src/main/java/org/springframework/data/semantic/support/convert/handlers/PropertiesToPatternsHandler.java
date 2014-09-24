@@ -71,11 +71,13 @@ public class PropertiesToPatternsHandler extends AbstractPropertiesToQueryHandle
 		handlePersistentProperty(persistentProperty);
 		if(persistentProperty.getMappingPolicy().shouldCascade(Cascade.GET)){
 			SemanticPersistentEntity<?> associatedPersistentEntity = mappingContext.getPersistentEntity(persistentProperty.getActualType());
-			String associationBinding = persistentProperty.getBindingName();
-			appendPattern(sb, associationBinding, "<"+ValueUtils.RDF_TYPE_PREDICATE+">", "<"+associatedPersistentEntity.getRDFType()+">");
-			PropertiesToPatternsHandler associationHandler = new PropertiesToPatternsHandler(this.sb, associationBinding, new HashMap<String, Object>(), this.mappingContext, ++this.depth, optional);
-			associatedPersistentEntity.doWithProperties(associationHandler);
-			associatedPersistentEntity.doWithAssociations(associationHandler);
+			if(objectValue == null){
+				String associationBinding = persistentProperty.getBindingName();
+				appendPattern(sb, associationBinding, "<"+ValueUtils.RDF_TYPE_PREDICATE+">", "<"+associatedPersistentEntity.getRDFType()+">");
+				PropertiesToPatternsHandler associationHandler = new PropertiesToPatternsHandler(this.sb, associationBinding, new HashMap<String, Object>(), this.mappingContext, ++this.depth, optional);
+				associatedPersistentEntity.doWithProperties(associationHandler);
+				associatedPersistentEntity.doWithAssociations(associationHandler);
+			}
 		}
 		if(optional){
 			sb.append("} ");

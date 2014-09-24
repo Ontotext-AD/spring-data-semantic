@@ -85,14 +85,16 @@ public class PropertiesToBindingsHandler extends AbstractPropertiesToQueryHandle
 	
 	private void handleAssociation(SemanticPersistentProperty persistentProperty) {
 		String associationBinding = persistentProperty.getBindingName();
-		//handle value in propertyToValue
-		appendPattern(sb, binding, "<" + persistentProperty.getAliasPredicate() + ">", associationBinding);
-		if(persistentProperty.getMappingPolicy().shouldCascade(Cascade.GET)){
-			SemanticPersistentEntity<?> associatedPersistentEntity = mappingContext.getPersistentEntity(persistentProperty.getActualType());
-			appendPattern(sb, associationBinding, "a", "<"+associatedPersistentEntity.getRDFType()+">");
-			PropertiesToBindingsHandler associationHandler = new PropertiesToBindingsHandler(this.sb, associationBinding, new HashMap<String, Object>(), this.mappingContext, ++this.depth);
-			associatedPersistentEntity.doWithProperties(associationHandler);
-			associatedPersistentEntity.doWithAssociations(associationHandler);
+		Object objectValue = propertyToValue.get(persistentProperty.getName());
+		if(objectValue == null){
+			appendPattern(sb, binding, "<" + persistentProperty.getAliasPredicate() + ">", associationBinding);
+			if(persistentProperty.getMappingPolicy().shouldCascade(Cascade.GET)){
+				SemanticPersistentEntity<?> associatedPersistentEntity = mappingContext.getPersistentEntity(persistentProperty.getActualType());
+				appendPattern(sb, associationBinding, "a", "<"+associatedPersistentEntity.getRDFType()+">");
+				PropertiesToBindingsHandler associationHandler = new PropertiesToBindingsHandler(this.sb, associationBinding, new HashMap<String, Object>(), this.mappingContext, ++this.depth);
+				associatedPersistentEntity.doWithProperties(associationHandler);
+				associatedPersistentEntity.doWithAssociations(associationHandler);
+			}
 		}
 	}
 }
