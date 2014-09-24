@@ -162,7 +162,7 @@ public class EntityToQueryConverter {
 	 */
 	protected String getPropertyPattern(URI uri, SemanticPersistentEntity<?> entity, SemanticPersistentProperty property){
 		StringBuilder sb = new StringBuilder();
-		new PropertiesToPatternsHandler(sb, "<"+uri+">", new HashMap<String, Object>(), this.mappingContext).doWithPersistentProperty(property);
+		new PropertiesToPatternsHandler(sb, "<"+uri+">", new HashMap<String, Object>(), this.mappingContext, false).doWithPersistentProperty(property);
 		return sb.toString();
 	}
 	
@@ -182,7 +182,7 @@ public class EntityToQueryConverter {
 			binding = "?"+entity.getRDFType().getLocalName();
 		}
 		AbstractPropertiesToQueryHandler.appendPattern(sb, binding, "<"+ValueUtils.RDF_TYPE_PREDICATE+">", "<"+entity.getRDFType()+">");
-		PropertiesToPatternsHandler handler = new PropertiesToPatternsHandler(sb, binding, propertyToValue, this.mappingContext);
+		PropertiesToPatternsHandler handler = new PropertiesToPatternsHandler(sb, binding, propertyToValue, this.mappingContext, false);
 		entity.doWithProperties(handler);
 		entity.doWithAssociations(handler);
 		return sb.toString();
