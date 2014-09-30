@@ -3,14 +3,14 @@ package org.springframework.data.semantic.support;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 import org.openrdf.model.Model;
 import org.openrdf.model.Resource;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.Value;
-import org.openrdf.model.impl.LinkedHashModel;
+import org.openrdf.model.impl.TreeModel;
+import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.repository.RepositoryException;
 import org.springframework.data.semantic.core.SemanticDatabase;
 import org.springframework.data.semantic.core.SemanticOperationsStatementsCollector;
@@ -78,7 +78,7 @@ public class SemanticTemplateStatementsCollector implements SemanticOperationsSt
 		try {
 			SemanticPersistentEntity<?> persistentEntity = mappingContext.getPersistentEntity(clazz);
 			Model results = semanticDB.getGraphQueryResults(entityToQueryConverter.getGraphQueryForEntityClass(persistentEntity), offset, limit);
-			return assembleModels(persistentEntity, results);
+			return assembleModels(persistentEntity.getRDFType(), results);
 		} catch (Exception e) {
 			throw ExceptionTranslator.translateExceptionIfPossible(e);
 		}
@@ -91,41 +91,33 @@ public class SemanticTemplateStatementsCollector implements SemanticOperationsSt
 		try {
 			SemanticPersistentEntity<?> persistentEntity = mappingContext.getPersistentEntity(clazz);
 			Model results = semanticDB.getGraphQueryResults(entityToQueryConverter.getGraphQueryForEntityClass(persistentEntity, parameterToValue), offset, limit);
-			return assembleModels(persistentEntity, results);
+			return assembleModels(persistentEntity.getRDFType(), results);
 		} catch (Exception e) {
 			throw ExceptionTranslator.translateExceptionIfPossible(e);
 		}
 	}
 	
-	private <T> Collection<Model> assembleModels(SemanticPersistentEntity<T> persistentEntity, Model allStatements){
-		Set<Resource> subjects = allStatements.filter(null, null, persistentEntity.getRDFType()).subjects();
-		Map<Resource, Resource> resourceToSubject = new HashMap<Resource, Resource>();
-		Map<Resource, Model> subjectToModel = new HashMap<Resource, Model>();
-		for(Statement statement : allStatements){
-			Resource subject = statement.getSubject();
-			if(subjects.contains(subject)){
-				Value object = statement.getObject();
-				if(object instanceof Resource){
-					resourceToSubject.put((Resource) object, subject);
-				}
-				Model statementsForSubject = subjectToModel.get(subject);
-				if(statementsForSubject == null){
-					statementsForSubject = new LinkedHashModel();
-					subjectToModel.put(subject, statementsForSubject);
-				}
-				statementsForSubject.add(statement);
-			}
-			else{
-				Value object = statement.getObject();
-				Resource entityId = resourceToSubject.get(subject);
-				if(object instanceof Resource){
-					resourceToSubject.put((Resource) object, entityId); 
-				}
-				Model statementsForSubject = subjectToModel.get(entityId);
-				statementsForSubject.add(statement);
+	public <T> Collection<Model> assembleModels(URI type, Model allStatements){
+		Model subjects = allStatements.filter(null, null, type);
+		Map<Resource, Model> entityIdToModel = new HashMap<Resource, Model>();
+		for(Statement st : subjects){
+			Resource subject = st.getSubject();
+			Model statementsForSubject = new TreeModel();
+			getStatementsForSubject(allStatements, subject, statementsForSubject);
+			entityIdToModel.put(subject, statementsForSubject);
+		}
+		return entityIdToModel.values();
+	}
+	
+	private void getStatementsForSubject(Model source, Resource subject, Model dest){
+		Model directStatements = source.filter(subject, null, null);
+		dest.addAll(directStatements);
+		for(Statement st : directStatements){
+			Value object = st.getObject();
+			if(object instanceof Resource && !st.getPredicate().equals(RDF.TYPE) && dest.filter((Resource) object, null, null).isEmpty()){
+				getStatementsForSubject(source, (Resource) object, dest);
 			}
 		}
-		return subjectToModel.values();
 	}
 	
 	
