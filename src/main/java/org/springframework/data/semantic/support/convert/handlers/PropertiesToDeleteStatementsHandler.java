@@ -36,7 +36,7 @@ public class PropertiesToDeleteStatementsHandler extends AbstractPropertiesToSta
 				statements.deleteStatement(new ContextStatementImpl((URI) value, new URIImpl(ValueUtils.RDF_TYPE_PREDICATE), persistentEntity.getRDFType(), (Resource) persistentEntity.getContextProperty().getValue(entity, persistentProperty.getMappingPolicy())));
 			}
 			else{
-				statements.deleteStatement(new StatementImpl((URI) value, new URIImpl(ValueUtils.RDF_TYPE_PREDICATE), persistentEntity.getRDFType()));
+				statements.deleteStatement(new StatementImpl(this.resourceId, new URIImpl(ValueUtils.RDF_TYPE_PREDICATE), persistentEntity.getRDFType()));
 			}
 		}
 		else{
