@@ -51,7 +51,7 @@ public abstract class AbstractPropertiesToStatementsHandlers implements Property
 						values = (Collection<Object>) value;
 					}
 					if(values.isEmpty() && !persistentProperty.isOptional() && !allowEmpty()){
-						throw new RequiredPropertyException(persistentProperty);
+						throw new RequiredPropertyException(persistentEntity.getIdProperty().getValue(entity, persistentEntity.getMappingPolicy()), persistentProperty);
 					}
 					for(Object val : values){
 						processPropertyStatement(persistentProperty, val);
@@ -63,7 +63,7 @@ public abstract class AbstractPropertiesToStatementsHandlers implements Property
 			}
 			else{
 				if(!persistentProperty.isOptional() && !allowEmpty()){
-					throw new RequiredPropertyException(persistentProperty);
+					throw new RequiredPropertyException(persistentEntity.getIdProperty().getValue(entity, persistentEntity.getMappingPolicy()), persistentProperty);
 				}
 			}
 		}
@@ -77,7 +77,7 @@ public abstract class AbstractPropertiesToStatementsHandlers implements Property
 		Object value = persistentProperty.getValue(entity, persistentEntity.getMappingPolicy());
 		if(value == null){
 			if(!persistentProperty.isOptional() && !allowEmpty()){
-				throw new RequiredPropertyException(persistentProperty);
+				throw new RequiredPropertyException(persistentEntity.getIdProperty().getValue(entity, persistentEntity.getMappingPolicy()), persistentProperty);
 			}
 		}
 		else{
@@ -91,7 +91,7 @@ public abstract class AbstractPropertiesToStatementsHandlers implements Property
 					associatedEntityInstances = (Collection<Object>) value;
 				}
 				if(associatedEntityInstances.isEmpty() && !persistentProperty.isOptional() && !allowEmpty()){
-					throw new RequiredPropertyException(persistentProperty);
+					throw new RequiredPropertyException(persistentEntity.getIdProperty().getValue(entity, persistentEntity.getMappingPolicy()), persistentProperty);
 				}
 				for(Object associatedEntityInstance : associatedEntityInstances){
 					URI associatedResourceId = associatedEntity.getResourceId(associatedEntityInstance);

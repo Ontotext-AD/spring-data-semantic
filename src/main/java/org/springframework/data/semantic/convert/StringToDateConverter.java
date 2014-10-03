@@ -11,7 +11,11 @@ public class StringToDateConverter implements Converter<String, Date>{
 	@Override
 	public Date convert(String source) {
 		if(!StringUtils.isEmpty(source)){
-			return XMLDatatypeUtil.parseCalendar(source).toGregorianCalendar().getTime();
+			try{
+				return XMLDatatypeUtil.parseCalendar(source).toGregorianCalendar().getTime();
+			} catch(NumberFormatException e){
+				return null;
+			}
 		}
 		else {
 			return null;

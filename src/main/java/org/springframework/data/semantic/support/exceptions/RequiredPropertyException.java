@@ -4,8 +4,8 @@ import org.springframework.data.semantic.mapping.SemanticPersistentProperty;
 
 public class RequiredPropertyException extends RuntimeException{
 	
-	public RequiredPropertyException(SemanticPersistentProperty persistentProperty){
-		super("The required property "+persistentProperty.getName() + " is null or empty. Please provide a value for it or mark it as @Opional.");
+	public RequiredPropertyException(Object id, SemanticPersistentProperty persistentProperty){
+		super("The required property "+persistentProperty.getName() + " is null or empty for instance with id "+id+". Please provide a value for it or mark it as @Opional.");
 	}
 
 	/**
