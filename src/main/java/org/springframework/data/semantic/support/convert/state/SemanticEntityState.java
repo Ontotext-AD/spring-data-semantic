@@ -1,6 +1,7 @@
 package org.springframework.data.semantic.support.convert.state;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -9,6 +10,7 @@ import org.openrdf.model.Model;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.impl.URIImpl;
+import org.springframework.core.convert.ConversionService;
 import org.springframework.data.semantic.convert.access.FieldAccessor;
 import org.springframework.data.semantic.convert.access.FieldAccessorProvider;
 import org.springframework.data.semantic.convert.access.listener.FieldAccessListener;
@@ -37,7 +39,7 @@ public class SemanticEntityState<T> implements
 	private final FieldAccessorProvider fieldAccessorProvider;
 	private final FieldAccessListenerProvider fieldAccessListenerProvider;
 	private final SemanticPersistentEntity<T> persistentEntity;
-	
+	private final ConversionService conversionService;
 
 	public SemanticEntityState(
 			final RDFState underlyingState,
@@ -45,7 +47,8 @@ public class SemanticEntityState<T> implements
 			final T entity,
 			final DelegatingFieldAccessorFactory nodeDelegatingFieldAccessorFactory,
 			final DelegatingFieldAccessListenerFactory delegatingFieldAccessListenerFactory,
-			SemanticPersistentEntity<T> persistentEntity) {
+			SemanticPersistentEntity<T> persistentEntity, 
+			ConversionService conversionService) {
 		this.entity = entity;
 		//this.type = type;
 		this.state = underlyingState;
@@ -56,6 +59,7 @@ public class SemanticEntityState<T> implements
 		this.fieldAccessors = fieldAccessorProvider.provideFieldAccessors(persistentEntity);
 		this.fieldAccessorListeners = fieldAccessListenerProvider.provideFieldAccessListeners(persistentEntity);
 		this.persistentEntity = persistentEntity;
+		this.conversionService = conversionService;
 	}
 
 	@Override
@@ -91,19 +95,37 @@ public class SemanticEntityState<T> implements
 			return accessor.getValue(entity, mappingPolicy);
 		}
 		else {			
-			return getValueFromState(property.getAliasPredicate());
+			return getValueFromState(property);
 		}
 	}
 	
-	private Object getValueFromState(String alias){
+	private Object getValueFromState(SemanticPersistentProperty property){
+		String alias = property.getAliasPredicate();
 		URI predicate = new URIImpl(alias);
 		Model model = state.getCurrentStatements();
+		
 		List<Object> values = new LinkedList<Object>();
 		Model results = model.filter(null, predicate, null);
 		for(Statement st : results){
 			values.add(st.getObject().stringValue());
 		}
-		return values;
+		
+		if(property.isCollectionLike()){
+			Class<?> componentType = property.getComponentType();
+			List<Object> convertedValues = new ArrayList<Object>(values.size());
+			if(conversionService.canConvert(String.class, componentType)){
+				for(Object o : values){
+					convertedValues.add(conversionService.convert(o, componentType));
+				}
+				return convertedValues;
+			}
+			else{
+				throw new IllegalArgumentException("No converter available for target type "+componentType.getName()+".");
+			}
+		}
+		else{
+			return values.isEmpty() ? null : values.get(0);
+		}
 	}
 
 	@Override

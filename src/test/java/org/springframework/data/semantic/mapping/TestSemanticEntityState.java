@@ -8,6 +8,7 @@ import org.junit.runner.RunWith;
 import org.openrdf.model.impl.StatementImpl;
 import org.openrdf.model.impl.URIImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.convert.support.DefaultConversionService;
 import org.springframework.data.semantic.core.RDFState;
 import org.springframework.data.semantic.core.SemanticDatabase;
 import org.springframework.data.semantic.support.convert.access.MockFieldAccessorFactory;
@@ -30,7 +31,7 @@ public class TestSemanticEntityState {
 	
 	@Before
 	public void setUp(){
-		entityState = new SemanticEntityState<Object>(null, sdb, new Object(), new MockFieldAccessorFactory(), new MockFieldAccessListenerFactory(), new SemanticPersistentEntityImpl<Object>(ClassTypeInformation.from(Object.class)));
+		entityState = new SemanticEntityState<Object>(null, sdb, new Object(), new MockFieldAccessorFactory(), new MockFieldAccessListenerFactory(), new SemanticPersistentEntityImpl<Object>(ClassTypeInformation.from(Object.class)), new DefaultConversionService());
 	}
 	
 	@Test
