@@ -10,7 +10,6 @@ import net.sf.ehcache.CacheManager;
 
 import org.openrdf.model.Model;
 import org.openrdf.model.URI;
-import org.openrdf.query.BindingSet;
 import org.openrdf.repository.RepositoryException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -191,8 +190,7 @@ public class SemanticTemplateCRUD implements SemanticOperationsCRUD, Initializin
 	@Override
 	public <T> long count(Class<T> clazz) {
 		try {
-			List<BindingSet> result = this.semanticDB.getQueryResults(entityToQueryConverter.getGraphQueryForResourceCount(this.mappingContext.getPersistentEntity(clazz)));
-			return Long.valueOf(result.get(0).getValue("count").stringValue());
+			return this.statementsCollector.getCountForResource(clazz);
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 		}
@@ -248,6 +246,12 @@ public class SemanticTemplateCRUD implements SemanticOperationsCRUD, Initializin
 		return results;
 	}
 
+	@Override
+	public Long countByProperty(Class<?> clazz,
+			Map<String, Object> parameterToValue) {
+		return this.statementsCollector.getCountForResourceAndProperties(clazz, parameterToValue);
+	}
+	
 	@Override
 	public SemanticMappingContext getSemanticMappingContext() {
 		return this.mappingContext;

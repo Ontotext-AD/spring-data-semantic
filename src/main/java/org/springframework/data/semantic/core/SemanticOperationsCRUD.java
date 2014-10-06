@@ -93,6 +93,12 @@ public interface SemanticOperationsCRUD {
 	 */
 	<T> Collection<T> findByProperty(Class<? extends T> clazz, Map<String, Object> parameterToValue);
 	
-	
+	/**
+	 * Count the number of entities of the given class that fulfill the parameter requirements.
+	 * @param clazz
+	 * @param parameterToValue
+	 * @return
+	 */
+	Long countByProperty(Class<?> clazz, Map<String, Object> parameterToValue);
 	
 }

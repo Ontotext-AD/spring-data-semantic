@@ -87,8 +87,14 @@ public class EntityToQueryConverter {
 	 * @param entity
 	 * @return
 	 */
-	public String getGraphQueryForResourceCount(SemanticPersistentEntity<?> entity){
-		return "SELECT (COUNT (DISTINCT ?uri) as ?count) WHERE { ?uri a <"+entity.getRDFType()+">}";
+	public String getGraphQueryForResourceCount(SemanticPersistentEntity<?> entity, Map<String, Object> propertyToValue){
+		StringBuilder sb = new StringBuilder();
+		String subjectBinding  = getSubjectBinding(null, entity);
+		sb.append("SELECT (COUNT (DISTINCT "+subjectBinding+") as ?count) WHERE { "+subjectBinding+" a <"+entity.getRDFType()+"> . ");
+		sb.append(getPropertyPatterns(null, entity, propertyToValue));
+		sb.append("}");
+		return sb.toString();
+		
 	}
 	
 	/**
@@ -118,6 +124,10 @@ public class EntityToQueryConverter {
 		return sb.toString();
 	}
 	
+	private String getSubjectBinding(URI uri, SemanticPersistentEntity<?> entity){
+		return uri != null ? "<"+uri+">" : "?"+entity.getRDFType().getLocalName();
+	}
+	
 	/**
 	 * Get bindings for the retrievable properties of the entity
 	 * @param uri - the uri of the entity
@@ -126,14 +136,7 @@ public class EntityToQueryConverter {
 	 */
 	protected String getPropertyBindings(URI uri, SemanticPersistentEntity<?> entity, Map<String, Object> propertyToValue){
 		StringBuilder sb = new StringBuilder();
-		String subjectBinding;
-		if(uri != null){
-			subjectBinding = "<"+uri+">";
-		}
-		else{
-			subjectBinding = "?"+entity.getRDFType().getLocalName();
-			
-		}
+		String subjectBinding = getSubjectBinding(uri, entity);
 		AbstractPropertiesToQueryHandler.appendPattern(sb, subjectBinding, "a", "<"+entity.getRDFType()+">");
 		PropertiesToBindingsHandler handler = new PropertiesToBindingsHandler(sb, subjectBinding, propertyToValue, this.mappingContext);
 		entity.doWithProperties(handler);

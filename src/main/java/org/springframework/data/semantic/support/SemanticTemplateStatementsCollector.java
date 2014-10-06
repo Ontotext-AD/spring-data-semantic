@@ -2,6 +2,7 @@ package org.springframework.data.semantic.support;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.openrdf.model.Model;
@@ -11,6 +12,7 @@ import org.openrdf.model.URI;
 import org.openrdf.model.Value;
 import org.openrdf.model.impl.TreeModel;
 import org.openrdf.model.vocabulary.RDF;
+import org.openrdf.query.BindingSet;
 import org.openrdf.repository.RepositoryException;
 import org.springframework.data.semantic.core.SemanticDatabase;
 import org.springframework.data.semantic.core.SemanticOperationsStatementsCollector;
@@ -42,9 +44,7 @@ public class SemanticTemplateStatementsCollector implements SemanticOperationsSt
 		return persistentEntity.getMappingPolicy();
 	}
 	
-	private SemanticPersistentEntity<?> getPersistentEntity(Class<?> targetClazz){
-		return (SemanticPersistentEntityImpl<?>) mappingContext.getPersistentEntity(targetClazz);
-	}	
+		
 		
 	@Override
 	public Model getStatementsForResourceProperty(Object entity, SemanticPersistentProperty property){
@@ -120,5 +120,35 @@ public class SemanticTemplateStatementsCollector implements SemanticOperationsSt
 		}
 	}
 	
+	private SemanticPersistentEntity<?> getPersistentEntity(Class<?> targetClazz){
+		return (SemanticPersistentEntityImpl<?>) mappingContext.getPersistentEntity(targetClazz);
+	}
+
+	
+	@Override
+	public <T> Long getCountForResource(Class<? extends T> clazz) {
+		List<BindingSet> result;
+		try {
+			SemanticPersistentEntity<?> persistentEntity = mappingContext.getPersistentEntity(clazz);
+			result = this.semanticDB.getQueryResults(entityToQueryConverter.getGraphQueryForResourceCount(persistentEntity, new HashMap<String, Object>()));
+			return Long.valueOf(result.get(0).getValue("count").stringValue());
+		} catch (Exception e) {
+			throw ExceptionTranslator.translateExceptionIfPossible(e);
+		}
+		
+	}
+	
+
+	@Override
+	public <T> Long getCountForResourceAndProperties(Class<? extends T> clazz,
+			Map<String, Object> parameterToValue) {
+		try {
+			SemanticPersistentEntity<?> persistentEntity = mappingContext.getPersistentEntity(clazz);
+			List<BindingSet> results = semanticDB.getQueryResults(entityToQueryConverter.getGraphQueryForResourceCount(persistentEntity, parameterToValue));
+			return Long.valueOf(results.get(0).getValue("count").stringValue());
+		} catch (Exception e) {
+			throw ExceptionTranslator.translateExceptionIfPossible(e);
+		}
+	}
 	
 }

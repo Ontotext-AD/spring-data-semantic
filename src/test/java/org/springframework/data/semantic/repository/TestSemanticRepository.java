@@ -290,5 +290,31 @@ public class TestSemanticRepository {
 		assertNotNull(entity);
 		assertTrue(entity.getUri().equals(MODEL_ENTITY.ENTITY_ONE) || entity.getUri().equals(MODEL_ENTITY.ENTITY_TWO));
 	}
+	
+	@Test
+	public void testCountBySimpleProperty(){
+		long count = modelEntityRepository.countByName("Model Entity One");
+		assertEquals(1, count);
+	}
+	
+	@Test
+	public void testCountByCollectionProperty(){
+		long count = modelEntityRepository.countBySynonyms(Arrays.asList("Model Entity Eins", "Model Entity Uno"));
+		assertEquals(1, count);
+	}
+	
+	@Test
+	public void testCountByAssociation(){
+		ModelEntity modelEntityThree = new ModelEntity();
+		modelEntityThree.setUri(MODEL_ENTITY.ENTITY_THREE);
+		long count = modelEntityRepository.countByRelated(Arrays.asList(modelEntityThree));
+		assertEquals(2, count);
+	}
+	
+	@Test
+	public void testCountByAssociationURI(){
+		long count = modelEntityRepository.countByRelated(MODEL_ENTITY.ENTITY_THREE);
+		assertEquals(2, count);
+	}
 
 }

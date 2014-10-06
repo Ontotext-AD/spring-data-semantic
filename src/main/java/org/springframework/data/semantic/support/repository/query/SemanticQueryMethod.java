@@ -19,8 +19,7 @@ public class SemanticQueryMethod extends QueryMethod {
 	
 	public RepositoryQuery createQuery(SemanticOperationsCRUD operations){
 		if(tree.isCountProjection()){
-			//TODO
-			return null;
+			return new CountSemanticRepositoryQuery(operations, this.getName(), this.getDomainClass(), this.getParameters());
 		}
 		else if(tree.isDelete()){
 			//TODO

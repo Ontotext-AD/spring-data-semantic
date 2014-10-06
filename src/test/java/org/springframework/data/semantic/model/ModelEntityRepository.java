@@ -17,6 +17,14 @@ public interface ModelEntityRepository extends SemanticRepository<ModelEntity> {
 	
 	List<ModelEntity> findByRelated(URI related);
 	
+	Long countByName(String name);
+	
+	Long countBySynonyms(List<String> synonyms);
+	
+	Long countByRelated(List<ModelEntity> related);
+	
+	Long countByRelated(URI related);
+	
 	ModelEntity findOneByRelated(URI related);
 
 }
