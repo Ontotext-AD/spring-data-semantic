@@ -68,7 +68,7 @@ public class TestEntityToQueryConverter {
 
 	@Test
 	public void TestPatternCreation(){
-		String queryPattern = entityToQueryConverter.getPropertyPatterns(resource, testEntityType, new HashMap<String, Object>());
+		String queryPattern = entityToQueryConverter.getPropertyPatterns(resource, testEntityType, new HashMap<String, Object>(), false);
 		String[] expected = expectedPattern.replaceAll("\\{|\\}", " ").replaceAll("\\s+", " ").split(" \\. ");
 		String[] resultPattern = queryPattern.replaceAll("\\{|\\}", " ").replaceAll("\\s+", " ").split(" \\. ");
 		Arrays.sort(expected, comparator);
@@ -100,7 +100,7 @@ public class TestEntityToQueryConverter {
 	
 	@Test
 	public void TestPatternCreationEagerLoad(){
-		String queryPattern = entityToQueryConverter.getPropertyPatterns(collectionResource, testCollectionType, new HashMap<String, Object>());
+		String queryPattern = entityToQueryConverter.getPropertyPatterns(collectionResource, testCollectionType, new HashMap<String, Object>(), false);
 		String[] expected = expectedPatternEager.replaceAll("\\{|\\}", " ").replaceAll("\\s+", " ").split(" \\. ");
 		String[] resultPattern = queryPattern.replaceAll("\\{|\\}", " ").replaceAll("\\s+", " ").split(" \\. ");
 		Arrays.sort(expected, comparator);
