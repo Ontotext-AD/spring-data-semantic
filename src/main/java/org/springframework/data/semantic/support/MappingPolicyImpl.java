@@ -52,10 +52,9 @@ public class MappingPolicyImpl implements MappingPolicy{
 		else{
 			Set<Cascade> intersection = new HashSet<Cascade>();
 			intersection.addAll(this.cascades);
-			intersection.removeAll(other.getCascades());
+			intersection.retainAll(other.getCascades());
 			return new MappingPolicyImpl(intersection);
 		}
-		
 	}
 
 }
