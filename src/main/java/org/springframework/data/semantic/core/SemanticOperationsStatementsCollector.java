@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.openrdf.model.Model;
 import org.openrdf.model.URI;
+import org.springframework.data.semantic.mapping.MappingPolicy;
 import org.springframework.data.semantic.mapping.SemanticPersistentProperty;
 
 public interface SemanticOperationsStatementsCollector {
@@ -15,7 +16,7 @@ public interface SemanticOperationsStatementsCollector {
 	
 	<T> Long getCountForResourceAndProperties(Class<? extends T> clazz, Map<String, Object> parameterToValue);
 
-	<T> Model getStatementsForResource(URI resource, Class<? extends T> clazz);
+	<T> Model getStatementsForResource(URI resource, Class<? extends T> clazz, MappingPolicy globalMappingPolicy);
 	
 	<T> Collection<Model> getStatementsForResources(Class<? extends T> clazz);
 	

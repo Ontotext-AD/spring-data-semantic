@@ -17,6 +17,7 @@ import org.openrdf.model.impl.URIImpl;
 import org.springframework.data.semantic.mapping.SemanticPersistentEntity;
 import org.springframework.data.semantic.model.ModelEntity;
 import org.springframework.data.semantic.model.ModelEntityCollector;
+import org.springframework.data.semantic.support.MappingPolicyImpl;
 import org.springframework.data.semantic.support.mapping.SemanticMappingContext;
 import org.springframework.data.util.ClassTypeInformation;
 
@@ -58,7 +59,7 @@ public class TestEntityToQueryConverter {
 	
 	@Test
 	public void TestBindingCreation(){
-		String queryBindings = entityToQueryConverter.getPropertyBindings(resource, testEntityType, new HashMap<String, Object>());
+		String queryBindings = entityToQueryConverter.getPropertyBindings(resource, testEntityType, new HashMap<String, Object>(), MappingPolicyImpl.ALL_POLICY);
 		String[] expected = expectedBindings.replaceAll("\\s+", " ").split(" \\. ");
 		String[] resultBindings = queryBindings.replaceAll("\\s+", " ").split(" \\. ");
 		Arrays.sort(expected, comparator);
@@ -68,7 +69,7 @@ public class TestEntityToQueryConverter {
 
 	@Test
 	public void TestPatternCreation(){
-		String queryPattern = entityToQueryConverter.getPropertyPatterns(resource, testEntityType, new HashMap<String, Object>(), false);
+		String queryPattern = entityToQueryConverter.getPropertyPatterns(resource, testEntityType, new HashMap<String, Object>(), false, MappingPolicyImpl.ALL_POLICY);
 		String[] expected = expectedPattern.replaceAll("\\{|\\}", " ").replaceAll("\\s+", " ").split(" \\. ");
 		String[] resultPattern = queryPattern.replaceAll("\\{|\\}", " ").replaceAll("\\s+", " ").split(" \\. ");
 		Arrays.sort(expected, comparator);
@@ -80,7 +81,7 @@ public class TestEntityToQueryConverter {
 	
 	@Test
 	public void TestGraphQueryCreation(){
-		String query = entityToQueryConverter.getGraphQueryForResource(resource, testEntityType);
+		String query = entityToQueryConverter.getGraphQueryForResource(resource, testEntityType, MappingPolicyImpl.ALL_POLICY);
 		String[] expected = expectedQuery.replaceAll("\\{|\\}", " ").replaceAll("\\s+", " ").split(" \\. ");
 		String[] resultBindings = query.replaceAll("\\{|\\}", " ").replaceAll("\\s+", " ").split(" \\. ");
 		Arrays.sort(expected, comparator);
@@ -90,7 +91,7 @@ public class TestEntityToQueryConverter {
 	
 	@Test
 	public void TestBindingCreationEagerLoad(){
-		String queryBindings = entityToQueryConverter.getPropertyBindings(collectionResource, testCollectionType, new HashMap<String, Object>());
+		String queryBindings = entityToQueryConverter.getPropertyBindings(collectionResource, testCollectionType, new HashMap<String, Object>(), MappingPolicyImpl.ALL_POLICY);
 		String[] expected = expectedBindingsEager.replaceAll("\\s+", " ").split(" \\. ");
 		String[] resultBindings = queryBindings.replaceAll("\\s+", " ").split(" \\. ");
 		Arrays.sort(expected, comparator);
@@ -100,7 +101,7 @@ public class TestEntityToQueryConverter {
 	
 	@Test
 	public void TestPatternCreationEagerLoad(){
-		String queryPattern = entityToQueryConverter.getPropertyPatterns(collectionResource, testCollectionType, new HashMap<String, Object>(), false);
+		String queryPattern = entityToQueryConverter.getPropertyPatterns(collectionResource, testCollectionType, new HashMap<String, Object>(), false, MappingPolicyImpl.ALL_POLICY);
 		String[] expected = expectedPatternEager.replaceAll("\\{|\\}", " ").replaceAll("\\s+", " ").split(" \\. ");
 		String[] resultPattern = queryPattern.replaceAll("\\{|\\}", " ").replaceAll("\\s+", " ").split(" \\. ");
 		Arrays.sort(expected, comparator);
@@ -110,7 +111,7 @@ public class TestEntityToQueryConverter {
 	
 	@Test
 	public void TestGraphQueryCreationEagerLoad(){
-		String query = entityToQueryConverter.getGraphQueryForResource(collectionResource, testCollectionType);
+		String query = entityToQueryConverter.getGraphQueryForResource(collectionResource, testCollectionType, MappingPolicyImpl.ALL_POLICY);
 		String[] expected = expectedQueryEager.replaceAll("\\{|\\}", " ").replaceAll("\\s+", " ").split(" \\. ");
 		String[] resultBindings = query.replaceAll("\\{|\\}", " ").replaceAll("\\s+", " ").split(" \\. ");
 		Arrays.sort(expected);

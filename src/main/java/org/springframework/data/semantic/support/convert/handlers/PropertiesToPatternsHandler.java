@@ -9,6 +9,7 @@ import org.openrdf.model.URI;
 import org.openrdf.model.Value;
 import org.springframework.data.mapping.Association;
 import org.springframework.data.semantic.convert.ObjectToLiteralConverter;
+import org.springframework.data.semantic.mapping.MappingPolicy;
 import org.springframework.data.semantic.mapping.SemanticPersistentEntity;
 import org.springframework.data.semantic.mapping.SemanticPersistentProperty;
 import org.springframework.data.semantic.support.Cascade;
@@ -24,12 +25,14 @@ public class PropertiesToPatternsHandler extends AbstractPropertiesToQueryHandle
 	private ObjectToLiteralConverter objectToLiteralConverter;
 	private int depth;
 	private boolean isCount;
+	private final MappingPolicy globalMappingPolicy;
 	
-	public PropertiesToPatternsHandler(StringBuilder sb, String binding, Map<String, Object> propertyToValue, SemanticMappingContext mappingContext, boolean isCount){
-		this(sb, binding, propertyToValue, mappingContext, 0, isCount);
+	
+	public PropertiesToPatternsHandler(StringBuilder sb, String binding, Map<String, Object> propertyToValue, SemanticMappingContext mappingContext, boolean isCount, MappingPolicy globalMappingPolicy){
+		this(sb, binding, propertyToValue, mappingContext, 0, isCount, globalMappingPolicy);
 	}
 	
-	public PropertiesToPatternsHandler(StringBuilder sb, String binding, Map<String, Object> propertyToValue, SemanticMappingContext mappingContext, int depth, boolean isCount){
+	public PropertiesToPatternsHandler(StringBuilder sb, String binding, Map<String, Object> propertyToValue, SemanticMappingContext mappingContext, int depth, boolean isCount, MappingPolicy globalMappingPolicy){
 		super(mappingContext);
 		this.sb = sb;
 		this.binding = binding;
@@ -37,6 +40,7 @@ public class PropertiesToPatternsHandler extends AbstractPropertiesToQueryHandle
 		this.objectToLiteralConverter = ObjectToLiteralConverter.getInstance();
 		this.depth = depth;
 		this.isCount = isCount;
+		this.globalMappingPolicy = globalMappingPolicy;
 	}
 
 	@Override
@@ -66,12 +70,12 @@ public class PropertiesToPatternsHandler extends AbstractPropertiesToQueryHandle
 			sb.append("OPTIONAL { ");
 		}
 		handlePersistentProperty(persistentProperty);
-		if(persistentProperty.getMappingPolicy().shouldCascade(Cascade.GET)){
+		if(persistentProperty.getMappingPolicy().combineWith(globalMappingPolicy).shouldCascade(Cascade.GET)){
 			SemanticPersistentEntity<?> associatedPersistentEntity = mappingContext.getPersistentEntity(persistentProperty.getActualType());
 			if(objectValue == null){
 				String associationBinding = persistentProperty.getBindingName();
 				appendPattern(sb, associationBinding, "<"+ValueUtils.RDF_TYPE_PREDICATE+">", "<"+associatedPersistentEntity.getRDFType()+">");
-				PropertiesToPatternsHandler associationHandler = new PropertiesToPatternsHandler(this.sb, associationBinding, new HashMap<String, Object>(), this.mappingContext, ++this.depth, this.isCount);
+				PropertiesToPatternsHandler associationHandler = new PropertiesToPatternsHandler(this.sb, associationBinding, new HashMap<String, Object>(), this.mappingContext, ++this.depth, this.isCount, globalMappingPolicy);
 				associatedPersistentEntity.doWithProperties(associationHandler);
 				associatedPersistentEntity.doWithAssociations(associationHandler);
 			}

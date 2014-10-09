@@ -158,7 +158,7 @@ public class SemanticEntityCreationTest {
 	private Model getTestStatements() throws QueryInterruptedException, RepositoryException, QueryCreationException, QueryEvaluationException, MalformedQueryException {
 		URI resource = new URIImpl("http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#LongridgeMerlot");
 		
-		Model statements =  statementsCollector.getStatementsForResource(resource, Merlot.class);
+		Model statements =  statementsCollector.getStatementsForResource(resource, Merlot.class, MappingPolicyImpl.ALL_POLICY);
 		return statements;
 		
 		

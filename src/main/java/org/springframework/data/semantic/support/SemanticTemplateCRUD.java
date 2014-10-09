@@ -139,7 +139,7 @@ public class SemanticTemplateCRUD implements SemanticOperationsCRUD, Initializin
 		@SuppressWarnings("unchecked")
 		SemanticPersistentEntity<T> persistentEntity = (SemanticPersistentEntity<T>) this.mappingContext.getPersistentEntity(entity.getClass());
 		URI id = persistentEntity.getResourceId(entity);
-		Model dbState = this.statementsCollector.getStatementsForResource(id, entity.getClass());
+		Model dbState = this.statementsCollector.getStatementsForResource(id, entity.getClass(), MappingPolicyImpl.DEFAULT_POLICY);
 		entity = this.entityPersister.persistEntity(entity, new RDFState(dbState));
 		entityCache.put(entity);
 		return entity;
@@ -152,7 +152,7 @@ public class SemanticTemplateCRUD implements SemanticOperationsCRUD, Initializin
 			@SuppressWarnings("unchecked")
 			SemanticPersistentEntity<T> persistentEntity = (SemanticPersistentEntity<T>) this.mappingContext.getPersistentEntity(entity.getClass());
 			URI id = persistentEntity.getResourceId(entity);
-			Model dbState = this.statementsCollector.getStatementsForResource(id, entity.getClass());
+			Model dbState = this.statementsCollector.getStatementsForResource(id, entity.getClass(), MappingPolicyImpl.DEFAULT_POLICY);
 			entityToExistingState.put(entity, new RDFState(dbState));
 		}
 		return this.entityPersister.persistEntities(entityToExistingState);
@@ -173,7 +173,7 @@ public class SemanticTemplateCRUD implements SemanticOperationsCRUD, Initializin
 		T entity = entityCache.get(resourceId, clazz);
 		if(entity == null){
 			try{
-				entity = createEntity(this.statementsCollector.getStatementsForResource(resourceId, clazz), clazz);
+				entity = createEntity(this.statementsCollector.getStatementsForResource(resourceId, clazz, MappingPolicyImpl.ALL_POLICY), clazz);
 				entityCache.put(entity);
 			} catch (DataAccessException e){
 				logger.error(e.getMessage(), e);

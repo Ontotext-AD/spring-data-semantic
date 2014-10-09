@@ -5,8 +5,10 @@ import java.util.LinkedList;
 import java.util.Map;
 
 import org.openrdf.model.URI;
+import org.springframework.data.semantic.mapping.MappingPolicy;
 import org.springframework.data.semantic.mapping.SemanticPersistentEntity;
 import org.springframework.data.semantic.mapping.SemanticPersistentProperty;
+import org.springframework.data.semantic.support.MappingPolicyImpl;
 import org.springframework.data.semantic.support.convert.handlers.AbstractPropertiesToQueryHandler;
 import org.springframework.data.semantic.support.convert.handlers.PropertiesToBindingsHandler;
 import org.springframework.data.semantic.support.convert.handlers.PropertiesToPatternsHandler;
@@ -57,8 +59,8 @@ public class EntityToQueryConverter {
 	 * @param entity - the container which holds the information about that entity
 	 * @return
 	 */
-	public String getGraphQueryForResource(URI uri, SemanticPersistentEntity<?> entity){
-		return getGraphQueryForResource(uri, entity, new HashMap<String, Object>());
+	public String getGraphQueryForResource(URI uri, SemanticPersistentEntity<?> entity, MappingPolicy globalMappingPolicy){
+		return getGraphQueryForResource(uri, entity, new HashMap<String, Object>(), globalMappingPolicy);
 	}
 	
 	/**
@@ -69,14 +71,14 @@ public class EntityToQueryConverter {
 	 * @param propertiesToValues - the properties with their required values
 	 * @return
 	 */
-	public String getGraphQueryForResource(URI uri, SemanticPersistentEntity<?> entity, Map<String, Object> propertyToValue){
+	public String getGraphQueryForResource(URI uri, SemanticPersistentEntity<?> entity, Map<String, Object> propertyToValue, MappingPolicy globalMappingPolicy){
 		StringBuilder sb = new StringBuilder();
 		
 		sb.append("CONSTRUCT { ");
-		sb.append(getPropertyBindings(uri, entity, propertyToValue));
+		sb.append(getPropertyBindings(uri, entity, propertyToValue, globalMappingPolicy));
 		sb.append(" }\n");
 		sb.append("WHERE { ");
-		sb.append(getPropertyPatterns(uri, entity, propertyToValue, false));
+		sb.append(getPropertyPatterns(uri, entity, propertyToValue, false, globalMappingPolicy));
 		sb.append(" }");
 		
 		return sb.toString();
@@ -91,7 +93,7 @@ public class EntityToQueryConverter {
 		StringBuilder sb = new StringBuilder();
 		String subjectBinding  = getSubjectBinding(null, entity);
 		sb.append("SELECT (COUNT (DISTINCT "+subjectBinding+") as ?count) WHERE { "+subjectBinding+" a <"+entity.getRDFType()+"> . ");
-		sb.append(getPropertyPatterns(null, entity, propertyToValue, true));
+		sb.append(getPropertyPatterns(null, entity, propertyToValue, true, MappingPolicyImpl.ALL_POLICY));
 		sb.append("}");
 		return sb.toString();
 		
@@ -115,10 +117,10 @@ public class EntityToQueryConverter {
 		StringBuilder sb = new StringBuilder();
 		
 		sb.append("CONSTRUCT { ");
-		sb.append(getPropertyBindings(null, entity, propertyToValue));
+		sb.append(getPropertyBindings(null, entity, propertyToValue, MappingPolicyImpl.ALL_POLICY));
 		sb.append(" }\n");
 		sb.append("WHERE { ");
-		sb.append(getPropertyPatterns(null, entity, propertyToValue, false));
+		sb.append(getPropertyPatterns(null, entity, propertyToValue, false, MappingPolicyImpl.ALL_POLICY));
 		sb.append(" }");
 		
 		return sb.toString();
@@ -134,11 +136,11 @@ public class EntityToQueryConverter {
 	 * @param entity - the container holding the information about the entity's structure
 	 * @return
 	 */
-	protected String getPropertyBindings(URI uri, SemanticPersistentEntity<?> entity, Map<String, Object> propertyToValue){
+	protected String getPropertyBindings(URI uri, SemanticPersistentEntity<?> entity, Map<String, Object> propertyToValue, MappingPolicy globalMappingPolicy){
 		StringBuilder sb = new StringBuilder();
 		String subjectBinding = getSubjectBinding(uri, entity);
 		AbstractPropertiesToQueryHandler.appendPattern(sb, subjectBinding, "a", "<"+entity.getRDFType()+">");
-		PropertiesToBindingsHandler handler = new PropertiesToBindingsHandler(sb, subjectBinding, propertyToValue, this.mappingContext);
+		PropertiesToBindingsHandler handler = new PropertiesToBindingsHandler(sb, subjectBinding, propertyToValue, this.mappingContext, globalMappingPolicy);
 		entity.doWithProperties(handler);
 		entity.doWithAssociations(handler);
 		return sb.toString();
@@ -165,11 +167,11 @@ public class EntityToQueryConverter {
 	 */
 	protected String getPropertyPattern(URI uri, SemanticPersistentEntity<?> entity, SemanticPersistentProperty property){
 		StringBuilder sb = new StringBuilder();
-		new PropertiesToPatternsHandler(sb, "<"+uri+">", new HashMap<String, Object>(), this.mappingContext, false).doWithPersistentProperty(property);
+		new PropertiesToPatternsHandler(sb, "<"+uri+">", new HashMap<String, Object>(), this.mappingContext, false, MappingPolicyImpl.ALL_POLICY).doWithPersistentProperty(property);
 		return sb.toString();
 	}
 	
-	protected String getPropertyPatterns(URI uri, SemanticPersistentEntity<?> entity, Map<String, Object> propertyToValue, boolean isCount){
+	protected String getPropertyPatterns(URI uri, SemanticPersistentEntity<?> entity, Map<String, Object> propertyToValue, boolean isCount, MappingPolicy globalMappingPolicy){
 		StringBuilder sb = new StringBuilder();
 		/*SemanticPersistentProperty contextP = entity.getContextProperty();
 		if(contextP != null){
@@ -185,7 +187,7 @@ public class EntityToQueryConverter {
 			binding = "?"+entity.getRDFType().getLocalName();
 		}
 		AbstractPropertiesToQueryHandler.appendPattern(sb, binding, "<"+ValueUtils.RDF_TYPE_PREDICATE+">", "<"+entity.getRDFType()+">");
-		PropertiesToPatternsHandler handler = new PropertiesToPatternsHandler(sb, binding, propertyToValue, this.mappingContext, isCount);
+		PropertiesToPatternsHandler handler = new PropertiesToPatternsHandler(sb, binding, propertyToValue, this.mappingContext, isCount, globalMappingPolicy);
 		entity.doWithProperties(handler);
 		entity.doWithAssociations(handler);
 		return sb.toString();

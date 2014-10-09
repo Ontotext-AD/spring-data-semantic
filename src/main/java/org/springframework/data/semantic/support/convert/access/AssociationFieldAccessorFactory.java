@@ -12,6 +12,7 @@ import org.springframework.data.semantic.convert.access.FieldAccessorFactory;
 import org.springframework.data.semantic.core.SemanticOperationsCRUD;
 import org.springframework.data.semantic.mapping.MappingPolicy;
 import org.springframework.data.semantic.mapping.SemanticPersistentProperty;
+import org.springframework.data.semantic.support.MappingPolicyImpl;
 import org.springframework.data.semantic.support.SemanticTemplateStatementsCollector;
 
 /**
@@ -81,7 +82,7 @@ public class AssociationFieldAccessorFactory implements FieldAccessorFactory {
 				Set<Resource> subjects = stIterator.subjects();
 				List<Object> result = new ArrayList<Object>(subjects.size());
 				for(Resource subject : subjects){
-					Model iterator = statementsCollector.getStatementsForResource((URI) subject, fieldType);
+					Model iterator = statementsCollector.getStatementsForResource((URI) subject, fieldType, MappingPolicyImpl.ALL_POLICY);
 					result.add(operations.createEntity(iterator, fieldType));
 				}
 				if(this.property.isArray()){
@@ -95,7 +96,7 @@ public class AssociationFieldAccessorFactory implements FieldAccessorFactory {
 				if(!stIterator.isEmpty()) {
 					
 					URI resource = (URI) stIterator.objects().iterator().next();
-					Model iterator = statementsCollector.getStatementsForResource(resource, fieldType);
+					Model iterator = statementsCollector.getStatementsForResource(resource, fieldType, MappingPolicyImpl.ALL_POLICY);
 					
 					return operations.createEntity(iterator, fieldType);
 				}

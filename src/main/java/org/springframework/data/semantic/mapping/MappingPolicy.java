@@ -1,6 +1,8 @@
 package org.springframework.data.semantic.mapping;
 
 
+import java.util.Set;
+
 import org.springframework.data.semantic.convert.access.FieldAccessor;
 import org.springframework.data.semantic.support.Cascade;
 
@@ -22,6 +24,8 @@ public interface MappingPolicy {
     boolean useDirty();
     
     boolean shouldCascade(Cascade cascade);
+    
+    Set<Cascade> getCascades();
     
     MappingPolicy combineWith(MappingPolicy other);
 }

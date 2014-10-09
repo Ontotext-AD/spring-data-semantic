@@ -9,6 +9,7 @@ import org.openrdf.model.URI;
 import org.openrdf.model.Value;
 import org.springframework.data.mapping.Association;
 import org.springframework.data.semantic.convert.ObjectToLiteralConverter;
+import org.springframework.data.semantic.mapping.MappingPolicy;
 import org.springframework.data.semantic.mapping.SemanticPersistentEntity;
 import org.springframework.data.semantic.mapping.SemanticPersistentProperty;
 import org.springframework.data.semantic.support.Cascade;
@@ -21,23 +22,20 @@ public class PropertiesToBindingsHandler extends AbstractPropertiesToQueryHandle
 	private Map<String, Object> propertyToValue;
 	private ObjectToLiteralConverter objectToLiteralConverter;
 	private int depth;
+	private final MappingPolicy globalMappingPolicy;
 	
-	public PropertiesToBindingsHandler(StringBuilder sb, String binding, Map<String, Object> propertyToValue, SemanticMappingContext mappingContext){
-		super(mappingContext);
-		this.sb = sb;
-		this.binding = binding;
-		this.propertyToValue = propertyToValue;
-		this.objectToLiteralConverter = ObjectToLiteralConverter.getInstance();
-		this.depth = 0;
+	public PropertiesToBindingsHandler(StringBuilder sb, String binding, Map<String, Object> propertyToValue, SemanticMappingContext mappingContext, MappingPolicy globalMappingPolicy){
+		this(sb, binding, propertyToValue, mappingContext, 0, globalMappingPolicy);
 	}
 	
-	public PropertiesToBindingsHandler(StringBuilder sb, String binding, Map<String, Object> propertyToValue, SemanticMappingContext mappingContext, int depth){
+	public PropertiesToBindingsHandler(StringBuilder sb, String binding, Map<String, Object> propertyToValue, SemanticMappingContext mappingContext, int depth, MappingPolicy globalMappingPolicy){
 		super(mappingContext);
 		this.sb = sb;
 		this.binding = binding;
 		this.propertyToValue = propertyToValue;
 		this.objectToLiteralConverter = ObjectToLiteralConverter.getInstance();
 		this.depth = depth;
+		this.globalMappingPolicy = globalMappingPolicy;
 	}
 	
 	@Override
@@ -88,10 +86,10 @@ public class PropertiesToBindingsHandler extends AbstractPropertiesToQueryHandle
 		Object objectValue = propertyToValue.get(persistentProperty.getName());
 		if(objectValue == null){
 			appendPattern(sb, binding, "<" + persistentProperty.getAliasPredicate() + ">", associationBinding);
-			if(persistentProperty.getMappingPolicy().shouldCascade(Cascade.GET)){
+			if(persistentProperty.getMappingPolicy().combineWith(globalMappingPolicy).shouldCascade(Cascade.GET)){
 				SemanticPersistentEntity<?> associatedPersistentEntity = mappingContext.getPersistentEntity(persistentProperty.getActualType());
 				appendPattern(sb, associationBinding, "a", "<"+associatedPersistentEntity.getRDFType()+">");
-				PropertiesToBindingsHandler associationHandler = new PropertiesToBindingsHandler(this.sb, associationBinding, new HashMap<String, Object>(), this.mappingContext, ++this.depth);
+				PropertiesToBindingsHandler associationHandler = new PropertiesToBindingsHandler(this.sb, associationBinding, new HashMap<String, Object>(), this.mappingContext, ++this.depth, this.globalMappingPolicy);
 				associatedPersistentEntity.doWithProperties(associationHandler);
 				associatedPersistentEntity.doWithAssociations(associationHandler);
 			}
