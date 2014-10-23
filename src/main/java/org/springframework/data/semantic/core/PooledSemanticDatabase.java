@@ -22,8 +22,11 @@ import org.openrdf.query.BindingSet;
 import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.query.QueryInterruptedException;
+import org.openrdf.query.QueryLanguage;
 import org.openrdf.query.QueryResults;
 import org.openrdf.query.TupleQueryResult;
+import org.openrdf.query.Update;
+import org.openrdf.query.UpdateExecutionException;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
@@ -294,19 +297,39 @@ public class PooledSemanticDatabase implements SemanticDatabase{
 		}		
 	}
 
-	public void removeStatement(Resource subject, URI predicate, Value object) {
-		removeStatement(new StatementImpl(subject, predicate, object));	
+	public void removeStatements(Resource subject, URI predicate, Value object) {
+		removeStatements(subject, predicate, object, null);
 	}
 
-	public void removeStatement(Resource subject, URI predicate, Value object,
+	public void removeStatements(Resource subject, URI predicate, Value object,
 			Resource context) {
-		removeStatement(new ContextStatementImpl(subject, predicate, object, context));	
+		RepositoryConnection con = connectionPool.getConnection();
+		try {
+			con.begin();
+			con.remove(subject, predicate, object, context);
+			con.commit();
+		} catch (RepositoryException e) {
+			logger.error(e.getMessage(),e);
+			try {
+				con.rollback();
+			} catch (RepositoryException e1) {
+				logger.error(e.getMessage(),e);
+			}
+			throw new SemanticDatabaseAccessException(e);
+		} finally {
+			try {
+				con.close();
+			} catch (RepositoryException e) {
+				logger.error(e.getMessage(),e);
+			}
+		}
 	}
 	
 	@Override
-	public void removeStatement(Collection<? extends Statement> statements) {
+	public void removeStatements(Collection<? extends Statement> statements) {
 		RepositoryConnection con = connectionPool.getConnection();
 		try {
+			con.begin();
 			con.remove(statements);
 			con.commit();
 		} catch (RepositoryException e) {
@@ -416,6 +439,32 @@ public class PooledSemanticDatabase implements SemanticDatabase{
 				throw new SemanticDatabaseAccessException(e);
 			}
 		}
+	}
+
+	@Override
+	public void executeUpdateStatement(String update) {
+		RepositoryConnection con = this.connectionPool.getConnection();
+		try {
+			Update updateQuery = con.prepareUpdate(QueryLanguage.SPARQL, update);
+			updateQuery.execute();
+		} catch (RepositoryException e) {
+			logger.error(e.getMessage(),e);
+			throw new SemanticDatabaseAccessException(e);
+		} catch (MalformedQueryException e) {
+			logger.error(e.getMessage(),e);
+			throw new SemanticDatabaseAccessException(e);
+		} catch (UpdateExecutionException e) {
+			logger.error(e.getMessage(),e);
+			throw new SemanticDatabaseAccessException(e);
+		} finally {
+			try {
+				con.close();
+			} catch (RepositoryException e) {
+				logger.error(e.getMessage(),e);
+				throw new SemanticDatabaseAccessException(e);
+			}
+		}
+		
 	}
 
 

@@ -9,6 +9,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openrdf.model.Model;
 import org.openrdf.model.Namespace;
+import org.openrdf.model.URI;
 import org.openrdf.model.impl.LinkedHashModel;
 import org.openrdf.model.impl.URIImpl;
 import org.openrdf.query.BindingSet;
@@ -80,5 +81,12 @@ public class SemanticDatabaseTest {
 		model.add(new URIImpl("urn:test:statement2"), new URIImpl(ValueUtils.RDF_TYPE_PREDICATE), new URIImpl("unr:type:test-statement"));
 		sdb.addStatements(model);
 		assertEquals(count+2, sdb.count());
+	}
+	
+	@Test
+	public void testDeleteStatements(){
+		URI uri = new URIImpl("urn:test:statement2");
+		sdb.removeStatements(uri, null, null);
+		assertTrue(sdb.getStatementsForSubject(uri).isEmpty());
 	}
 }

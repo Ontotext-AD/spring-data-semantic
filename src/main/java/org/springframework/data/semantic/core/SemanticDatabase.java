@@ -212,7 +212,7 @@ public interface SemanticDatabase {
 	 * @param predicate
 	 * @param object
 	 */
-	void removeStatement(Resource subject, URI predicate, Value object);
+	void removeStatements(Resource subject, URI predicate, Value object);
 	
 	/**
 	 * Delete the {@link Statement} defined by the given subject, predicate, object and graph.
@@ -221,13 +221,19 @@ public interface SemanticDatabase {
 	 * @param object
 	 * @param context
 	 */
-	void removeStatement(Resource subject, URI predicate, Value object, Resource context);
+	void removeStatements(Resource subject, URI predicate, Value object, Resource context);
+	
+	/**
+	 * 
+	 * @param update
+	 */
+	void executeUpdateStatement(String update);
 	
 	/**
 	 * Delete the given {@link Collection} of {@link Statement}s from the repository.
 	 * @param statements
 	 */
-	void removeStatement(Collection<? extends Statement> statements);
+	void removeStatements(Collection<? extends Statement> statements);
 	
 	
 	/**

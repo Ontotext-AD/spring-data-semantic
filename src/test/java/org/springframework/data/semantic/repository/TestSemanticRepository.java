@@ -317,4 +317,10 @@ public class TestSemanticRepository {
 		assertEquals(2, count);
 	}
 
+	@Test
+	public void testDeleteAll(){
+		modelEntityRepository.deleteAll();
+		assertEquals(0, modelEntityRepository.count());
+	}
+	
 }

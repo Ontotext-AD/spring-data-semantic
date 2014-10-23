@@ -25,14 +25,15 @@ public class PropertiesToPatternsHandler extends AbstractPropertiesToQueryHandle
 	private ObjectToLiteralConverter objectToLiteralConverter;
 	private int depth;
 	private boolean isCount;
+	private boolean isDelete;
 	private final MappingPolicy globalMappingPolicy;
 	
 	
-	public PropertiesToPatternsHandler(StringBuilder sb, String binding, Map<String, Object> propertyToValue, SemanticMappingContext mappingContext, boolean isCount, MappingPolicy globalMappingPolicy){
-		this(sb, binding, propertyToValue, mappingContext, 0, isCount, globalMappingPolicy);
+	public PropertiesToPatternsHandler(StringBuilder sb, String binding, Map<String, Object> propertyToValue, SemanticMappingContext mappingContext, boolean isCount, boolean isDelete, MappingPolicy globalMappingPolicy){
+		this(sb, binding, propertyToValue, mappingContext, 0, isCount, isDelete, globalMappingPolicy);
 	}
 	
-	public PropertiesToPatternsHandler(StringBuilder sb, String binding, Map<String, Object> propertyToValue, SemanticMappingContext mappingContext, int depth, boolean isCount, MappingPolicy globalMappingPolicy){
+	public PropertiesToPatternsHandler(StringBuilder sb, String binding, Map<String, Object> propertyToValue, SemanticMappingContext mappingContext, int depth, boolean isCount, boolean isDelete, MappingPolicy globalMappingPolicy){
 		super(mappingContext);
 		this.sb = sb;
 		this.binding = binding;
@@ -40,6 +41,7 @@ public class PropertiesToPatternsHandler extends AbstractPropertiesToQueryHandle
 		this.objectToLiteralConverter = ObjectToLiteralConverter.getInstance();
 		this.depth = depth;
 		this.isCount = isCount;
+		this.isDelete = isDelete;
 		this.globalMappingPolicy = globalMappingPolicy;
 	}
 
@@ -62,7 +64,7 @@ public class PropertiesToPatternsHandler extends AbstractPropertiesToQueryHandle
 		//TODO handle existing value in propertyToValue
 		//handlePersistentProperty(persistentProperty);
 		Object objectValue = this.propertyToValue.get(persistentProperty.getName());
-		Boolean optional = persistentProperty.isOptional() && (objectValue == null);
+		Boolean optional = persistentProperty.isOptional() && (objectValue == null) && !isDelete;
 		if(optional && isCount){
 			return;
 		}
@@ -75,7 +77,7 @@ public class PropertiesToPatternsHandler extends AbstractPropertiesToQueryHandle
 			if(objectValue == null){
 				String associationBinding = persistentProperty.getBindingName();
 				appendPattern(sb, associationBinding, "<"+ValueUtils.RDF_TYPE_PREDICATE+">", "<"+associatedPersistentEntity.getRDFType()+">");
-				PropertiesToPatternsHandler associationHandler = new PropertiesToPatternsHandler(this.sb, associationBinding, new HashMap<String, Object>(), this.mappingContext, ++this.depth, this.isCount, globalMappingPolicy);
+				PropertiesToPatternsHandler associationHandler = new PropertiesToPatternsHandler(this.sb, associationBinding, new HashMap<String, Object>(), this.mappingContext, ++this.depth, this.isCount, this.isDelete, globalMappingPolicy);
 				associatedPersistentEntity.doWithProperties(associationHandler);
 				associatedPersistentEntity.doWithAssociations(associationHandler);
 			}
@@ -89,7 +91,7 @@ public class PropertiesToPatternsHandler extends AbstractPropertiesToQueryHandle
 	public void handlePersistentProperty(SemanticPersistentProperty persistentProperty) {
 		if(isRetrivableProperty(persistentProperty)){
 			Object objectValue = this.propertyToValue.get(persistentProperty.getName());
-			Boolean optional = persistentProperty.isOptional() && (objectValue == null) && !persistentProperty.isAssociation() ; //&& !isTransitiveOptional
+			Boolean optional = persistentProperty.isOptional() && (objectValue == null) && !persistentProperty.isAssociation() && !isDelete; //&& !isTransitiveOptional
 			if(optional && isCount){
 				return;
 			}

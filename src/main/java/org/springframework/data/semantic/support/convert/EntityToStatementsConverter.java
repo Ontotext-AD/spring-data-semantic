@@ -37,5 +37,11 @@ public class EntityToStatementsConverter {
 		return statements;
 	}
 	
+	public RDFState convertClassToDeleteStatements(SemanticPersistentEntity<?> persistentEntity){
+		RDFState statements = new RDFState();
+		//TODO
+		return statements;
+	}
+	
 
 }

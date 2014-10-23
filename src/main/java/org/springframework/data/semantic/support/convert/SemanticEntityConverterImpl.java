@@ -106,7 +106,7 @@ public class SemanticEntityConverterImpl implements SemanticEntityConverter {
 			EntityState<Object, RDFState> state = sourceStateTransmitter.copyPropertiesTo(wrapper, currentState);
 			mergedModel.merge(state.getPersistentState());
 		}
-		semanticDatabase.removeStatement(mergedModel.getDeleteStatements());
+		semanticDatabase.removeStatements(mergedModel.getDeleteStatements());
 		semanticDatabase.addStatements(mergedModel.getCurrentStatements());
 	}
 

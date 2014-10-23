@@ -10,6 +10,7 @@ import java.util.Set;
 
 import org.openrdf.model.Namespace;
 import org.openrdf.model.URI;
+import org.openrdf.model.Value;
 import org.openrdf.model.impl.URIImpl;
 import org.springframework.data.mapping.context.AbstractMappingContext;
 import org.springframework.data.mapping.model.SimpleTypeHolder;
@@ -27,7 +28,7 @@ import org.springframework.data.util.TypeInformation;
 public class SemanticMappingContext  extends AbstractMappingContext<SemanticPersistentEntity<?>, SemanticPersistentProperty>{
 	private static Set<Class<?>> simpleTypes = new HashSet<Class<?>>();
 	static {
-		simpleTypes.add(URI.class);
+		simpleTypes.add(Value.class);
 	}
 	
 	private Namespace defaultNS;

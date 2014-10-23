@@ -178,7 +178,7 @@ public class SemanticEntityState<T> implements
 
 	@Override
 	public T persist() {
-		semanticDb.removeStatement(state.getDeleteStatements());
+		semanticDb.removeStatements(state.getDeleteStatements());
 		state.getDeleteStatements().clear();
 		semanticDb.addStatements(state.getCurrentStatements());
 		return entity;

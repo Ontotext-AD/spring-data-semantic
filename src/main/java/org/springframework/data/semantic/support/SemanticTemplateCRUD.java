@@ -95,7 +95,7 @@ public class SemanticTemplateCRUD implements SemanticOperationsCRUD, Initializin
 				this.sourceStateTransmitter = new SemanticSourceStateTransmitter(this.sesFactory);
 				this.entityConverter = new SemanticEntityConverterImpl(this.mappingContext, this.conversionService, this.entityInstantiator, this.sourceStateTransmitter, this.entityToStatementsConverter, this.semanticDB);
 				this.entityPersister = new SemanticEntityPersisterImpl(this.entityConverter);
-				this.entityRemover = new SemanticEntityRemoverImpl(this.semanticDB, this.entityToStatementsConverter);
+				this.entityRemover = new SemanticEntityRemoverImpl(this.semanticDB, this.entityToStatementsConverter, this.mappingContext);
 				if(this.entityCache != null){
 					this.entityCache.clearAll();
 					if(applicationContext.getBeanNamesForType(CacheManager.class).length != 0){
@@ -229,8 +229,10 @@ public class SemanticTemplateCRUD implements SemanticOperationsCRUD, Initializin
 
 	@Override
 	public <T> void deleteAll(Class<? extends T> clazz) {
-		//TODO
-		throw new UnsupportedOperationException();
+		@SuppressWarnings("unchecked")
+		SemanticPersistentEntity<T> persistentEntity = (SemanticPersistentEntity<T>) this.mappingContext.getPersistentEntity(clazz);
+		entityCache.clear(clazz);
+		this.entityRemover.deleteAll(persistentEntity);
 	}
 
 	@Override
