@@ -7,6 +7,11 @@ import org.openrdf.model.ValueFactory;
 import org.openrdf.model.impl.ValueFactoryImpl;
 import org.springframework.core.convert.converter.Converter;
 
+/**
+ * 
+ * @author konstantin.pentchev
+ *
+ */
 public class ObjectToLiteralConverter implements Converter<Object, Value> {
 	
 	private static ObjectToLiteralConverter INSTANCE;
@@ -52,8 +57,11 @@ public class ObjectToLiteralConverter implements Converter<Object, Value> {
 		else if(source instanceof Double){
 			return factory.createLiteral((Double) source);
 		}
+		else if(source instanceof String){
+			return factory.createLiteral((String) source);
+		}
 		else {
-			return factory.createLiteral(source.toString());
+			return null;
 		}
 	}
 
