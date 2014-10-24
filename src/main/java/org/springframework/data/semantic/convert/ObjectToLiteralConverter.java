@@ -61,7 +61,7 @@ public class ObjectToLiteralConverter implements Converter<Object, Value> {
 			return factory.createLiteral((String) source);
 		}
 		else {
-			return null;
+			return factory.createLiteral(source.toString());
 		}
 	}
 
