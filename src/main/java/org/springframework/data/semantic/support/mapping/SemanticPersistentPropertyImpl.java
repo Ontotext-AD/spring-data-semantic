@@ -76,7 +76,7 @@ public class SemanticPersistentPropertyImpl extends
 	
 	public String getBindingName(){
 		if(bindingName == null){
-			bindingName = "?"+getOwner().getType().getSimpleName().toLowerCase()+"_"+getName();
+			bindingName = getOwner().getType().getSimpleName().toLowerCase()+"_"+getName();
 		}
 		return bindingName;
 	}

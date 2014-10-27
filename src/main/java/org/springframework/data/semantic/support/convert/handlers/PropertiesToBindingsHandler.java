@@ -75,14 +75,14 @@ public class PropertiesToBindingsHandler extends AbstractPropertiesToQueryHandle
 				}
 			}
 			else{
-				appendPattern(sb, binding, "<" + persistentProperty.getAliasPredicate() + ">", persistentProperty.getBindingName());
+				appendPattern(sb, binding, "<" + persistentProperty.getAliasPredicate() + ">", getObjectBinding(binding, persistentProperty));
 			}
 			
 		}
 	}
 	
 	private void handleAssociation(SemanticPersistentProperty persistentProperty) {
-		String associationBinding = persistentProperty.getBindingName();
+		String associationBinding = getObjectBinding(binding, persistentProperty);
 		Object objectValue = propertyToValue.get(persistentProperty.getName());
 		if(objectValue == null){
 			appendPattern(sb, binding, "<" + persistentProperty.getAliasPredicate() + ">", associationBinding);

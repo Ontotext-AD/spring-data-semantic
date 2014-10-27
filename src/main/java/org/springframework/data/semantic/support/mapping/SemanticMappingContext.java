@@ -8,6 +8,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.joda.time.Duration;
+import org.joda.time.Instant;
+import org.joda.time.Interval;
+import org.joda.time.Period;
 import org.openrdf.model.Namespace;
 import org.openrdf.model.URI;
 import org.openrdf.model.Value;
@@ -29,6 +33,10 @@ public class SemanticMappingContext  extends AbstractMappingContext<SemanticPers
 	private static Set<Class<?>> simpleTypes = new HashSet<Class<?>>();
 	static {
 		simpleTypes.add(Value.class);
+		simpleTypes.add(Period.class);
+		simpleTypes.add(Duration.class);
+		simpleTypes.add(Interval.class);
+		simpleTypes.add(Instant.class);
 	}
 	
 	private Namespace defaultNS;

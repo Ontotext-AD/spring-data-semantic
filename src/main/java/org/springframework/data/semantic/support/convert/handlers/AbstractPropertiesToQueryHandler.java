@@ -37,4 +37,15 @@ public abstract class AbstractPropertiesToQueryHandler implements PropertyHandle
 		sb.append(" . ");
 	}
 	
+	public static String getObjectBinding(String subjBinding, SemanticPersistentProperty persistentProperty){
+		String obj;
+		if(subjBinding.charAt(0) != '<'){
+			obj = subjBinding + "_" + persistentProperty.getBindingName();
+		}
+		else{
+			obj = "?" + persistentProperty.getBindingName();
+		}
+		return obj;
+	}
+	
 }

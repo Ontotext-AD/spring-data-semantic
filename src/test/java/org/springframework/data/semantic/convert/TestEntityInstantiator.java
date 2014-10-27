@@ -13,6 +13,7 @@ import org.openrdf.model.impl.LiteralImpl;
 import org.openrdf.model.impl.NamespaceImpl;
 import org.openrdf.model.impl.StatementImpl;
 import org.openrdf.model.impl.URIImpl;
+import org.openrdf.model.vocabulary.RDF;
 import org.springframework.data.semantic.core.RDFState;
 import org.springframework.data.semantic.mapping.SemanticPersistentEntity;
 import org.springframework.data.semantic.model.ModelEntity;
@@ -34,10 +35,10 @@ public class TestEntityInstantiator {
 	@Before
 	public void setupTest(){
 		state = new RDFState();
-		state.addStatement(new StatementImpl(id, namePredicate, name));
-		
 		mappingContext = new SemanticMappingContext(Arrays.asList(new NamespaceImpl("skos", "http://www.w3.org/2004/02/skos/core#")), new NamespaceImpl("", "urn:default:"));
 		testEntityType = (SemanticPersistentEntity<ModelEntity>) mappingContext.getPersistentEntity(ClassTypeInformation.from(ModelEntity.class));
+		state.addStatement(new StatementImpl(id, namePredicate, name));
+		state.addStatement(new StatementImpl(id, RDF.TYPE, testEntityType.getRDFType()));
 	}
 	
 	@Test

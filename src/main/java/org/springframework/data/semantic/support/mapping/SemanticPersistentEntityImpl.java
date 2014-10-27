@@ -2,6 +2,7 @@ package org.springframework.data.semantic.support.mapping;
 
 import org.openrdf.model.Resource;
 import org.openrdf.model.URI;
+import org.openrdf.model.vocabulary.RDF;
 import org.springframework.data.mapping.model.BasicPersistentEntity;
 import org.springframework.data.semantic.annotation.Namespace;
 import org.springframework.data.semantic.annotation.SemanticEntity;
@@ -80,7 +81,7 @@ public class SemanticPersistentEntityImpl<T> extends BasicPersistentEntity<T, Se
 
 	@Override
 	public void setPersistentState(Object entity, RDFState statements) {
-		URI subjectId = (URI) statements.getCurrentStatements().subjects().iterator().next();
+		URI subjectId = (URI) statements.getCurrentStatements().filter(null, RDF.TYPE, getRDFType()).subjects().iterator().next();
 		setResourceId(entity, subjectId);
 	}
 
