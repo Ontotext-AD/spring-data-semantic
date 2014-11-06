@@ -1,6 +1,6 @@
 package org.springframework.data.semantic.core;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.util.Properties;
@@ -18,17 +18,12 @@ import org.openrdf.query.TupleQueryResult;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
-import org.openrdf.repository.config.RepositoryConfig;
 import org.springframework.core.io.ClassPathResource;
 
 public class SemanticDatabaseManagerTest {
 
-	private static String url;
-	private static String securedUrl;
-	private static String newRepoID;
-	private static String username;
-	private static String password;
 	private static String localRepositoryBase;
+	private static String newRepoID;
 	
 	@BeforeClass
 	public static void prepare() {
@@ -41,10 +36,7 @@ public class SemanticDatabaseManagerTest {
 		}
 		
 		
-		url = props.getProperty("url", "");
-		securedUrl = props.getProperty("securedUrl", "");		
-		username = props.getProperty("username", "");
-		password = props.getProperty("password", "");
+		
 		
 		localRepositoryBase = props.getProperty("localRepositoryBase", "");		
 		newRepoID = "test-repo-"+String.valueOf((int)Math.floor(Math.random()*10000));
@@ -56,7 +48,7 @@ public class SemanticDatabaseManagerTest {
 	@Test
 	public void testCreateLocalRepoWithDefaultConfigAndCustomID() {
 		try {
-			Repository repo = SemanticDatabaseManager.getRepository(localRepositoryBase, newRepoID);
+			Repository repo = SemanticDatabaseManager.getRepository(localRepositoryBase+"/"+Protocol.REPOSITORIES+"/"+newRepoID, null);
 			assertTrue(testRepoSimple(repo));
 		} catch(Exception e) {
 			e.printStackTrace();
@@ -67,71 +59,14 @@ public class SemanticDatabaseManagerTest {
 	@Test
 	public void testOpenExistingLocalRepo() {
 		try {
-			Repository repo = SemanticDatabaseManager.getRepository(localRepositoryBase+"/"+Protocol.REPOSITORIES+"/"+newRepoID);
-			assertTrue(testRepoSimple(repo));
-		}catch (Exception e) {
-			e.printStackTrace();
-			assertTrue(false);
-		}
-	}
-	
-	@Test
-	public void testCreateLocalRepoWithCustomConfig() {		
-		RepositoryConfig config = null;
-		try {
-			config = SemanticDatabaseManager.getDefaultConfig();
-			config.setID(newRepoID);
-			Repository repo = SemanticDatabaseManager.getRepository(localRepositoryBase, "", config);
-			assertTrue(testRepoSimple(repo));
-		} catch (Exception e) {
-			e.printStackTrace();
-			assertTrue(false);
-		}		
-	}	
-	
-	
-	//----Remote repository tests----------------------------------------------
-		
-	//@Test
-	public void testCreateRemoteRepoWithDefaultConfig() {
-		try {
-			Repository repo = SemanticDatabaseManager.getRepository(url, newRepoID);
-			assertTrue(testRepoSimple(repo));
-		}catch(UnsupportedOperationException e) {
-			assertTrue(true);		
-		}catch (Exception e) {
-			e.printStackTrace();
-			assertTrue(false);
-		}		
-	}
-		
-	//@Test
-	public void testCreateRemoteRepoWithCustomConfig() {		
-		try {
-			RepositoryConfig config = SemanticDatabaseManager.getDefaultConfig();
-			config.setID(newRepoID);
-			Repository repo = SemanticDatabaseManager.getRepository(url, newRepoID, config);
-			
-			//Repository creation for remote locations is not allowed, the operation above should not succeed.
-			assertTrue(false);
-		}catch(UnsupportedOperationException e) {
-			assertTrue(true);
-		}catch (Exception e) {
-			e.printStackTrace();
-			assertTrue(false);
-		}
-	}
-	
-	//@Test
-	public void testOpenExistingRemoteRepo() {
-		try {
-			Repository repo = SemanticDatabaseManager.getRepository(url, "test");
+			Repository repo = SemanticDatabaseManager.getRepository(localRepositoryBase+"/"+Protocol.REPOSITORIES+"/"+newRepoID, null);
 			assertTrue(testRepoSimple(repo));
 		}catch (Exception e) {
 			e.printStackTrace();
 			assertTrue(false);
 		}
 	}	
+		
 	
 	
 	//----Auxiliary methods----------------------------------------------------

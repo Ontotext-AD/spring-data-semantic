@@ -31,6 +31,8 @@ import org.openrdf.rio.Rio;
 import org.openrdf.rio.helpers.StatementCollector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+import org.springframework.util.StringUtils;
 
 /**
  * Encapsulates the functionality for safe creation of repositories i.e. the
@@ -54,7 +56,7 @@ public class SemanticDatabaseManager {
 	private static final String DEFAULT_CONFIG_FILE = "META-INF/config/data-memory.ttl";
 
 	private static Map<String, RepositoryManager> openRepositoryManagers = new HashMap<String, RepositoryManager>();
-	private static Logger log = LoggerFactory
+	private static Logger logger = LoggerFactory
 			.getLogger(SemanticDatabaseManager.class);
 
 	// ----Public methods-------------------------------------------------------
@@ -79,7 +81,7 @@ public class SemanticDatabaseManager {
 	 * @return the initialized repository
 	 */
 	public static Repository getRepository(String baseURL, String repoId,
-			String username, String password, RepositoryConfig config) {
+			String username, String password, String configFile) {
 
 		Repository repo = null;
 		try {
@@ -94,13 +96,13 @@ public class SemanticDatabaseManager {
 					throw new UnsupportedOperationException(
 							"Repository creation for remote locations is not currently supported.");
 				}
-				repo = createRepository(manager, repoId, config);
+				repo = createRepository(manager, repoId, getConfig(configFile));
 			}
 
 		} catch (RepositoryException re) {
-			log.error("Error opening repository for location {}", baseURL, re);
+			logger.error("Error opening repository for location {}", baseURL, re);
 		} catch (RepositoryConfigException rce) {
-			log.error("Error opening repository for location {}", baseURL, rce);
+			logger.error("Error opening repository for location {}", baseURL, rce);
 		}
 
 		return repo;
@@ -108,36 +110,21 @@ public class SemanticDatabaseManager {
 
 	/**
 	 * see getRepository(String baseURL, String repoId, String username, String
-	 * password, RepositoryConfig config)
+	 * password, String configFile)
 	 */
-	public static Repository getRepository(String baseURL, String repoId,
-			RepositoryConfig config) {
-		return getRepository(baseURL, repoId, "", "", config);
+	public static Repository getRepository(String baseURL, String repoId, String configFile) {
+		return getRepository(baseURL, repoId, "", "", configFile);
 	}
 
-	/**
-	 * see getRepository(String baseURL, String repoId, String username, String
-	 * password, RepositoryConfig config)
-	 */
-	public static Repository getRepository(String baseURL, String repoId) {
-		return getRepository(baseURL, repoId, "", "", null);
-	}
-
-	public static Repository getRepository(String repoURL,
-			RepositoryConfig config) {
+	public static Repository getRepository(String repoURL, String configFile) {
 		String[] parts = parseRepositoryURL(repoURL);
-		return getRepository(parts[0], parts[1], config);
+		return getRepository(parts[0], parts[1], configFile);
 	}
 
 	public static Repository getRepository(String repoURL, String username,
-			String password, RepositoryConfig config) {
+			String password, String configFile) {
 		String[] parts = parseRepositoryURL(repoURL);
-		return getRepository(parts[0], parts[1], username, password, config);
-	}
-
-	public static Repository getRepository(String repoURL) {
-		String[] parts = parseRepositoryURL(repoURL);
-		return getRepository(parts[0], parts[1]);
+		return getRepository(parts[0], parts[1], username, password, configFile);
 	}
 
 	public static synchronized void shutdownManager(String baseURL) {
@@ -168,6 +155,42 @@ public class SemanticDatabaseManager {
 		defaultConfig.parse(graph, repositoryNode);
 		return defaultConfig;
 	}
+	
+	public static RepositoryConfig getConfig(String configFile){
+		Graph graph = new TreeModel();
+		PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
+		RDFParser rdfParser = Rio.createParser(RDFFormat.TURTLE);
+		rdfParser.setRDFHandler(new StatementCollector(graph));
+		if(StringUtils.hasText(configFile)){
+			try {
+				RepositoryConfig config = new RepositoryConfig();
+				
+				rdfParser.parse(resolver.getResource(configFile).getInputStream(), RepositoryConfigSchema.NAMESPACE);
+				Resource repositoryNode = GraphUtil.getUniqueSubject(graph, RDF.TYPE, RepositoryConfigSchema.REPOSITORY);
+				config.parse(graph, repositoryNode);
+				return config;
+			} catch (IOException e) {
+				logger.error("The given configuration file cannot be found at '" + configFile
+						+ "' - it is not a valid location or the file does not exist.", e);
+			} /*catch (Exception e) {
+				throw new IllegalArgumentException("The given location '" + url
+						+ "' is not a valid local repository location.", e);
+			}*/ catch (RepositoryConfigException e) {
+				logger.error("The given configuration file found at '" + configFile
+						+ "' - is not a valid sesame repository configuration file.", e);
+			} catch (RDFParseException e) {
+				logger.error("The given configuration file found at '" + configFile
+						+ "' - is not a valid sesame repository configuration file.", e);
+			} catch (RDFHandlerException e) {
+				logger.error("The given configuration file found at '" + configFile
+						+ "' - is not a valid sesame repository configuration file.", e);
+			} catch (GraphUtilException e) {
+				logger.error("The given configuration file found at '" + configFile
+						+ "' - is not a valid sesame repository configuration file.", e);
+			}
+		}
+		return null;
+	}
 
 	// ----Private methods------------------------------------------------------
 
@@ -177,11 +200,11 @@ public class SemanticDatabaseManager {
 
 		Repository repo;
 		if (config == null) {
-			log.info("Config is null, opening a repository with default config.");
+			logger.info("Config is null, opening a repository with default config.");
 			try {
 				config = getDefaultConfig();
 			} catch (Exception e) {
-				log.error("Cannot load default config. ", e);
+				logger.error("Cannot load default config. ", e);
 				return null;
 			}
 		}
@@ -203,7 +226,7 @@ public class SemanticDatabaseManager {
 
 		RepositoryManager repoManager;
 		if ((repoManager = openRepositoryManagers.get(serverURL)) != null) {
-			log.info("Repository manager found for base location {}.",
+			logger.info("Repository manager found for base location {}.",
 					serverURL);
 			return repoManager;
 		}
@@ -226,7 +249,7 @@ public class SemanticDatabaseManager {
 	private static RepositoryManager createNewLocalRepositoryManager(
 			String baseDir) throws RepositoryException {
 
-		log.info("Creating new local repository manager for base location {}.",
+		logger.info("Creating new local repository manager for base location {}.",
 				baseDir);
 		LocalRepositoryManager repoManager = new LocalRepositoryManager(
 				new File(baseDir));
@@ -238,7 +261,7 @@ public class SemanticDatabaseManager {
 			String serverURL, String username, String password)
 			throws RepositoryException {
 
-		log.info(
+		logger.info(
 				"Creating new remote repository manager for base location {}.",
 				serverURL);
 		RemoteRepositoryManager repoManager = new RemoteRepositoryManager(
