@@ -139,7 +139,7 @@ public class SemanticTemplateCRUD implements SemanticOperationsCRUD, Initializin
 		@SuppressWarnings("unchecked")
 		SemanticPersistentEntity<T> persistentEntity = (SemanticPersistentEntity<T>) this.mappingContext.getPersistentEntity(entity.getClass());
 		URI id = persistentEntity.getResourceId(entity);
-		Model dbState = this.statementsCollector.getStatementsForResource(id, entity.getClass(), MappingPolicyImpl.DEFAULT_POLICY);
+		Model dbState = this.statementsCollector.getStatementsForResourceOriginalPredicates(id, entity.getClass(), MappingPolicyImpl.DEFAULT_POLICY);
 		entity = this.entityPersister.persistEntity(entity, new RDFState(dbState));
 		entityCache.put(entity);
 		return entity;
@@ -152,7 +152,7 @@ public class SemanticTemplateCRUD implements SemanticOperationsCRUD, Initializin
 			@SuppressWarnings("unchecked")
 			SemanticPersistentEntity<T> persistentEntity = (SemanticPersistentEntity<T>) this.mappingContext.getPersistentEntity(entity.getClass());
 			URI id = persistentEntity.getResourceId(entity);
-			Model dbState = this.statementsCollector.getStatementsForResource(id, entity.getClass(), MappingPolicyImpl.DEFAULT_POLICY);
+			Model dbState = this.statementsCollector.getStatementsForResourceOriginalPredicates(id, entity.getClass(), MappingPolicyImpl.DEFAULT_POLICY);
 			entityToExistingState.put(entity, new RDFState(dbState));
 		}
 		return this.entityPersister.persistEntities(entityToExistingState);

@@ -59,7 +59,7 @@ public class TestEntityToQueryConverter {
 	
 	@Test
 	public void TestBindingCreation(){
-		String queryBindings = entityToQueryConverter.getPropertyBindings(resource, testEntityType, new HashMap<String, Object>(), MappingPolicyImpl.ALL_POLICY);
+		String queryBindings = entityToQueryConverter.getPropertyBindings(resource, testEntityType, new HashMap<String, Object>(), MappingPolicyImpl.ALL_POLICY, false);
 		String[] expected = expectedBindings.replaceAll("\\s+", " ").split(" \\. ");
 		String[] resultBindings = queryBindings.replaceAll("\\s+", " ").split(" \\. ");
 		Arrays.sort(expected, comparator);
@@ -91,7 +91,7 @@ public class TestEntityToQueryConverter {
 	
 	@Test
 	public void TestBindingCreationEagerLoad(){
-		String queryBindings = entityToQueryConverter.getPropertyBindings(collectionResource, testCollectionType, new HashMap<String, Object>(), MappingPolicyImpl.ALL_POLICY);
+		String queryBindings = entityToQueryConverter.getPropertyBindings(collectionResource, testCollectionType, new HashMap<String, Object>(), MappingPolicyImpl.ALL_POLICY, false);
 		String[] expected = expectedBindingsEager.replaceAll("\\s+", " ").split(" \\. ");
 		String[] resultBindings = queryBindings.replaceAll("\\s+", " ").split(" \\. ");
 		Arrays.sort(expected, comparator);

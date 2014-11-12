@@ -16,6 +16,8 @@ public interface SemanticOperationsStatementsCollector {
 	
 	<T> Long getCountForResourceAndProperties(Class<? extends T> clazz, Map<String, Object> parameterToValue);
 
+	<T> Model getStatementsForResourceOriginalPredicates(URI resource, Class<? extends T> clazz, MappingPolicy globalMappingPolicy);
+	
 	<T> Model getStatementsForResource(URI resource, Class<? extends T> clazz, MappingPolicy globalMappingPolicy);
 	
 	<T> Collection<Model> getStatementsForResources(Class<? extends T> clazz);

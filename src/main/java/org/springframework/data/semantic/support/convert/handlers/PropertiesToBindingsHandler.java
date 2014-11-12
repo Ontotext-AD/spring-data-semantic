@@ -13,6 +13,7 @@ import org.springframework.data.semantic.mapping.MappingPolicy;
 import org.springframework.data.semantic.mapping.SemanticPersistentEntity;
 import org.springframework.data.semantic.mapping.SemanticPersistentProperty;
 import org.springframework.data.semantic.support.Cascade;
+import org.springframework.data.semantic.support.Direction;
 import org.springframework.data.semantic.support.mapping.SemanticMappingContext;
 
 public class PropertiesToBindingsHandler extends AbstractPropertiesToQueryHandler {
@@ -23,12 +24,17 @@ public class PropertiesToBindingsHandler extends AbstractPropertiesToQueryHandle
 	private ObjectToLiteralConverter objectToLiteralConverter;
 	private int depth;
 	private final MappingPolicy globalMappingPolicy;
+	private final Boolean originalPredicates;
 	
 	public PropertiesToBindingsHandler(StringBuilder sb, String binding, Map<String, Object> propertyToValue, SemanticMappingContext mappingContext, MappingPolicy globalMappingPolicy){
-		this(sb, binding, propertyToValue, mappingContext, 0, globalMappingPolicy);
+		this(sb, binding, propertyToValue, mappingContext, 0, globalMappingPolicy, false);
 	}
 	
-	public PropertiesToBindingsHandler(StringBuilder sb, String binding, Map<String, Object> propertyToValue, SemanticMappingContext mappingContext, int depth, MappingPolicy globalMappingPolicy){
+	public PropertiesToBindingsHandler(StringBuilder sb, String binding, Map<String, Object> propertyToValue, SemanticMappingContext mappingContext, MappingPolicy globalMappingPolicy, Boolean originalPredicates){
+		this(sb, binding, propertyToValue, mappingContext, 0, globalMappingPolicy, originalPredicates);
+	}
+	
+	public PropertiesToBindingsHandler(StringBuilder sb, String binding, Map<String, Object> propertyToValue, SemanticMappingContext mappingContext, int depth, MappingPolicy globalMappingPolicy, Boolean originalPredicates){
 		super(mappingContext);
 		this.sb = sb;
 		this.binding = binding;
@@ -36,6 +42,7 @@ public class PropertiesToBindingsHandler extends AbstractPropertiesToQueryHandle
 		this.objectToLiteralConverter = ObjectToLiteralConverter.getInstance();
 		this.depth = depth;
 		this.globalMappingPolicy = globalMappingPolicy;
+		this.originalPredicates = originalPredicates;
 	}
 	
 	@Override
@@ -65,17 +72,32 @@ public class PropertiesToBindingsHandler extends AbstractPropertiesToQueryHandle
 					for(Object o : (Collection<Object>) objectValue){
 						Value val = this.objectToLiteralConverter.convert(o);
 						String obj = val instanceof URI ? "<"+val+">" : val.toString();
-						appendPattern(sb, binding, "<" + persistentProperty.getAliasPredicate() + ">", obj);
+						if(originalPredicates){
+							appendPattern(sb, binding, "<" + persistentProperty.getPredicate() + ">", obj);
+						}
+						else{
+							appendPattern(sb, binding, "<" + persistentProperty.getAliasPredicate() + ">", obj);
+						}
 					}
 				}
 				else{
 					Value val = this.objectToLiteralConverter.convert(objectValue);
 					String obj = val instanceof URI ? "<"+val+">" : val.toString();
-					appendPattern(sb, binding, "<" + persistentProperty.getAliasPredicate() + ">", obj);
+					if(originalPredicates){
+						appendPattern(sb, binding, "<" + persistentProperty.getPredicate() + ">", obj);
+					}
+					else{
+						appendPattern(sb, binding, "<" + persistentProperty.getAliasPredicate() + ">", obj);
+					}
 				}
 			}
 			else{
-				appendPattern(sb, binding, "<" + persistentProperty.getAliasPredicate() + ">", getObjectBinding(binding, persistentProperty));
+				if(originalPredicates){
+					appendPattern(sb, binding, "<" + persistentProperty.getPredicate() + ">", getObjectBinding(binding, persistentProperty));
+				}
+				else{
+					appendPattern(sb, binding, "<" + persistentProperty.getAliasPredicate() + ">", getObjectBinding(binding, persistentProperty));
+				}
 			}
 			
 		}
@@ -85,11 +107,25 @@ public class PropertiesToBindingsHandler extends AbstractPropertiesToQueryHandle
 		String associationBinding = getObjectBinding(binding, persistentProperty);
 		Object objectValue = propertyToValue.get(persistentProperty.getName());
 		if(objectValue == null){
-			appendPattern(sb, binding, "<" + persistentProperty.getAliasPredicate() + ">", associationBinding);
+			if(originalPredicates){
+				if(Direction.OUTGOING.equals(persistentProperty.getDirection())){
+					appendPattern(sb, binding, "<" + persistentProperty.getPredicate() + ">", associationBinding);
+				}
+				else if(Direction.INCOMING.equals(persistentProperty.getDirection())){
+					appendPattern(sb, associationBinding, "<" + persistentProperty.getPredicate() + ">", binding);
+				}
+				else{
+					appendPattern(sb, binding, "<" + persistentProperty.getPredicate() + ">", associationBinding);
+					appendPattern(sb, associationBinding, "<" + persistentProperty.getPredicate() + ">", binding);
+				}
+			}
+			else{
+				appendPattern(sb, binding, "<" + persistentProperty.getAliasPredicate() + ">", associationBinding);
+			}
 			if(persistentProperty.getMappingPolicy().combineWith(globalMappingPolicy).shouldCascade(Cascade.GET)){
 				SemanticPersistentEntity<?> associatedPersistentEntity = mappingContext.getPersistentEntity(persistentProperty.getActualType());
 				appendPattern(sb, associationBinding, "a", "<"+associatedPersistentEntity.getRDFType()+">");
-				PropertiesToBindingsHandler associationHandler = new PropertiesToBindingsHandler(this.sb, associationBinding, new HashMap<String, Object>(), this.mappingContext, ++this.depth, this.globalMappingPolicy);
+				PropertiesToBindingsHandler associationHandler = new PropertiesToBindingsHandler(this.sb, associationBinding, new HashMap<String, Object>(), this.mappingContext, ++this.depth, this.globalMappingPolicy, this.originalPredicates);
 				associatedPersistentEntity.doWithProperties(associationHandler);
 				associatedPersistentEntity.doWithAssociations(associationHandler);
 			}

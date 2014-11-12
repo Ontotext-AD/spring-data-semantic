@@ -57,6 +57,16 @@ public class SemanticTemplateStatementsCollector implements SemanticOperationsSt
 			throw ExceptionTranslator.translateExceptionIfPossible(e);
 		}
 	}	
+	
+	@Override
+	public <T> Model getStatementsForResourceOriginalPredicates(URI resource, Class<? extends T> clazz, MappingPolicy globalMappingPolicy){
+		try {
+			return semanticDB.getGraphQueryResults(
+					entityToQueryConverter.getGraphQueryForResourceWithOriginalPredicates(resource, getPersistentEntity(clazz), globalMappingPolicy));
+		} catch (Exception e) {
+			throw ExceptionTranslator.translateExceptionIfPossible(e);
+		}
+	}
 
 	@Override
 	public <T> Model getStatementsForResource(URI resource, Class<? extends T> clazz, MappingPolicy globalMappingPolicy) {

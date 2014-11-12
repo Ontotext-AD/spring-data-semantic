@@ -78,10 +78,11 @@ public class SemanticEntityConverterImpl implements SemanticEntityConverter {
         RDFState currentState = toStatementsConverter.convertEntityToStatements(persistentEntity, source);
 		if (dbStatements != null && !dbStatements.isEmpty()) {
 			//TODO optimize conversion of alias statements to actual statements
-			Object dbObject = read(source.getClass(), dbStatements);
-			RDFState dbState = toStatementsConverter.convertEntityToStatements(persistentEntity, dbObject);
-			dbState.getCurrentStatements().removeAll(currentState.getCurrentStatements());
-        	currentState.setDeleteStatements(dbState.getCurrentStatements());
+			//Object dbObject = read(source.getClass(), dbStatements);
+			//RDFState dbState = toStatementsConverter.convertEntityToStatements(persistentEntity, dbObject);
+			//dbState.getCurrentStatements().removeAll(currentState.getCurrentStatements());
+			dbStatements.getCurrentStatements().removeAll(currentState.getCurrentStatements());
+        	currentState.setDeleteStatements(dbStatements.getCurrentStatements());
         }
 		EntityState<Object, RDFState> state = sourceStateTransmitter.copyPropertiesTo(wrapper, currentState);
 		state.persist();
@@ -98,10 +99,11 @@ public class SemanticEntityConverterImpl implements SemanticEntityConverter {
 	        RDFState currentState = toStatementsConverter.convertEntityToStatements(persistentEntity, source);
 			if (dbStatements != null && !dbStatements.isEmpty()) {
 				//TODO optimize conversion of alias statements to actual statements
-				Object dbObject = read(source.getClass(), dbStatements);
-				RDFState dbState = toStatementsConverter.convertEntityToStatements(persistentEntity, dbObject);
-				dbState.getCurrentStatements().removeAll(currentState.getCurrentStatements());
-	        	currentState.setDeleteStatements(dbState.getCurrentStatements());
+				//Object dbObject = read(source.getClass(), dbStatements);
+				//RDFState dbState = toStatementsConverter.convertEntityToStatements(persistentEntity, dbObject);
+				//dbState.getCurrentStatements().removeAll(currentState.getCurrentStatements());
+				dbStatements.getCurrentStatements().removeAll(currentState.getCurrentStatements());
+	        	currentState.setDeleteStatements(dbStatements.getCurrentStatements());
 	        }
 			EntityState<Object, RDFState> state = sourceStateTransmitter.copyPropertiesTo(wrapper, currentState);
 			mergedModel.merge(state.getPersistentState());

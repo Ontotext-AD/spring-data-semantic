@@ -59,8 +59,19 @@ public class EntityToQueryConverter {
 	 * @param entity - the container which holds the information about that entity
 	 * @return
 	 */
+	public String getGraphQueryForResourceWithOriginalPredicates(URI uri, SemanticPersistentEntity<?> entity, MappingPolicy globalMappingPolicy){
+		return getGraphQueryForResource(uri, entity, new HashMap<String, Object>(), globalMappingPolicy, true);
+	}
+	
+	/**
+	 * Create a graph query retrieving the molecule of an entity. 
+	 * Only 'retrievable' {@link #isRetrivableProperty(SemanticPersistentProperty)} properties will be fetched
+	 * @param uri - the uri of the entity
+	 * @param entity - the container which holds the information about that entity
+	 * @return
+	 */
 	public String getGraphQueryForResource(URI uri, SemanticPersistentEntity<?> entity, MappingPolicy globalMappingPolicy){
-		return getGraphQueryForResource(uri, entity, new HashMap<String, Object>(), globalMappingPolicy);
+		return getGraphQueryForResource(uri, entity, new HashMap<String, Object>(), globalMappingPolicy, false);
 	}
 	
 	/**
@@ -71,11 +82,11 @@ public class EntityToQueryConverter {
 	 * @param propertiesToValues - the properties with their required values
 	 * @return
 	 */
-	public String getGraphQueryForResource(URI uri, SemanticPersistentEntity<?> entity, Map<String, Object> propertyToValue, MappingPolicy globalMappingPolicy){
+	public String getGraphQueryForResource(URI uri, SemanticPersistentEntity<?> entity, Map<String, Object> propertyToValue, MappingPolicy globalMappingPolicy, Boolean originalPredicates){
 		StringBuilder sb = new StringBuilder();
 		
 		sb.append("CONSTRUCT { ");
-		sb.append(getPropertyBindings(uri, entity, propertyToValue, globalMappingPolicy));
+		sb.append(getPropertyBindings(uri, entity, propertyToValue, globalMappingPolicy, originalPredicates));
 		sb.append(" }\n");
 		sb.append("WHERE { ");
 		sb.append(getPropertyPatterns(uri, entity, propertyToValue, false, globalMappingPolicy));
@@ -117,7 +128,7 @@ public class EntityToQueryConverter {
 		StringBuilder sb = new StringBuilder();
 		
 		sb.append("CONSTRUCT { ");
-		sb.append(getPropertyBindings(null, entity, propertyToValue, MappingPolicyImpl.ALL_POLICY));
+		sb.append(getPropertyBindings(null, entity, propertyToValue, MappingPolicyImpl.ALL_POLICY, false));
 		sb.append(" }\n");
 		sb.append("WHERE { ");
 		sb.append(getPropertyPatterns(null, entity, propertyToValue, false, MappingPolicyImpl.ALL_POLICY));
@@ -136,11 +147,11 @@ public class EntityToQueryConverter {
 	 * @param entity - the container holding the information about the entity's structure
 	 * @return
 	 */
-	protected String getPropertyBindings(URI uri, SemanticPersistentEntity<?> entity, Map<String, Object> propertyToValue, MappingPolicy globalMappingPolicy){
+	protected String getPropertyBindings(URI uri, SemanticPersistentEntity<?> entity, Map<String, Object> propertyToValue, MappingPolicy globalMappingPolicy, Boolean originalPredicates){
 		StringBuilder sb = new StringBuilder();
 		String subjectBinding = getSubjectBinding(uri, entity);
 		AbstractPropertiesToQueryHandler.appendPattern(sb, subjectBinding, "a", "<"+entity.getRDFType()+">");
-		PropertiesToBindingsHandler handler = new PropertiesToBindingsHandler(sb, subjectBinding, propertyToValue, this.mappingContext, globalMappingPolicy);
+		PropertiesToBindingsHandler handler = new PropertiesToBindingsHandler(sb, subjectBinding, propertyToValue, this.mappingContext, globalMappingPolicy, originalPredicates);
 		entity.doWithProperties(handler);
 		entity.doWithAssociations(handler);
 		return sb.toString();
