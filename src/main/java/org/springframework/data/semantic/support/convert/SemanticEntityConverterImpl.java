@@ -8,6 +8,8 @@ import java.util.Set;
 
 import org.openrdf.model.URI;
 import org.openrdf.model.Value;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.data.mapping.Association;
 import org.springframework.data.mapping.AssociationHandler;
@@ -23,6 +25,7 @@ import org.springframework.data.semantic.mapping.SemanticPersistentEntity;
 import org.springframework.data.semantic.mapping.SemanticPersistentProperty;
 import org.springframework.data.semantic.support.Cascade;
 import org.springframework.data.semantic.support.Direction;
+import org.springframework.data.semantic.support.exceptions.RequiredPropertyException;
 import org.springframework.data.semantic.support.mapping.SemanticMappingContext;
 import org.springframework.data.semantic.support.mapping.SemanticPersistentEntityImpl;
 import org.springframework.data.semantic.support.util.ValueUtils;
@@ -32,6 +35,8 @@ import org.springframework.data.semantic.support.util.ValueUtils;
  * This service should not be used directly, but rather via a caching abstraction (SemanticEntityPersister)
  */
 public class SemanticEntityConverterImpl implements SemanticEntityConverter {
+	
+	private Logger logger = LoggerFactory.getLogger(SemanticEntityConverterImpl.class);
 
 	private final SemanticMappingContext mappingContext;
 	private final ConversionService conversionService;
@@ -92,21 +97,25 @@ public class SemanticEntityConverterImpl implements SemanticEntityConverter {
 	public void write(Map<Object, RDFState> objectsAndState) {
 		RDFState mergedModel = new RDFState();
 		for(Entry<Object, RDFState> entry : objectsAndState.entrySet()){
-			Object source = entry.getKey();
-			RDFState dbStatements = entry.getValue();
-			final SemanticPersistentEntity<?> persistentEntity = mappingContext.getPersistentEntity(source.getClass());
-			final BeanWrapper<Object> wrapper = BeanWrapper.<Object>create(source, conversionService);
-	        RDFState currentState = toStatementsConverter.convertEntityToStatements(persistentEntity, source);
-			if (dbStatements != null && !dbStatements.isEmpty()) {
-				//TODO optimize conversion of alias statements to actual statements
-				//Object dbObject = read(source.getClass(), dbStatements);
-				//RDFState dbState = toStatementsConverter.convertEntityToStatements(persistentEntity, dbObject);
-				//dbState.getCurrentStatements().removeAll(currentState.getCurrentStatements());
-				dbStatements.getCurrentStatements().removeAll(currentState.getCurrentStatements());
-	        	currentState.setDeleteStatements(dbStatements.getCurrentStatements());
-	        }
-			EntityState<Object, RDFState> state = sourceStateTransmitter.copyPropertiesTo(wrapper, currentState);
-			mergedModel.merge(state.getPersistentState());
+			try{
+				Object source = entry.getKey();
+				RDFState dbStatements = entry.getValue();
+				final SemanticPersistentEntity<?> persistentEntity = mappingContext.getPersistentEntity(source.getClass());
+				final BeanWrapper<Object> wrapper = BeanWrapper.<Object>create(source, conversionService);
+		        RDFState currentState = toStatementsConverter.convertEntityToStatements(persistentEntity, source);
+				if (dbStatements != null && !dbStatements.isEmpty()) {
+					//TODO optimize conversion of alias statements to actual statements
+					//Object dbObject = read(source.getClass(), dbStatements);
+					//RDFState dbState = toStatementsConverter.convertEntityToStatements(persistentEntity, dbObject);
+					//dbState.getCurrentStatements().removeAll(currentState.getCurrentStatements());
+					dbStatements.getCurrentStatements().removeAll(currentState.getCurrentStatements());
+		        	currentState.setDeleteStatements(dbStatements.getCurrentStatements());
+		        }
+				EntityState<Object, RDFState> state = sourceStateTransmitter.copyPropertiesTo(wrapper, currentState);
+				mergedModel.merge(state.getPersistentState());
+			} catch(RequiredPropertyException e){
+				logger.error(e.getMessage(), e);
+			}
 		}
 		semanticDatabase.removeStatements(mergedModel.getDeleteStatements());
 		semanticDatabase.addStatements(mergedModel.getCurrentStatements());
