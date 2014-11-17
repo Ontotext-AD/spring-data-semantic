@@ -6,7 +6,7 @@
 	<artifactId>spring-data-semantic</artifactId>
 	<name>Spring Data Semantic</name>
 	<description />
-	<version>1.0.0.RC2</version>
+	<version>1.0.0.RC3</version>
 
 	<distributionManagement>
 		<repository>
