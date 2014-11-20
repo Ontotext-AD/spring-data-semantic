@@ -107,10 +107,10 @@ public class PooledSemanticDatabase implements SemanticDatabase{
 		RepositoryConnection con = connectionPool.getConnection();
 		try{
 			TupleSparqlQuery query = new TupleSparqlQuery(source, con);
-			if(offset != null){
+			if(limit != null){
 				query.setLimit(limit);
 			}
-			if(limit != null){
+			if(offset != null){
 				query.setOffset(offset);
 			}
 			TupleQueryResult queryResult = query.evaluate();
