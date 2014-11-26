@@ -103,7 +103,6 @@ public class PooledSemanticDatabase implements SemanticDatabase{
 	public List<BindingSet> getQueryResults(String source, Long offset, Long limit) 
 			throws RepositoryException, QueryEvaluationException, MalformedQueryException {
 
-		List<BindingSet> result = new ArrayList<BindingSet>();		
 		RepositoryConnection con = connectionPool.getConnection();
 		try{
 			TupleSparqlQuery query = new TupleSparqlQuery(source, con);
@@ -113,16 +112,11 @@ public class PooledSemanticDatabase implements SemanticDatabase{
 			if(offset != null){
 				query.setOffset(offset);
 			}
-			TupleQueryResult queryResult = query.evaluate();
-			while(queryResult.hasNext()){
-				result.add(queryResult.next());
-			}
-			return result;
+
+			return Iterations.asList(query.evaluate());
 		} finally {
 			con.close();
 		}
-
-
 	}
 
 	@Override
