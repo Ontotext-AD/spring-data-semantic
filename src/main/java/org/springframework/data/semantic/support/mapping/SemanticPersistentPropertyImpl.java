@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.openrdf.model.URI;
+import org.openrdf.model.impl.URIImpl;
 import org.springframework.data.mapping.Association;
 import org.springframework.data.mapping.PersistentEntity;
 import org.springframework.data.mapping.model.AbstractPersistentProperty;
@@ -102,19 +103,27 @@ public class SemanticPersistentPropertyImpl extends
 	@Override
 	public URI getPredicate() {
 		if (hasPredicate()) {
-			return mappingContext.resolveURI(getAnnotation(Predicate.class).value());
-		} else {
-			if(this.getOwner() instanceof SemanticPersistentEntity){
-				SemanticPersistentEntity<?> persistentEntity = (SemanticPersistentEntity<?>) this.getOwner();
-				URI namespace = persistentEntity.getNamespace();
-				if(namespace != null){
-					return ValueUtils.createUri(namespace.stringValue(), field.getName());
-				}
+			String predicate = getAnnotation(Predicate.class).value();
+			if(ValueUtils.isAbsoluteURI(predicate)){
+				return new URIImpl(predicate);
 			}
-			return mappingContext.resolveURI(field.getName());
+			return resolveWithNamespace(predicate);
+		} else {
+			return resolveWithNamespace(field.getName());
 		}
 	}
-	
+
+	private URI resolveWithNamespace(String name) {
+		if(this.getOwner() instanceof SemanticPersistentEntity){
+			SemanticPersistentEntity<?> persistentEntity = (SemanticPersistentEntity<?>) this.getOwner();
+			URI namespace = persistentEntity.getNamespace();
+			if(namespace != null){
+				return ValueUtils.createUri(namespace.stringValue(), name);
+			}
+		}
+		return mappingContext.resolveURI(name);
+	}
+
 	@Override
 	public SemanticPersistentProperty getInverseProperty() {
 		if(this.isAssociation()){

@@ -8,6 +8,7 @@ import java.util.List;
 import org.junit.Test;
 import org.openrdf.model.Namespace;
 import org.openrdf.model.impl.NamespaceImpl;
+import org.openrdf.model.impl.URIImpl;
 import org.springframework.data.semantic.mapping.SemanticPersistentEntity;
 import org.springframework.data.semantic.mapping.SemanticPersistentProperty;
 import org.springframework.data.semantic.model.NamespaceEntity;
@@ -33,4 +34,18 @@ public class TestNamespaceAnnotation {
 		assertEquals(namespace+"NamespaceEntity", pe.getRDFType().stringValue());
 	}
 
+	@Test
+	public void testAbsolutePredicate() {
+		// make sure @Predicate() annotations with absolute URI stay absolute and the same
+		assertEquals(
+				new URIImpl("urn:really:absolute"),
+				pe.getPersistentProperty("withAbsolutePredicate").getPredicate());
+	}
+
+	@Test
+	public void testRelativePredicate() {
+		assertEquals(
+				new URIImpl(namespace + "relative"),
+				pe.getPersistentProperty("withRelativePredicate").getPredicate());
+	}
 }
