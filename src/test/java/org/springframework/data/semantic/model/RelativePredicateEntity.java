@@ -6,14 +6,11 @@ import org.springframework.data.semantic.annotation.Predicate;
 import org.springframework.data.semantic.annotation.ResourceId;
 import org.springframework.data.semantic.annotation.SemanticEntity;
 
-@Namespace(namespace="urn:test:namespace:")
 @SemanticEntity
-public class NamespaceEntity {
-	
+public class RelativePredicateEntity {
+
 	@ResourceId
 	private URI id;
-	
-	private String name;
 
 	@Predicate("urn:really:absolute")
 	private String withAbsolutePredicate;
@@ -33,20 +30,6 @@ public class NamespaceEntity {
 	 */
 	public void setId(URI id) {
 		this.id = id;
-	}
-
-	/**
-	 * @return the name
-	 */
-	public String getName() {
-		return name;
-	}
-
-	/**
-	 * @param name the name to set
-	 */
-	public void setName(String name) {
-		this.name = name;
 	}
 
 	public String getWithAbsolutePredicate() {
