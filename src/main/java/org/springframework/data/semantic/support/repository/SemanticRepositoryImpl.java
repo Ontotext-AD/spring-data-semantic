@@ -107,14 +107,12 @@ public class SemanticRepositoryImpl<T> implements SemanticRepository<T> {
 
 	@Override
 	public T create(T entity) {
-		// TODO Auto-generated method stub
-		return null;
+		return this.operations.create(entity);
 	}
 
 	@Override
 	public Iterable<T> create(Iterable<T> entities) {
-		// TODO Auto-generated method stub
-		return null;
+		return this.operations.create(entities);
 	}
 
 	

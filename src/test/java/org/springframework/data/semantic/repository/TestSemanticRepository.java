@@ -92,12 +92,12 @@ public class TestSemanticRepository {
 	}
 	
 	@Test
-	public void testCreateUpdate(){
+	public void testCreate(){
 		long count = sdb.count();
 		WineBody newEntity = new WineBody();
 		newEntity.setUri(WINE.VERDEJO);
 		newEntity.setLabel("Verdejo");
-		wineRepository.save(newEntity);
+		wineRepository.create(newEntity);
 		assertTrue(count < sdb.count());
 		List<Statement> statementsForResource = sdb.getStatementsForSubject(WINE.VERDEJO);
 		assertFalse(statementsForResource.isEmpty());
@@ -140,7 +140,7 @@ public class TestSemanticRepository {
 		sauvignon_blanc.setLabel("Sauvignon blanc");
 		sauvignon_blanc.setUri(WINE.SAUVIGNON_BLANC);
 		
-		Iterable<WineBody> newWineBodies = wineRepository.save(Arrays.asList(macabeo, sauvignon_blanc));
+		Iterable<WineBody> newWineBodies = wineRepository.create(Arrays.asList(macabeo, sauvignon_blanc));
 		assertNotNull(newWineBodies);
 		assertTrue(newWineBodies.iterator().hasNext());
 		

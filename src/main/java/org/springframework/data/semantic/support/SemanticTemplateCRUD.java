@@ -136,7 +136,11 @@ public class SemanticTemplateCRUD implements SemanticOperationsCRUD, Initializin
 	
 	@Override
 	public <T> Iterable<T> create(Iterable<T> entities) {
-		return this.entityPersister.persistEntities(new HashMap<T, RDFState>());
+		Map<T, RDFState> entityToExistingState = new HashMap<T, RDFState>();
+		for(T entity : entities){
+			entityToExistingState.put(entity, new RDFState());
+		}
+		return this.entityPersister.persistEntities(entityToExistingState);
 	}
 
 	@Override
