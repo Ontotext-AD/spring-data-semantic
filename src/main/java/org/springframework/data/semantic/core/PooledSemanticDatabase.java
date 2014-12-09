@@ -5,7 +5,6 @@ import info.aduna.iteration.Iterations;
 import java.io.File;
 import java.io.IOException;
 import java.security.InvalidParameterException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -24,7 +23,6 @@ import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.query.QueryInterruptedException;
 import org.openrdf.query.QueryLanguage;
 import org.openrdf.query.QueryResults;
-import org.openrdf.query.TupleQueryResult;
 import org.openrdf.query.Update;
 import org.openrdf.query.UpdateExecutionException;
 import org.openrdf.repository.Repository;

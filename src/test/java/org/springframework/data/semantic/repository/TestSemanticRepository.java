@@ -17,6 +17,7 @@ import org.junit.runner.RunWith;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.semantic.core.SemanticDatabase;
 import org.springframework.data.semantic.model.DateEntity;
 import org.springframework.data.semantic.model.DateEntityRepository;
@@ -161,6 +162,18 @@ public class TestSemanticRepository {
 			count++;
 		}
 		assertEquals(modelEntityRepository.count(), count);
+	}
+	
+	@Test
+	public void testFindPage(){
+		int pageSize = 2;
+		Iterable<ModelEntity> modelEntities = modelEntityRepository.findAll(new PageRequest(0, pageSize));
+		int count = 0;
+		for(ModelEntity entity : modelEntities){
+			assertNotNull(entity.getUri());
+			count++;
+		}
+		assertEquals(pageSize, count);
 	}
 	
 	@Test

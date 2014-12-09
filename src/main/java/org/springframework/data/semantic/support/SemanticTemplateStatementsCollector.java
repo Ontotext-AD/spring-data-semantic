@@ -1,5 +1,6 @@
 package org.springframework.data.semantic.support;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -13,7 +14,11 @@ import org.openrdf.model.Value;
 import org.openrdf.model.impl.TreeModel;
 import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.query.BindingSet;
+import org.openrdf.query.MalformedQueryException;
+import org.openrdf.query.QueryEvaluationException;
+import org.openrdf.query.QueryInterruptedException;
 import org.openrdf.repository.RepositoryException;
+import org.springframework.data.repository.query.QueryCreationException;
 import org.springframework.data.semantic.core.SemanticDatabase;
 import org.springframework.data.semantic.core.SemanticOperationsStatementsCollector;
 import org.springframework.data.semantic.mapping.MappingPolicy;
@@ -159,6 +164,33 @@ public class SemanticTemplateStatementsCollector implements SemanticOperationsSt
 		} catch (Exception e) {
 			throw ExceptionTranslator.translateExceptionIfPossible(e);
 		}
+	}
+
+	@Override
+	public <T> Collection<URI> getUrisForOffsetAndLimit(
+			Class<? extends T> clazz, Integer offset, Integer limit) {
+		SemanticPersistentEntity<?> persistentEntity = mappingContext.getPersistentEntity(clazz);
+		List<URI> ids = new ArrayList<URI>(limit);
+		try {
+			List<BindingSet> results = semanticDB.getQueryResults(entityToQueryConverter.getQueryForIds(persistentEntity, offset, limit));
+			for(BindingSet result : results){
+				Value id = result.getValue("id");
+				if(id instanceof URI){
+					ids.add((URI) id);
+				}
+			}
+		} catch (QueryInterruptedException e) {
+			throw ExceptionTranslator.translateExceptionIfPossible(e);
+		} catch (RepositoryException e) {
+			throw ExceptionTranslator.translateExceptionIfPossible(e);
+		} catch (QueryCreationException e) {
+			throw ExceptionTranslator.translateExceptionIfPossible(e);
+		} catch (QueryEvaluationException e) {
+			throw ExceptionTranslator.translateExceptionIfPossible(e);
+		} catch (MalformedQueryException e) {
+			throw ExceptionTranslator.translateExceptionIfPossible(e);
+		}
+		return ids;
 	}
 	
 }

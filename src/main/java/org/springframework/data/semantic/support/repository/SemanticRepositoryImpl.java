@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.openrdf.model.URI;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.PagingAndSortingRepository;
@@ -41,8 +42,7 @@ public class SemanticRepositoryImpl<T> implements SemanticRepository<T> {
 
 	@Override
 	public Page<T> findAll(Pageable pageable) {
-		// TODO Auto-generated method stub
-		return null;
+		return new PageImpl<T>(this.operations.findAll(clazz, pageable), pageable, this.count());
 	}
 
 	@Override

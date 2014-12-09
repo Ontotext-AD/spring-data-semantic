@@ -25,4 +25,6 @@ public interface SemanticOperationsStatementsCollector {
 	<T> Collection<Model> getStatementsForResources(Class<? extends T> clazz, Long offset, Long limit);
 	
 	<T> Collection<Model> getStatementsForResourcesAndProperties(Class<? extends T> clazz, Map<String, Object> parameterToValue, Long offset, Long limit);
+	
+	<T> Collection<URI> getUrisForOffsetAndLimit(Class<? extends T> clazz, Integer offset, Integer limit);
 } 

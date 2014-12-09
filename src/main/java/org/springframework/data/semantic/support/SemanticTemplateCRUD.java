@@ -1,5 +1,6 @@
 package org.springframework.data.semantic.support;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -19,6 +20,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.semantic.cache.EntityCache;
 import org.springframework.data.semantic.convert.SemanticEntityConverter;
 import org.springframework.data.semantic.convert.SemanticEntityInstantiator;
@@ -261,6 +263,17 @@ public class SemanticTemplateCRUD implements SemanticOperationsCRUD, Initializin
 
 	public SemanticDatabase getSemanticDB() {
 		return semanticDB;
+	}
+
+	@Override
+	public <T> List<T> findAll(Class<? extends T> clazz, Pageable pageRequest) {
+		Collection<URI> ids = this.statementsCollector.getUrisForOffsetAndLimit(clazz, pageRequest.getOffset(), pageRequest.getPageSize());
+		List<T> entities = new ArrayList<T>(pageRequest.getPageSize());
+		for(URI id : ids){
+			T entity = this.find(id, clazz);
+			entities.add(entity);
+		}
+		return entities;
 	}
 	
 	

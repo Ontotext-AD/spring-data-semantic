@@ -117,7 +117,18 @@ public class EntityToQueryConverter {
 	 * @return
 	 */
 	public String getQueryForResourceExistence(URI resourceId, SemanticPersistentEntity<?> entity){
-		return "ASK {<"+resourceId+"> a <"+entity.getRDFType()+">}";
+		return "ASK {<"+resourceId+"> a <"+entity.getRDFType()+"> }";
+	}
+	
+	/**
+	 * Create a select query for the ids (URIs) of entities of a given type in the given range.
+	 * @param entity
+	 * @param offset
+	 * @param size
+	 * @return
+	 */
+	public String getQueryForIds(SemanticPersistentEntity<?> entity, int offset, int size){
+		return "SELECT ?id WHERE { ?id a <"+entity.getRDFType()+"> } OFFSET "+offset+" LIMIT "+size+"";
 	}
 	
 	public String getGraphQueryForEntityClass(SemanticPersistentEntity<?> entity){

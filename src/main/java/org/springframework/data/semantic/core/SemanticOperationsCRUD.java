@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.openrdf.model.Model;
 import org.openrdf.model.URI;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.semantic.support.mapping.SemanticMappingContext;
 
 public interface SemanticOperationsCRUD {
@@ -61,6 +62,8 @@ public interface SemanticOperationsCRUD {
      * @return
      */
     <T> List<T> findAll(Class<? extends T> clazz);
+    
+    <T> List<T> findAll(Class<? extends T> clazz, Pageable pageRequest);
     
     /**
      * Create a new entity form the given {@link Class} and {@link Model}.
