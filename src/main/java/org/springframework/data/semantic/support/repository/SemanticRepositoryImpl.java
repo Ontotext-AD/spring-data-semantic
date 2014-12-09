@@ -105,6 +105,18 @@ public class SemanticRepositoryImpl<T> implements SemanticRepository<T> {
 		this.operations.deleteAll(clazz);
 	}
 
+	@Override
+	public T create(T entity) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Iterable<T> create(Iterable<T> entities) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 	
 
 }
