@@ -20,6 +20,10 @@ public class WINE extends VOCABULARY {
 	public static final URI GAMZA = create("Gamza");
 	public static final URI KADARKA = create("Kadarka");
 	
+	public static final URI VERDEJO = create("Verdejo");
+	public static final URI MACABEO = create("Macabeo");
+	public static final URI SAUVIGNON_BLANC = create("Sauvignon_blanc");
+	
 	private static URI create(String localName){
 		return create(NAMESPACE, localName);
 	}

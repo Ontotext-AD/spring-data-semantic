@@ -92,6 +92,21 @@ public class TestSemanticRepository {
 	}
 	
 	@Test
+	public void testCreateUpdate(){
+		long count = sdb.count();
+		WineBody newEntity = new WineBody();
+		newEntity.setUri(WINE.VERDEJO);
+		newEntity.setLabel("Verdejo");
+		wineRepository.save(newEntity);
+		assertTrue(count < sdb.count());
+		List<Statement> statementsForResource = sdb.getStatementsForSubject(WINE.VERDEJO);
+		assertFalse(statementsForResource.isEmpty());
+		//System.out.println(statementsForResource);
+		WineBody verdejo = wineRepository.findOne(WINE.VERDEJO);
+		assertNotNull(verdejo);
+	}
+	
+	@Test
 	public void testSaveMultiple(){
 		assertNull(wineRepository.findOne(WINE.GAMZA));
 		assertNull(wineRepository.findOne(WINE.KADARKA));
@@ -110,6 +125,27 @@ public class TestSemanticRepository {
 		
 		assertNotNull(wineRepository.findOne(WINE.GAMZA));
 		assertNotNull(wineRepository.findOne(WINE.KADARKA));
+	}
+	
+	@Test
+	public void testCreateMultiple(){
+		assertNull(wineRepository.findOne(WINE.MACABEO));
+		assertNull(wineRepository.findOne(WINE.SAUVIGNON_BLANC));
+		
+		WineBody macabeo = new WineBody();
+		macabeo.setLabel("Macabeo");
+		macabeo.setUri(WINE.MACABEO);
+		
+		WineBody sauvignon_blanc = new WineBody();
+		sauvignon_blanc.setLabel("Sauvignon blanc");
+		sauvignon_blanc.setUri(WINE.SAUVIGNON_BLANC);
+		
+		Iterable<WineBody> newWineBodies = wineRepository.save(Arrays.asList(macabeo, sauvignon_blanc));
+		assertNotNull(newWineBodies);
+		assertTrue(newWineBodies.iterator().hasNext());
+		
+		assertNotNull(wineRepository.findOne(WINE.MACABEO));
+		assertNotNull(wineRepository.findOne(WINE.SAUVIGNON_BLANC));
 	}
 	
 	@Test
