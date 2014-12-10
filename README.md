@@ -27,7 +27,9 @@ $ mvn clean install
 
 ## Getting started
 
--- With internal repository for simplicity
+-- With internal repository for simplicity. We can use taxonomies from here https://github.com/Ontotext-AD/commons-pub/tree/master/ontologies and
+ create some examples with PLO. We have a model here as well https://github.com/Ontotext-AD/concept-pub/tree/master/concept-data-model/src/main/java/com/ontotext/pub/concept/model
+
 
 ### About
 
