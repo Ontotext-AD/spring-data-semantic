@@ -50,7 +50,7 @@ public class TestEntityInstantiator {
 	@Before
 	public void setupTest(){
 		state = new RDFState();
-		mappingContext = new SemanticMappingContext(Arrays.asList(new NamespaceImpl("skos", "http://www.w3.org/2004/02/skos/core#")), new NamespaceImpl("", "urn:default:"));
+		mappingContext = new SemanticMappingContext(Arrays.asList(new NamespaceImpl("skos", "http://www.w3.org/2004/02/skos/core#")), new NamespaceImpl("", "urn:default:"), true);
 		testEntityType = (SemanticPersistentEntity<ModelEntity>) mappingContext.getPersistentEntity(ClassTypeInformation.from(ModelEntity.class));
 		state.addStatement(new StatementImpl(id, namePredicate, name));
 		state.addStatement(new StatementImpl(id, RDF.TYPE, testEntityType.getRDFType()));

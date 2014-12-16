@@ -29,20 +29,5 @@ public class SemanticRepositoryConfigExtension extends RepositoryConfigurationEx
 	protected String getModulePrefix() {
 		return "semantic";
 	}
-	
-	/*@Override
-	public void postProcess(BeanDefinitionBuilder builder,
-			XmlRepositoryConfigurationSource config) {
-		initSemanticTemplate();
-	}
-	
-	private void initSemanticTemplate(){
-		GenericBeanDefinition beanDef = new GenericBeanDefinition();
-		beanDef.setBeanClass(SemanticTemplate.class);
-		ConstructorArgumentValues ctorArgs = new ConstructorArgumentValues();
-		ctorArgs.addGenericArgumentValue(new RuntimeBeanReference("beanName"));
-		
-		beanDef.setConstructorArgumentValues(constructorArgumentValues)
-	}*/
 
 }

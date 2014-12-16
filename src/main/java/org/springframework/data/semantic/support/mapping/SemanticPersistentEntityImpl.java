@@ -15,6 +15,9 @@
  */
 package org.springframework.data.semantic.support.mapping;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.openrdf.model.Resource;
 import org.openrdf.model.URI;
 import org.openrdf.model.vocabulary.RDF;
@@ -155,6 +158,12 @@ public class SemanticPersistentEntityImpl<T> extends BasicPersistentEntity<T, Se
 			return (Resource) getContextProperty().getValue(entity, getMappingPolicy());
 		}
 		return null;
+	}
+
+	@Override
+	public List<URI> getRDFSuperTypes() {
+		// TODO Auto-generated method stub
+		return new ArrayList<URI>();
 	}
 
 }

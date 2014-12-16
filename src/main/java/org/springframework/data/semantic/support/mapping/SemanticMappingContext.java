@@ -55,15 +55,10 @@ public class SemanticMappingContext  extends AbstractMappingContext<SemanticPers
 	}
 	
 	private Namespace defaultNS;
-	private Map<String, String> prefix2Namespace; 
+	private Map<String, String> prefix2Namespace;
+	private final boolean explicitSupertypes;
 	
-	/*public SemanticMappingContext(){
-		super();
-		setSimpleTypeHolder(new SimpleTypeHolder(simpleTypes, true));
-		prefix2Namespace = new HashMap<String, String>();
-	}*/
-	
-	public SemanticMappingContext(List<? extends Namespace> namespaces, Namespace defaultNS){
+	public SemanticMappingContext(List<? extends Namespace> namespaces, Namespace defaultNS, boolean explicitSupertypes){
 		super();
 		setSimpleTypeHolder(new SimpleTypeHolder(simpleTypes, true));
 		this.prefix2Namespace = new HashMap<String, String>();
@@ -71,6 +66,7 @@ public class SemanticMappingContext  extends AbstractMappingContext<SemanticPers
 			this.prefix2Namespace.put(ns.getPrefix(), ns.getName());
 		}
 		this.defaultNS = defaultNS;
+		this.explicitSupertypes = explicitSupertypes;
 	}
 	
 	public boolean isSemanticPersistentEntity(Class<?> clazz){
@@ -82,7 +78,11 @@ public class SemanticMappingContext  extends AbstractMappingContext<SemanticPers
 			TypeInformation<T> typeInformation) {
 		final Class<T> type = typeInformation.getType();
         if (type.isAnnotationPresent(SemanticEntity.class)) {
-            return new SemanticPersistentEntityImpl<T>(typeInformation, this);
+            SemanticPersistentEntityImpl<T> persistentEntity = new SemanticPersistentEntityImpl<T>(typeInformation, this);
+            if(this.explicitSupertypes){
+            	//TODO set supertypes
+            }
+            return persistentEntity;
         }
         throw new IllegalArgumentException("Type " + type + " is not a @SemanticEntity!"); //TODO new Exception type to be used
 	}

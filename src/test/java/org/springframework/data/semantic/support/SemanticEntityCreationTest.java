@@ -136,10 +136,10 @@ public class SemanticEntityCreationTest {
 		expLocation = defaultNs.getName() + "NewZealandRegion";
 		expYear = 1998;
 		
-		mappingContext = new SemanticMappingContext(namespaces, defaultNs);
+		mappingContext = new SemanticMappingContext(namespaces, defaultNs, true);
 		testEntityType = mappingContext.getPersistentEntity(ClassTypeInformation.from(Merlot.class));
 		ConversionService conversionService = new DefaultConversionService();
-		operations = new SemanticTemplateCRUD(sdb, conversionService);
+		operations = new SemanticTemplateCRUD(sdb, conversionService, true);
 		statementsCollector = new SemanticTemplateStatementsCollector(sdb, mappingContext, new EntityToQueryConverter(mappingContext));
 		
 	}

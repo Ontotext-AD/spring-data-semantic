@@ -36,7 +36,7 @@ public class TestStringSemanticPersistentEntity {
 	
 	private static final String id = "one";
 	
-	private SemanticMappingContext mappingContext = new SemanticMappingContext(new ArrayList<Namespace>(0), new NamespaceImpl("", defaultNS));
+	private SemanticMappingContext mappingContext = new SemanticMappingContext(new ArrayList<Namespace>(0), new NamespaceImpl("", defaultNS), true);
 	
 	@Test
 	@SuppressWarnings("unchecked")

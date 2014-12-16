@@ -36,6 +36,9 @@ public class SemanticConfigurationBeanDefinitionParser extends
 		if(element.hasAttribute("semantic-database-ref")){
 			builder.addPropertyReference("semanticDatabase", element.getAttribute("semantic-database-ref"));
 		}
+		if(element.hasAttribute("explicit-supertypes")){
+			builder.addPropertyValue("explicitSupertypes", element.getAttribute("explicit-supertypes"));
+		}
 		
 		builder.setAutowireMode(Autowire.BY_TYPE.value());
 		setupConfigurationClassPostProcessor(parserContext);

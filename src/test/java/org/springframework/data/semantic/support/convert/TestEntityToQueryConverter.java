@@ -61,7 +61,7 @@ public class TestEntityToQueryConverter {
 	
 	@Before
 	public void setup(){
-		this.mappingContext = new SemanticMappingContext(Arrays.asList(new NamespaceImpl("skos", "http://www.w3.org/2004/02/skos/core#")), new NamespaceImpl("", "urn:sprind-data-semantic:"));
+		this.mappingContext = new SemanticMappingContext(Arrays.asList(new NamespaceImpl("skos", "http://www.w3.org/2004/02/skos/core#")), new NamespaceImpl("", "urn:sprind-data-semantic:"), true);
 		this.testEntityType = this.mappingContext.getPersistentEntity(ClassTypeInformation.from(ModelEntity.class));
 		this.testCollectionType = this.mappingContext.getPersistentEntity(ClassTypeInformation.from(ModelEntityCollector.class));
 		this.entityToQueryConverter = new EntityToQueryConverter(this.mappingContext);

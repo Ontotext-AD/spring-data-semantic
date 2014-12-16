@@ -55,7 +55,7 @@ public class SemanticTemplateStatementsCollector implements SemanticOperationsSt
 		
 		this.semanticDB = semanticDB;
 		this.mappingContext = mappingContext != null ? mappingContext 
-				: new SemanticMappingContext(semanticDB.getNamespaces(), semanticDB.getDefaultNamespace());
+				: new SemanticMappingContext(semanticDB.getNamespaces(), semanticDB.getDefaultNamespace(), true);
 		this.entityToQueryConverter = entityToQueryConverter;
 	}	
 	
