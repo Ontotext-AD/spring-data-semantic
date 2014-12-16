@@ -16,6 +16,7 @@
 package org.springframework.data.semantic.support.mapping;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.openrdf.model.Resource;
@@ -46,6 +47,7 @@ public class SemanticPersistentEntityImpl<T> extends BasicPersistentEntity<T, Se
 	private URI rdfType;
 	private URI namespace;
 	private boolean hasNamespace = true;
+	private List<SemanticPersistentEntity<?>> supertypes;
 	
 	
 	public SemanticPersistentEntityImpl(TypeInformation<T> typeInformation) {
@@ -56,6 +58,7 @@ public class SemanticPersistentEntityImpl<T> extends BasicPersistentEntity<T, Se
 			SemanticMappingContext semanticMappingContext) {
 		super(typeInformation);
 		this.mappingContext = semanticMappingContext;
+		this.supertypes = new LinkedList<SemanticPersistentEntity<?>>();
 	}
 
 	@Override
@@ -122,6 +125,10 @@ public class SemanticPersistentEntityImpl<T> extends BasicPersistentEntity<T, Se
 	public boolean hasContextProperty() {
 		return contextProperty != null;
 	}
+	
+	public void setSupertypes(List<SemanticPersistentEntity<?>> supertypes){
+		this.supertypes = supertypes;
+	}
 
 	@Override
 	public void setResourceId(Object entity, URI id) {
@@ -162,8 +169,11 @@ public class SemanticPersistentEntityImpl<T> extends BasicPersistentEntity<T, Se
 
 	@Override
 	public List<URI> getRDFSuperTypes() {
-		// TODO Auto-generated method stub
-		return new ArrayList<URI>();
+		List<URI> superTypeURIs = new ArrayList<URI>(this.supertypes.size());
+		for(SemanticPersistentEntity<?> persistentEntity : this.supertypes){
+			superTypeURIs.add(persistentEntity.getRDFType());
+		}
+		return superTypeURIs;
 	}
 
 }
