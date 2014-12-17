@@ -31,7 +31,7 @@ import org.springframework.data.semantic.support.mapping.SemanticMappingContext;
 
 public class TestNamespaceAnnotation {
 	
-	private SemanticMappingContext mappingContext = new SemanticMappingContext((List<? extends Namespace>) new LinkedList<Namespace>(), new NamespaceImpl("", "urn:default:namespace:"));
+	private SemanticMappingContext mappingContext = new SemanticMappingContext((List<? extends Namespace>) new LinkedList<Namespace>(), new NamespaceImpl("", "urn:default:namespace:"), true);
 	
 	@SuppressWarnings("unchecked")
 	private SemanticPersistentEntity<NamespaceEntity> pe = (SemanticPersistentEntity<NamespaceEntity>) mappingContext.getPersistentEntity(NamespaceEntity.class);

@@ -33,15 +33,21 @@ public class SemanticConfiguration {
 	
 	private SemanticDatabase semanticDatabase;
 	
+	private boolean explicitSupertypes = true;
+	
 	@Autowired(required=false)
 	public void setSemanticDatabase(SemanticDatabase semanticDatabase) {
 		this.semanticDatabase = semanticDatabase;
 	}
 	
+	public void setExplicitSupertypes(boolean explicitSupertypes) {
+		this.explicitSupertypes = explicitSupertypes;
+	}
+	
 	
 	@Bean
 	public SemanticTemplateCRUD semanticTemplateCRUD() {
-		return new SemanticTemplateCRUD(semanticDatabase, conversionService());
+		return new SemanticTemplateCRUD(semanticDatabase, conversionService(), explicitSupertypes);
 	}
 	
 	@Bean

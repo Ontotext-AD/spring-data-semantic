@@ -39,7 +39,7 @@ public class TestSemanticTemplateStatementsCollector {
 	
 	private SemanticTemplateStatementsCollector collector; 
 	
-	private SemanticMappingContext mappingContext = new SemanticMappingContext((List<? extends Namespace>) new LinkedList<Namespace>(), new NamespaceImpl("", "urn:default:namespace:"));
+	private SemanticMappingContext mappingContext = new SemanticMappingContext((List<? extends Namespace>) new LinkedList<Namespace>(), new NamespaceImpl("", "urn:default:namespace:"), true);
 	
 	private Statement statement = new StatementImpl(new URIImpl("urn:test:d"), new URIImpl("urn:test:has"), new URIImpl("urn:test:j"));
 	

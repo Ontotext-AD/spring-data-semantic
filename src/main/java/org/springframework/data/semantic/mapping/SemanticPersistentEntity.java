@@ -15,6 +15,8 @@
  */
 package org.springframework.data.semantic.mapping;
 
+import java.util.List;
+
 import org.openrdf.model.Resource;
 import org.openrdf.model.URI;
 import org.springframework.data.mapping.model.MutablePersistentEntity;
@@ -50,10 +52,16 @@ public interface SemanticPersistentEntity<T> extends MutablePersistentEntity<T, 
 	 boolean hasContextProperty();
 	 
 	 /**
-	  * Returns the 
+	  * Returns the {@link URI} identifying this entity's RDF type.
 	  * @return
 	  */
 	 URI getRDFType();
+	 
+	 /**
+	  * Returns the {@link List} of {@link URI}s identifying this entity's superclass' RDF types.
+	  * @return
+	  */
+	 List<URI> getRDFSuperTypes();
 	 
 	 /**
 	  * Retrieve the {@link URI} of the given instance.

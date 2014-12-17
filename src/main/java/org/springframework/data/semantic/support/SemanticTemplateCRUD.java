@@ -85,11 +85,14 @@ public class SemanticTemplateCRUD implements SemanticOperationsCRUD, Initializin
 	
 	private EntityCache entityCache;
 	
+	private final boolean explicitSupertypes;
+	
 	private Logger logger = LoggerFactory.getLogger(SemanticTemplateCRUD.class);
 	
-	public SemanticTemplateCRUD(SemanticDatabase semanticDB, ConversionService conversionService){
+	public SemanticTemplateCRUD(SemanticDatabase semanticDB, ConversionService conversionService, boolean explicitSupertypes){
 		this.semanticDB = semanticDB;
 		this.conversionService = conversionService;
+		this.explicitSupertypes = explicitSupertypes;
 		init();
 	}
 	
@@ -102,7 +105,7 @@ public class SemanticTemplateCRUD implements SemanticOperationsCRUD, Initializin
 		if(this.semanticDB != null && this.conversionService != null){
 			try {
 				this.entityInstantiator = new SemanticEntityInstantiatorImpl();
-				this.mappingContext = new SemanticMappingContext(semanticDB.getNamespaces(), this.semanticDB.getDefaultNamespace());
+				this.mappingContext = new SemanticMappingContext(semanticDB.getNamespaces(), this.semanticDB.getDefaultNamespace(), this.explicitSupertypes);
 				this.entityToQueryConverter = new EntityToQueryConverter(this.mappingContext);
 				this.entityToStatementsConverter = new EntityToStatementsConverter(mappingContext);
 				this.statementsCollector = new SemanticTemplateStatementsCollector(this.semanticDB, this.mappingContext, this.entityToQueryConverter);

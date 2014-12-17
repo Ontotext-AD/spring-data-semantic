@@ -37,7 +37,7 @@ public class TestSemanticPersistentEntity {
 	
 	@Before
 	public void setup(){
-		mappingContext = new SemanticMappingContext(Arrays.asList(new NamespaceImpl("skos", "http://www.w3.org/2004/02/skos/core#")), new NamespaceImpl("", "urn:default:"));
+		mappingContext = new SemanticMappingContext(Arrays.asList(new NamespaceImpl("skos", "http://www.w3.org/2004/02/skos/core#")), new NamespaceImpl("", "urn:default:"), true);
 		testEntityType = mappingContext.getPersistentEntity(ClassTypeInformation.from(ModelEntity.class));
 	}
 	

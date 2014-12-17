@@ -38,7 +38,7 @@ import static org.junit.Assert.assertEquals;
 public class TestRelativePredicateAnnotation {
 	private static final String DEFAULT_NS = "urn:default:namespace:";
 	private SemanticMappingContext
-			mappingContext = new SemanticMappingContext((List<? extends Namespace>) new LinkedList<Namespace>(), new NamespaceImpl("", DEFAULT_NS));
+			mappingContext = new SemanticMappingContext((List<? extends Namespace>) new LinkedList<Namespace>(), new NamespaceImpl("", DEFAULT_NS), true);
 
 	@SuppressWarnings("unchecked")
 	private SemanticPersistentEntity<RelativePredicateEntity> pe =

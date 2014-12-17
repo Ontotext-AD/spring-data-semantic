@@ -19,6 +19,7 @@ import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -55,15 +56,10 @@ public class SemanticMappingContext  extends AbstractMappingContext<SemanticPers
 	}
 	
 	private Namespace defaultNS;
-	private Map<String, String> prefix2Namespace; 
+	private Map<String, String> prefix2Namespace;
+	private final boolean explicitSupertypes;
 	
-	/*public SemanticMappingContext(){
-		super();
-		setSimpleTypeHolder(new SimpleTypeHolder(simpleTypes, true));
-		prefix2Namespace = new HashMap<String, String>();
-	}*/
-	
-	public SemanticMappingContext(List<? extends Namespace> namespaces, Namespace defaultNS){
+	public SemanticMappingContext(List<? extends Namespace> namespaces, Namespace defaultNS, boolean explicitSupertypes){
 		super();
 		setSimpleTypeHolder(new SimpleTypeHolder(simpleTypes, true));
 		this.prefix2Namespace = new HashMap<String, String>();
@@ -71,6 +67,7 @@ public class SemanticMappingContext  extends AbstractMappingContext<SemanticPers
 			this.prefix2Namespace.put(ns.getPrefix(), ns.getName());
 		}
 		this.defaultNS = defaultNS;
+		this.explicitSupertypes = explicitSupertypes;
 	}
 	
 	public boolean isSemanticPersistentEntity(Class<?> clazz){
@@ -82,7 +79,20 @@ public class SemanticMappingContext  extends AbstractMappingContext<SemanticPers
 			TypeInformation<T> typeInformation) {
 		final Class<T> type = typeInformation.getType();
         if (type.isAnnotationPresent(SemanticEntity.class)) {
-            return new SemanticPersistentEntityImpl<T>(typeInformation, this);
+            SemanticPersistentEntityImpl<T> persistentEntity = new SemanticPersistentEntityImpl<T>(typeInformation, this);
+            if(this.explicitSupertypes){
+            	List<SemanticPersistentEntity<?>> superTypes = new LinkedList<SemanticPersistentEntity<?>>();
+            	Class<?> supertype = type.getSuperclass();
+            	while(supertype != null){
+            		SemanticPersistentEntity<?> superPersistentEntity = this.getPersistentEntity(supertype);
+            		if(superPersistentEntity != null){
+            			superTypes.add(superPersistentEntity);
+            		}
+            		supertype = supertype.getSuperclass();
+            	}
+            	persistentEntity.setSupertypes(superTypes);
+            }
+            return persistentEntity;
         }
         throw new IllegalArgumentException("Type " + type + " is not a @SemanticEntity!"); //TODO new Exception type to be used
 	}

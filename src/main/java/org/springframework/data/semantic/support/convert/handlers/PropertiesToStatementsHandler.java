@@ -51,6 +51,9 @@ public class PropertiesToStatementsHandler extends AbstractPropertiesToStatement
 		Resource context = persistentEntity.getContext(entity);
 		if(persistentProperty.isIdProperty()){
 			addStatement(resourceId, new URIImpl(ValueUtils.RDF_TYPE_PREDICATE), persistentEntity.getRDFType(), context);
+			for(URI supertype : persistentEntity.getRDFSuperTypes()){
+				addStatement(resourceId, new URIImpl(ValueUtils.RDF_TYPE_PREDICATE), supertype, context);
+			}
 		}
 		else{
 			addStatement(resourceId, persistentProperty.getPredicate(), objectToLiteralConverter.convert(value), context);

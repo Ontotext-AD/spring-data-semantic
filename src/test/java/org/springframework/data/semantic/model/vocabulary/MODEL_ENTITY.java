@@ -36,6 +36,8 @@ public class MODEL_ENTITY extends VOCABULARY {
 	public final static URI COLLECTOR_ONE = create("collector:1");
 	
 	public final static URI COLLECTOR_TWO = create("collector:2");
+	
+	public final static URI ENTITY_EXTENDED = create("entity:extended:1");
 
 	private static URI create(String localName){
 		return create(NAMESPACE, localName);
