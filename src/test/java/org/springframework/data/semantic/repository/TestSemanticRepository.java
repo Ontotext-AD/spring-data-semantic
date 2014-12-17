@@ -41,6 +41,8 @@ import org.springframework.data.semantic.model.ModelEntityCollector;
 import org.springframework.data.semantic.model.ModelEntityCollectorCascadeAll;
 import org.springframework.data.semantic.model.ModelEntityCollectorCascadeAllRepository;
 import org.springframework.data.semantic.model.ModelEntityCollectorRepository;
+import org.springframework.data.semantic.model.ModelEntityExtended;
+import org.springframework.data.semantic.model.ModelEntityExtendedRepository;
 import org.springframework.data.semantic.model.ModelEntityRepository;
 import org.springframework.data.semantic.model.WineBody;
 import org.springframework.data.semantic.model.WineBodyRepository;
@@ -72,6 +74,9 @@ public class TestSemanticRepository {
 	
 	@Autowired
 	private DateEntityRepository dateEntityRepository;
+	
+	@Autowired
+	private ModelEntityExtendedRepository modelEntityExtendedRepository;
 	
 	@Before
 	public void initRepo() {
@@ -385,6 +390,26 @@ public class TestSemanticRepository {
 	public void testDeleteAll(){
 		modelEntityRepository.deleteAll();
 		assertEquals(0, modelEntityRepository.count());
+	}
+	
+	@Test
+	public void testAddExtendedEntity(){
+		ModelEntityExtended mee = new ModelEntityExtended();
+		mee.setUri(MODEL_ENTITY.ENTITY_EXTENDED);
+		mee.setName("Model Entity Extended One");
+		mee.setSynonyms(Arrays.asList("Model Entity Erweitert Eins"));
+		mee.setDummyProperty("blq");
+		mee = modelEntityExtendedRepository.save(mee);
+		assertNotNull(mee);
+		
+		mee = modelEntityExtendedRepository.findOne(MODEL_ENTITY.ENTITY_EXTENDED);
+		assertNotNull(mee);
+		assertNotNull(mee.getUri());
+		assertNotNull(mee.getName());
+		assertNotNull(mee.getSynonyms());
+		
+		ModelEntity me = modelEntityRepository.findOne(MODEL_ENTITY.ENTITY_EXTENDED);
+		assertNotNull(me);
 	}
 	
 }
