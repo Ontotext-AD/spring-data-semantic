@@ -19,6 +19,7 @@ import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -80,7 +81,16 @@ public class SemanticMappingContext  extends AbstractMappingContext<SemanticPers
         if (type.isAnnotationPresent(SemanticEntity.class)) {
             SemanticPersistentEntityImpl<T> persistentEntity = new SemanticPersistentEntityImpl<T>(typeInformation, this);
             if(this.explicitSupertypes){
-            	//TODO set supertypes
+            	List<SemanticPersistentEntity<?>> superTypes = new LinkedList<SemanticPersistentEntity<?>>();
+            	Class<?> supertype = type.getSuperclass();
+            	while(supertype != null){
+            		SemanticPersistentEntity<?> superPersistentEntity = this.getPersistentEntity(supertype);
+            		if(superPersistentEntity != null){
+            			superTypes.add(superPersistentEntity);
+            		}
+            		supertype = supertype.getSuperclass();
+            	}
+            	persistentEntity.setSupertypes(superTypes);
             }
             return persistentEntity;
         }
