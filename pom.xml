@@ -29,7 +29,7 @@
 
 	<groupId>com.ontotext</groupId>
 	<artifactId>spring-data-semantic</artifactId>
-	<version>1.0.0.RC5</version>
+	<version>1.0.0-SNAPSHOT</version>
 
 	<name>Spring Data Semantic</name>
 	<description>Implementation of Spring Data for Sesame databases</description>
