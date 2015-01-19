@@ -29,5 +29,5 @@ public interface EntityStateFactory<STATE> {
 	 * @param detachable
 	 * @return
 	 */
-	public <R> EntityState<R, STATE> getEntityState(final R entity, boolean detachable);
+	<R> EntityState<R, STATE> getEntityState(final R entity, boolean detachable);
 }

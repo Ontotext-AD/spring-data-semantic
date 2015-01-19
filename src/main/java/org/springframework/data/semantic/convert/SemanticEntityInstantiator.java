@@ -32,7 +32,7 @@ public interface SemanticEntityInstantiator {
 	 * @param statements - the given state.
 	 * @return
 	 */
-	public <T> T createInstanceFromState(SemanticPersistentEntity<T> entity, RDFState statements); 
+	<T> T createInstanceFromState(SemanticPersistentEntity<T> entity, RDFState statements); 
 	
 	/**
 	 * Creates and instance of the given class with the given {@link URI} as id.
@@ -40,6 +40,6 @@ public interface SemanticEntityInstantiator {
 	 * @param id
 	 * @return
 	 */
-	public <T> T createInstance(SemanticPersistentEntity<T> entity, URI id);
+	<T> T createInstance(SemanticPersistentEntity<T> entity, URI id);
 	
 }
