@@ -34,6 +34,7 @@ import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.config.RepositoryConfig;
 import org.openrdf.repository.config.RepositoryConfigException;
 import org.openrdf.repository.config.RepositoryConfigSchema;
+import org.openrdf.repository.http.HTTPRepository;
 import org.openrdf.repository.manager.LocalRepositoryManager;
 import org.openrdf.repository.manager.RemoteRepositoryManager;
 import org.openrdf.repository.manager.RepositoryManager;
@@ -91,7 +92,7 @@ public class SemanticDatabaseManager {
 	 *            for authentication against a remote repository
 	 * @param password
 	 *            for authentication against a remote repository
-	 * @param config
+	 * @param configFile
 	 *            configuration used when creating a new repository
 	 * @return the initialized repository
 	 */
@@ -100,20 +101,23 @@ public class SemanticDatabaseManager {
 
 		Repository repo = null;
 		try {
-			// get an existing repositorymanager or create a new one
-			RepositoryManager manager = getRepositoryManagerForLocation(
-					baseURL, username, password);
-
-			if ((repo = manager.getRepository(repoId)) != null) {
-				repo.initialize();
+			if (baseURL.startsWith("http")) {
+				// as per DSP-705, skip the RepositoryManager when creating/using remote repository
+				HTTPRepository httpRepository = new HTTPRepository(baseURL, repoId);
+				httpRepository.setUsernameAndPassword(username, password);
+				httpRepository.initialize();
+				repo = httpRepository;
 			} else {
-				if (baseURL.startsWith("http")) {
-					throw new UnsupportedOperationException(
-							"Repository creation for remote locations is not currently supported.");
-				}
-				repo = createRepository(manager, repoId, getConfig(configFile));
-			}
+				// get an existing repositorymanager or create a new one
+				RepositoryManager manager = getRepositoryManagerForLocation(
+						baseURL, username, password);
 
+				if ((repo = manager.getRepository(repoId)) != null) {
+					repo.initialize();
+				} else {
+					repo = createRepository(manager, repoId, getConfig(configFile));
+				}
+			}
 		} catch (RepositoryException re) {
 			logger.error("Error opening repository for location {}", baseURL, re);
 		} catch (RepositoryConfigException rce) {
