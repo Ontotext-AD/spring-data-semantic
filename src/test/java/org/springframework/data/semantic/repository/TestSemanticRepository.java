@@ -32,6 +32,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
+import org.openrdf.repository.RepositoryException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.semantic.core.SemanticDatabase;
@@ -81,7 +82,24 @@ public class TestSemanticRepository {
 	private ModelEntityExtendedRepository modelEntityExtendedRepository;
 	
 	@Before
-	public void initRepo() {
+	public void initRepo() throws RepositoryException {
+		/*
+		 The two lines below are needed to workaround specific issue introduced while fixing DSP-705:
+		 Problem 1: SemanticMappingContext is now initialized lazily which postpones the
+		 initialization for after the repository is populated. SemanticDatabase.getDefaultNamespace()
+		 then returns <http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#> because wine.ttl says so.
+		 Then tests fail because they expect the default namespace to be the hardcoded default
+		 <urn:sprind-data-semantic:>
+		 Solution 1: Call any SemanticRepository method before data upload to initialize
+		 SemanticMappingContext with the expected defaults; that's the second line
+		 Problem 2: Previous tests might have already used the same repository path and uploaded
+		 their own data, tainting the namespaces
+		 Solution 2: Introduce clearNamespaces() method on SemanticDatabase, call it before
+		 initializing the SemanticMappingContext
+		 */
+		sdb.clearNamespaces();
+		wineRepository.findAll();
+		// upload test data
 		Utils.populateTestRepository(sdb);
 	}
 	

@@ -139,4 +139,8 @@ public class SemanticMappingContext  extends AbstractMappingContext<SemanticPers
 		return new URIImpl(defaultNS.getName()+lName);
 	}
 
+	@Override public String toString() {
+		// useful for debugging...
+		return String.format("[SemanticMappingContext; default=%s; other=%s]", defaultNS, prefix2Namespace);
+	}
 }

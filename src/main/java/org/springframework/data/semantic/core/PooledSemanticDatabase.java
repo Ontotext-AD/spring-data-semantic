@@ -97,6 +97,15 @@ public class PooledSemanticDatabase implements SemanticDatabase{
 		}		
 	}
 
+	public void clearNamespaces() throws RepositoryException {
+		RepositoryConnection con = connectionPool.getConnection();
+		try {
+			con.clearNamespaces();
+		} finally {
+			con.close();
+		}
+	}
+
 	public List<Resource> getContexts() throws RepositoryException {
 		RepositoryConnection con = connectionPool.getConnection();
 		try {
@@ -427,8 +436,8 @@ public class PooledSemanticDatabase implements SemanticDatabase{
 	public void clear() {
 		RepositoryConnection con = connectionPool.getConnection();
 		try {
-			 con.remove(null, null, null, new Resource[0]);
-			 con.commit();
+			con.remove(null, null, null, new Resource[0]);
+			con.commit();
 		} catch (RepositoryException e) {
 			try {
 				con.rollback();
