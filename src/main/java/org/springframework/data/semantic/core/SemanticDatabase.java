@@ -81,12 +81,6 @@ public interface SemanticDatabase {
 	void addNamespace(String prefix, String namespace) throws RepositoryException;
 
 	/**
-	 * Clears all defined namespaces
-	 * @throws RepositoryException
-	 */
-	void clearNamespaces() throws RepositoryException;
-
-	/**
 	 * Retrieve the {@link List} of context {@link Resource}s defined in the semantic database.
 	 * @return
 	 * @throws RepositoryException

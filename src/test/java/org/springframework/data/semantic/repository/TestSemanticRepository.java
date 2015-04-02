@@ -83,24 +83,17 @@ public class TestSemanticRepository {
 	
 	@Before
 	public void initRepo() throws RepositoryException {
+		// upload test data
+		Utils.populateTestRepository(sdb);
 		/*
-		 The two lines below are needed to workaround specific issue introduced while fixing DSP-705:
-		 Problem 1: SemanticMappingContext is now initialized lazily which postpones the
+		 Problem: SemanticMappingContext is now initialized lazily which postpones the
 		 initialization for after the repository is populated. SemanticDatabase.getDefaultNamespace()
 		 then returns <http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#> because wine.ttl says so.
 		 Then tests fail because they expect the default namespace to be the hardcoded default
 		 <urn:sprind-data-semantic:>
-		 Solution 1: Call any SemanticRepository method before data upload to initialize
-		 SemanticMappingContext with the expected defaults; that's the second line
-		 Problem 2: Previous tests might have already used the same repository path and uploaded
-		 their own data, tainting the namespaces
-		 Solution 2: Introduce clearNamespaces() method on SemanticDatabase, call it before
-		 initializing the SemanticMappingContext
+		 Solution: add a default prefix to what the test expect after the repository is populated
 		 */
-		sdb.clearNamespaces();
-		wineRepository.findAll();
-		// upload test data
-		Utils.populateTestRepository(sdb);
+		sdb.addNamespace("", MODEL_ENTITY.NAMESPACE);
 	}
 	
 	@After
