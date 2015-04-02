@@ -86,7 +86,7 @@ public class SemanticTemplateCRUD implements SemanticOperationsCRUD, Initializin
 	private EntityCache entityCache;
 	
 	private final boolean explicitSupertypes;
-	private boolean isInitialized = false;
+	private volatile boolean isInitialized = false;
 	private final Object initLockObject = new Object();
 	
 	private Logger logger = LoggerFactory.getLogger(SemanticTemplateCRUD.class);
@@ -99,16 +99,16 @@ public class SemanticTemplateCRUD implements SemanticOperationsCRUD, Initializin
 	
 	public void changeDatabase(SemanticDatabase semanticDB){
 		this.semanticDB = semanticDB;
-		synchronized (initLockObject) {
-			isInitialized = false;
-		}
+		isInitialized = false;
 	}
 
 	private void lazyInit() {
-		synchronized (initLockObject) {
-			if (!isInitialized) {
-				init();
-				isInitialized = true;
+		if (!isInitialized) {
+			synchronized (initLockObject) {
+				if (!isInitialized) {
+					init();
+					isInitialized = true;
+				}
 			}
 		}
 	}
