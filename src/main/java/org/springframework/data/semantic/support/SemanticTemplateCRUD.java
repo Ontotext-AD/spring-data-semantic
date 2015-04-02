@@ -21,7 +21,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import net.sf.ehcache.CacheManager;
 
@@ -87,7 +86,8 @@ public class SemanticTemplateCRUD implements SemanticOperationsCRUD, Initializin
 	private EntityCache entityCache;
 	
 	private final boolean explicitSupertypes;
-	private final AtomicBoolean isInitialized = new AtomicBoolean(false);
+	private boolean isInitialized = false;
+	private final Object initLockObject = new Object();
 	
 	private Logger logger = LoggerFactory.getLogger(SemanticTemplateCRUD.class);
 	
@@ -99,16 +99,14 @@ public class SemanticTemplateCRUD implements SemanticOperationsCRUD, Initializin
 	
 	public void changeDatabase(SemanticDatabase semanticDB){
 		this.semanticDB = semanticDB;
-		isInitialized.set(false);
+		isInitialized = false;
 	}
 
 	private void lazyInit() {
-		if (isInitialized.compareAndSet(false, true)) {
-			try {
+		synchronized (initLockObject) {
+			if (!isInitialized) {
 				init();
-			} catch (RuntimeException e) {
-				isInitialized.set(false); // attempt re-initialization
-				throw e;
+				isInitialized = true;
 			}
 		}
 	}
