@@ -427,8 +427,8 @@ public class PooledSemanticDatabase implements SemanticDatabase{
 	public void clear() {
 		RepositoryConnection con = connectionPool.getConnection();
 		try {
-			 con.remove(null, null, null, new Resource[0]);
-			 con.commit();
+			con.remove(null, null, null, new Resource[0]);
+			con.commit();
 		} catch (RepositoryException e) {
 			try {
 				con.rollback();

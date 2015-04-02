@@ -86,6 +86,8 @@ public class SemanticTemplateCRUD implements SemanticOperationsCRUD, Initializin
 	private EntityCache entityCache;
 	
 	private final boolean explicitSupertypes;
+	private volatile boolean isInitialized = false;
+	private final Object initLockObject = new Object();
 	
 	private Logger logger = LoggerFactory.getLogger(SemanticTemplateCRUD.class);
 	
@@ -93,14 +95,24 @@ public class SemanticTemplateCRUD implements SemanticOperationsCRUD, Initializin
 		this.semanticDB = semanticDB;
 		this.conversionService = conversionService;
 		this.explicitSupertypes = explicitSupertypes;
-		init();
 	}
 	
 	public void changeDatabase(SemanticDatabase semanticDB){
 		this.semanticDB = semanticDB;
-		init();
+		isInitialized = false;
 	}
-	
+
+	private void lazyInit() {
+		if (!isInitialized) {
+			synchronized (initLockObject) {
+				if (!isInitialized) {
+					init();
+					isInitialized = true;
+				}
+			}
+		}
+	}
+
 	private void init(){
 		if(this.semanticDB != null && this.conversionService != null){
 			try {
@@ -154,6 +166,7 @@ public class SemanticTemplateCRUD implements SemanticOperationsCRUD, Initializin
 	
 	@Override
 	public <T> Iterable<T> create(Iterable<T> entities) {
+		lazyInit();
 		Map<T, RDFState> entityToExistingState = new HashMap<T, RDFState>();
 		for(T entity : entities){
 			entityToExistingState.put(entity, new RDFState());
@@ -163,6 +176,7 @@ public class SemanticTemplateCRUD implements SemanticOperationsCRUD, Initializin
 
 	@Override
 	public <T> T create(T entity) {
+		lazyInit();
 		entity = this.entityPersister.persistEntity(entity, new RDFState());
 		entityCache.put(entity);
 		return entity;
@@ -182,6 +196,7 @@ public class SemanticTemplateCRUD implements SemanticOperationsCRUD, Initializin
 	
 	@Override
 	public <T> Iterable<T> save(Iterable<T> entities) {
+		lazyInit();
 		Map<T, RDFState> entityToExistingState = new HashMap<T, RDFState>();
 		for(T entity : entities){
 			@SuppressWarnings("unchecked")
@@ -195,6 +210,7 @@ public class SemanticTemplateCRUD implements SemanticOperationsCRUD, Initializin
 	
 	@Override
 	public <T> List<T> findAll(Class<? extends T> clazz) {
+		lazyInit();
 		Collection<Model> statementsPerEntity = this.statementsCollector.getStatementsForResources(clazz);
 		List<T> results = new LinkedList<T>();
 		for(Model statements : statementsPerEntity){
@@ -205,6 +221,7 @@ public class SemanticTemplateCRUD implements SemanticOperationsCRUD, Initializin
 
 	@Override
 	public <T> T find(URI resourceId, Class<? extends T> clazz) {
+		lazyInit();
 		T entity = entityCache.get(resourceId, clazz);
 		if(entity == null){
 			try{
@@ -219,11 +236,13 @@ public class SemanticTemplateCRUD implements SemanticOperationsCRUD, Initializin
 
 	
 	public <T> T createEntity(Model statements, Class<T> clazz) {
+		lazyInit();
 		return entityPersister.createEntityFromState(new RDFState(statements), clazz);
     }
 
 	@Override
 	public <T> long count(Class<T> clazz) {
+		lazyInit();
 		try {
 			return this.statementsCollector.getCountForResource(clazz);
 		} catch (Exception e) {
@@ -234,6 +253,7 @@ public class SemanticTemplateCRUD implements SemanticOperationsCRUD, Initializin
 
 	@Override
 	public <T> boolean exists(URI resourceId, Class<? extends T> clazz) {
+		lazyInit();
 		T entity = entityCache.get(resourceId, clazz);
 		if(entity != null){
 			return true;
@@ -248,6 +268,7 @@ public class SemanticTemplateCRUD implements SemanticOperationsCRUD, Initializin
 
 	@Override
 	public <T> void delete(URI resourceId, Class<? extends T> clazz) {
+		lazyInit();
 		T entity = this.find(resourceId, clazz);
 		this.delete(entity);
 		
@@ -255,6 +276,7 @@ public class SemanticTemplateCRUD implements SemanticOperationsCRUD, Initializin
 
 	@Override
 	public <T> void delete(T entity) {
+		lazyInit();
 		@SuppressWarnings("unchecked")
 		SemanticPersistentEntity<T> persistentEntity = (SemanticPersistentEntity<T>) this.mappingContext.getPersistentEntity(entity.getClass());
 		entityCache.remove(entity);
@@ -264,6 +286,7 @@ public class SemanticTemplateCRUD implements SemanticOperationsCRUD, Initializin
 
 	@Override
 	public <T> void deleteAll(Class<? extends T> clazz) {
+		lazyInit();
 		@SuppressWarnings("unchecked")
 		SemanticPersistentEntity<T> persistentEntity = (SemanticPersistentEntity<T>) this.mappingContext.getPersistentEntity(clazz);
 		entityCache.clear(clazz);
@@ -273,6 +296,7 @@ public class SemanticTemplateCRUD implements SemanticOperationsCRUD, Initializin
 	@Override
 	public <T> Collection<T> findByProperty(Class<? extends T> clazz,
 			Map<String, Object> parameterToValue) {
+		lazyInit();
 		Collection<Model> statementsPerEntity = this.statementsCollector.getStatementsForResourcesAndProperties(clazz, parameterToValue, null, null);
 		List<T> results = new LinkedList<T>();
 		for(Model statements : statementsPerEntity){
@@ -286,11 +310,13 @@ public class SemanticTemplateCRUD implements SemanticOperationsCRUD, Initializin
 	@Override
 	public Long countByProperty(Class<?> clazz,
 			Map<String, Object> parameterToValue) {
+		lazyInit();
 		return this.statementsCollector.getCountForResourceAndProperties(clazz, parameterToValue);
 	}
 	
 	@Override
 	public SemanticMappingContext getSemanticMappingContext() {
+		lazyInit();
 		return this.mappingContext;
 	}
 
@@ -300,6 +326,7 @@ public class SemanticTemplateCRUD implements SemanticOperationsCRUD, Initializin
 
 	@Override
 	public <T> List<T> findAll(Class<? extends T> clazz, Pageable pageRequest) {
+		lazyInit();
 		Collection<URI> ids = this.statementsCollector.getUrisForOffsetAndLimit(clazz, pageRequest.getOffset(), pageRequest.getPageSize());
 		List<T> entities = new ArrayList<T>(pageRequest.getPageSize());
 		for(URI id : ids){

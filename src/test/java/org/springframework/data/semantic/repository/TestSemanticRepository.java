@@ -32,6 +32,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
+import org.openrdf.repository.RepositoryException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.semantic.core.SemanticDatabase;
@@ -81,8 +82,18 @@ public class TestSemanticRepository {
 	private ModelEntityExtendedRepository modelEntityExtendedRepository;
 	
 	@Before
-	public void initRepo() {
+	public void initRepo() throws RepositoryException {
+		// upload test data
 		Utils.populateTestRepository(sdb);
+		/*
+		 Problem: SemanticMappingContext is now initialized lazily which postpones the
+		 initialization for after the repository is populated. SemanticDatabase.getDefaultNamespace()
+		 then returns <http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#> because wine.ttl says so.
+		 Then tests fail because they expect the default namespace to be the hardcoded default
+		 <urn:sprind-data-semantic:>
+		 Solution: add a default prefix to what the test expect after the repository is populated
+		 */
+		sdb.addNamespace("", MODEL_ENTITY.NAMESPACE);
 	}
 	
 	@After

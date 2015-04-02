@@ -79,7 +79,7 @@ public interface SemanticDatabase {
 	 * @throws RepositoryException
 	 */
 	void addNamespace(String prefix, String namespace) throws RepositoryException;
-	
+
 	/**
 	 * Retrieve the {@link List} of context {@link Resource}s defined in the semantic database.
 	 * @return
