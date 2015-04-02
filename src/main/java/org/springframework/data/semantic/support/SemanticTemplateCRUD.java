@@ -99,7 +99,9 @@ public class SemanticTemplateCRUD implements SemanticOperationsCRUD, Initializin
 	
 	public void changeDatabase(SemanticDatabase semanticDB){
 		this.semanticDB = semanticDB;
-		isInitialized = false;
+		synchronized (initLockObject) {
+			isInitialized = false;
+		}
 	}
 
 	private void lazyInit() {
