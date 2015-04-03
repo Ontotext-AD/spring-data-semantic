@@ -1,22 +1,22 @@
-<urn:sprind-data-semantic:entity:1> a <urn:sprind-data-semantic:ModelEntity> .
-<urn:sprind-data-semantic:entity:1> <http://www.w3.org/2004/02/skos/core#prefLabel> "Model Entity One" .
-<urn:sprind-data-semantic:entity:1> <http://www.w3.org/2004/02/skos/core#altLabel> "Model Entity Eins" .
-<urn:sprind-data-semantic:entity:1> <http://www.w3.org/2004/02/skos/core#altLabel> "Model Entity Uno" .
-<urn:sprind-data-semantic:entity:1> <urn:sprind-data-semantic:related> <urn:sprind-data-semantic:entity:2> .
-<urn:sprind-data-semantic:entity:2> <urn:sprind-data-semantic:related> <urn:sprind-data-semantic:entity:1> .
-<urn:sprind-data-semantic:entity:1> <urn:sprind-data-semantic:related> <urn:sprind-data-semantic:entity:3> .
-<urn:sprind-data-semantic:entity:3> <urn:sprind-data-semantic:related> <urn:sprind-data-semantic:entity:1> .
-<urn:sprind-data-semantic:entity:2> a <urn:sprind-data-semantic:ModelEntity> .
-<urn:sprind-data-semantic:entity:2> <http://www.w3.org/2004/02/skos/core#prefLabel> "Model Entity Two" .
-<urn:sprind-data-semantic:entity:2> <http://www.w3.org/2004/02/skos/core#altLabel> "Model Entity Zwei" .
-<urn:sprind-data-semantic:entity:2> <http://www.w3.org/2004/02/skos/core#altLabel> "Model Entity Due" .
-<urn:sprind-data-semantic:entity:3> a <urn:sprind-data-semantic:ModelEntity> .
-<urn:sprind-data-semantic:entity:4> a <urn:sprind-data-semantic:ModelEntity> .
-<urn:sprind-data-semantic:entity:2> <urn:sprind-data-semantic:related> <urn:sprind-data-semantic:entity:3> .
-<urn:sprind-data-semantic:entity:3> <urn:sprind-data-semantic:related> <urn:sprind-data-semantic:entity:2> .
-<urn:sprind-data-semantic:entity:2> <urn:sprind-data-semantic:related> <urn:sprind-data-semantic:entity:4> .
-<urn:sprind-data-semantic:entity:4> <urn:sprind-data-semantic:related> <urn:sprind-data-semantic:entity:2> .
-<urn:sprind-data-semantic:collector:1> a <urn:sprind-data-semantic:ModelEntityCollector> .
-<urn:sprind-data-semantic:collector:1> <urn:sprind-data-semantic:entities> <urn:sprind-data-semantic:entity:1> .
-<urn:sprind-data-semantic:collector:1> <urn:sprind-data-semantic:entities> <urn:sprind-data-semantic:entity:2> .
+<urn:spring-data-semantic:entity:1> a <urn:spring-data-semantic:ModelEntity> .
+<urn:spring-data-semantic:entity:1> <http://www.w3.org/2004/02/skos/core#prefLabel> "Model Entity One" .
+<urn:spring-data-semantic:entity:1> <http://www.w3.org/2004/02/skos/core#altLabel> "Model Entity Eins" .
+<urn:spring-data-semantic:entity:1> <http://www.w3.org/2004/02/skos/core#altLabel> "Model Entity Uno" .
+<urn:spring-data-semantic:entity:1> <urn:spring-data-semantic:related> <urn:spring-data-semantic:entity:2> .
+<urn:spring-data-semantic:entity:2> <urn:spring-data-semantic:related> <urn:spring-data-semantic:entity:1> .
+<urn:spring-data-semantic:entity:1> <urn:spring-data-semantic:related> <urn:spring-data-semantic:entity:3> .
+<urn:spring-data-semantic:entity:3> <urn:spring-data-semantic:related> <urn:spring-data-semantic:entity:1> .
+<urn:spring-data-semantic:entity:2> a <urn:spring-data-semantic:ModelEntity> .
+<urn:spring-data-semantic:entity:2> <http://www.w3.org/2004/02/skos/core#prefLabel> "Model Entity Two" .
+<urn:spring-data-semantic:entity:2> <http://www.w3.org/2004/02/skos/core#altLabel> "Model Entity Zwei" .
+<urn:spring-data-semantic:entity:2> <http://www.w3.org/2004/02/skos/core#altLabel> "Model Entity Due" .
+<urn:spring-data-semantic:entity:3> a <urn:spring-data-semantic:ModelEntity> .
+<urn:spring-data-semantic:entity:4> a <urn:spring-data-semantic:ModelEntity> .
+<urn:spring-data-semantic:entity:2> <urn:spring-data-semantic:related> <urn:spring-data-semantic:entity:3> .
+<urn:spring-data-semantic:entity:3> <urn:spring-data-semantic:related> <urn:spring-data-semantic:entity:2> .
+<urn:spring-data-semantic:entity:2> <urn:spring-data-semantic:related> <urn:spring-data-semantic:entity:4> .
+<urn:spring-data-semantic:entity:4> <urn:spring-data-semantic:related> <urn:spring-data-semantic:entity:2> .
+<urn:spring-data-semantic:collector:1> a <urn:spring-data-semantic:ModelEntityCollector> .
+<urn:spring-data-semantic:collector:1> <urn:spring-data-semantic:entities> <urn:spring-data-semantic:entity:1> .
+<urn:spring-data-semantic:collector:1> <urn:spring-data-semantic:entities> <urn:spring-data-semantic:entity:2> .
 

@@ -16,11 +16,10 @@
 package org.springframework.data.semantic.model;
 
 import org.openrdf.model.URI;
-import org.springframework.data.semantic.annotation.Predicate;
-import org.springframework.data.semantic.annotation.RelatedTo;
-import org.springframework.data.semantic.annotation.ResourceId;
-import org.springframework.data.semantic.annotation.SemanticEntity;
+import org.springframework.data.semantic.annotation.*;
+import org.springframework.data.semantic.model.vocabulary.WINE;
 
+@Namespace(namespace = WINE.NAMESPACE)
 @SemanticEntity
 public class Merlot {
 	
