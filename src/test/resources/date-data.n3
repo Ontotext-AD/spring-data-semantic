@@ -1,2 +1,2 @@
-<urn:sprind-data-semantic:date:1> a <urn:sprind-data-semantic:DateEntity> .
-<urn:sprind-data-semantic:date:1> <urn:sprind-data-semantic:date> "2014-08-21T10:00:00.000Z"^^<http://www.w3.org/2001/XMLSchema#dateTime> .
+<urn:spring-data-semantic:date:1> a <urn:spring-data-semantic:DateEntity> .
+<urn:spring-data-semantic:date:1> <urn:spring-data-semantic:date> "2014-08-21T10:00:00.000Z"^^<http://www.w3.org/2001/XMLSchema#dateTime> .

@@ -368,7 +368,7 @@ public class PooledSemanticDatabase implements SemanticDatabase{
 		try {
 			String defaultNSName = con.getNamespace("");
 			if(defaultNSName == null){
-				return new NamespaceImpl("", "urn:sprind-data-semantic:");
+				return new NamespaceImpl("", "urn:spring-data-semantic:");
 			}
 			return new NamespaceImpl("", defaultNSName);
 		} finally {

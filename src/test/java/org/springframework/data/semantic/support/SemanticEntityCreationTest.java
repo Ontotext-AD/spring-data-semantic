@@ -44,6 +44,7 @@ import org.springframework.data.semantic.core.SemanticDatabase;
 import org.springframework.data.semantic.core.SemanticOperationsCRUD;
 import org.springframework.data.semantic.mapping.SemanticPersistentEntity;
 import org.springframework.data.semantic.model.Merlot;
+import org.springframework.data.semantic.model.vocabulary.WINE;
 import org.springframework.data.semantic.support.convert.EntityToQueryConverter;
 import org.springframework.data.semantic.support.mapping.SemanticMappingContext;
 import org.springframework.data.semantic.testutils.Utils;
@@ -72,10 +73,7 @@ public class SemanticEntityCreationTest {
 
 	@Autowired
 	SemanticDatabase sdb;
-		
-	Namespace defaultNs;
-	List<Namespace> namespaces;
-	
+
 	SemanticMappingContext mappingContext;
 	SemanticPersistentEntity<?> testEntityType;
 	
@@ -88,16 +86,14 @@ public class SemanticEntityCreationTest {
 	public void prepare() throws RepositoryException {
 		//populate repository with test data in order to have repeatable results
 		Utils.populateTestRepository(sdb);	
-		defaultNs = sdb.getDefaultNamespace();
-		namespaces = sdb.getNamespaces();
-		
+
 		expectedStatements = new HashMap<String, Statement>();
 				
 		expectedStatements.put("urn:field:flavor",
 				new StatementImpl(
-						new URIImpl(defaultNs.getName()+"LongridgeMerlot"), 
+						new URIImpl(WINE.NAMESPACE+"LongridgeMerlot"),
 						new URIImpl("urn:field:flavor"), 
-						new URIImpl(defaultNs.getName()+"Moderate")));
+						new URIImpl(WINE.NAMESPACE+"Moderate")));
 		
 		/*expectedStatements.put("urn:field:body",
 				new StatementImpl(
@@ -107,36 +103,36 @@ public class SemanticEntityCreationTest {
 		
 		expectedStatements.put("urn:field:maker",
 				new StatementImpl(
-						new URIImpl(defaultNs.getName()+"LongridgeMerlot"), 
+						new URIImpl(WINE.NAMESPACE+"LongridgeMerlot"),
 						new URIImpl("urn:field:maker"), 
-						new URIImpl(defaultNs.getName()+"Longridge")));
+						new URIImpl(WINE.NAMESPACE+"Longridge")));
 		
 		expectedStatements.put("urn:field:sugar",
 				new StatementImpl(
-						new URIImpl(defaultNs.getName()+"LongridgeMerlot"), 
+						new URIImpl(WINE.NAMESPACE+"LongridgeMerlot"),
 						new URIImpl("urn:field:sugar"), 
-						new URIImpl(defaultNs.getName()+"Dry")));
+						new URIImpl(WINE.NAMESPACE+"Dry")));
 		
 		expectedStatements.put("urn:field:location",
 				new StatementImpl(
-						new URIImpl(defaultNs.getName()+"LongridgeMerlot"), 
+						new URIImpl(WINE.NAMESPACE+"LongridgeMerlot"),
 						new URIImpl("urn:field:location"), 
-						new URIImpl(defaultNs.getName()+"NewZealandRegion")));
+						new URIImpl(WINE.NAMESPACE+"NewZealandRegion")));
 		
 		expectedStatements.put("urn:field:year",
 				new StatementImpl(
-						new URIImpl(defaultNs.getName()+"LongridgeMerlot"), 
+						new URIImpl(WINE.NAMESPACE+"LongridgeMerlot"),
 						new URIImpl("urn:field:year"), 
 						new IntegerMemLiteral(null, BigInteger.valueOf(1998), XMLSchema.POSITIVE_INTEGER)));
 		
-		expBody = new URIImpl(defaultNs.getName()+"Light");
-		expFlavor = defaultNs.getName() + "Moderate";
-		expMaker = defaultNs.getName() + "Longridge";
-		expSugar = defaultNs.getName() + "Dry";
-		expLocation = defaultNs.getName() + "NewZealandRegion";
+		expBody = new URIImpl(WINE.NAMESPACE + "Light");
+		expFlavor = WINE.NAMESPACE + "Moderate";
+		expMaker = WINE.NAMESPACE + "Longridge";
+		expSugar = WINE.NAMESPACE + "Dry";
+		expLocation = WINE.NAMESPACE + "NewZealandRegion";
 		expYear = 1998;
 		
-		mappingContext = new SemanticMappingContext(namespaces, defaultNs, true);
+		mappingContext = new SemanticMappingContext(sdb.getNamespaces(), sdb.getDefaultNamespace(), true);
 		testEntityType = mappingContext.getPersistentEntity(ClassTypeInformation.from(Merlot.class));
 		ConversionService conversionService = new DefaultConversionService();
 		operations = new SemanticTemplateCRUD(sdb, conversionService, true);

@@ -19,7 +19,7 @@ import org.openrdf.model.URI;
 
 public class MODEL_ENTITY extends VOCABULARY {
 	
-	public static final String NAMESPACE = "urn:sprind-data-semantic:";
+	public static final String NAMESPACE = "urn:spring-data-semantic:";
 	
 	public final static URI ENTITY_ONE = create("entity:1");
 	
