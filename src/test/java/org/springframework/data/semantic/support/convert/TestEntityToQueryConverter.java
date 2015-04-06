@@ -44,9 +44,13 @@ public class TestEntityToQueryConverter {
 	private String expectedBindingsEager = "<http://ontotext.com/resource/test-collection> a <urn:spring-data-semantic:ModelEntityCollector> . <http://ontotext.com/resource/test-collection> <urn:modelentitycollector:field:entities> ?modelentitycollector_entities . ?modelentitycollector_entities a <urn:spring-data-semantic:ModelEntity> . ?modelentitycollector_entities <urn:modelentity:field:name> ?modelentitycollector_entities_modelentity_name . ?modelentitycollector_entities <urn:modelentity:field:synonyms> ?modelentitycollector_entities_modelentity_synonyms . ?modelentitycollector_entities <urn:modelentity:field:related> ?modelentitycollector_entities_modelentity_related . ";
 	private String expectedPatternEager = "<http://ontotext.com/resource/test-collection> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <urn:spring-data-semantic:ModelEntityCollector> . <http://ontotext.com/resource/test-collection> <urn:spring-data-semantic:entities> ?modelentitycollector_entities . ?modelentitycollector_entities <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <urn:spring-data-semantic:ModelEntity> . OPTIONAL { ?modelentitycollector_entities <http://www.w3.org/2004/02/skos/core#prefLabel> ?modelentitycollector_entities_modelentity_name . } OPTIONAL { ?modelentitycollector_entities <http://www.w3.org/2004/02/skos/core#altLabel> ?modelentitycollector_entities_modelentity_synonyms . } OPTIONAL { ?modelentitycollector_entities <urn:spring-data-semantic:related> ?modelentitycollector_entities_modelentity_related . } ";
 	private String expectedQueryEager = "CONSTRUCT { "+expectedBindingsEager+" } WHERE { "+expectedPatternEager+"}";
-	
-	
-	private URI resource = new URIImpl("http://ontotext.com/resource/test");
+
+    private String expectedBindingsUnion = "<http://ontotext.com/resource/test> a <urn:spring-data-semantic:ModelEntity> . <http://ontotext.com/resource/test> <urn:modelentity:field:name> ?modelentity_name . <http://ontotext.com/resource/test> <urn:modelentity:field:synonyms> ?modelentity_synonyms . <http://ontotext.com/resource/test> <urn:modelentity:field:related> ?modelentity_related . ";
+    private String expectedPatternUnion = "<http://ontotext.com/resource/test> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <urn:spring-data-semantic:ModelEntity> . {} UNION { <http://ontotext.com/resource/test> <http://www.w3.org/2004/02/skos/core#prefLabel> ?modelentity_name . } UNION { <http://ontotext.com/resource/test> <http://www.w3.org/2004/02/skos/core#altLabel> ?modelentity_synonyms . } {} UNION { { <http://ontotext.com/resource/test> <urn:spring-data-semantic:related> ?modelentity_related . } } ";
+    private String expectedQueryUnion = "CONSTRUCT { "+expectedBindingsUnion+" } WHERE { "+expectedPatternUnion+"}";
+
+
+    private URI resource = new URIImpl("http://ontotext.com/resource/test");
 	
 	private URI collectionResource = new URIImpl("http://ontotext.com/resource/test-collection");
 	
@@ -84,7 +88,7 @@ public class TestEntityToQueryConverter {
 
 	@Test
 	public void TestPatternCreation(){
-		String queryPattern = entityToQueryConverter.getPropertyPatterns(resource, testEntityType, new HashMap<String, Object>(), false, MappingPolicyImpl.ALL_POLICY);
+		String queryPattern = entityToQueryConverter.getPropertyPatterns(resource, testEntityType, new HashMap<String, Object>(), false, MappingPolicyImpl.ALL_POLICY, false);
 		String[] expected = expectedPattern.replaceAll("\\{|\\}", " ").replaceAll("\\s+", " ").split(" \\. ");
 		String[] resultPattern = queryPattern.replaceAll("\\{|\\}", " ").replaceAll("\\s+", " ").split(" \\. ");
 		Arrays.sort(expected, comparator);
@@ -97,7 +101,7 @@ public class TestEntityToQueryConverter {
 	@Test
 	public void TestGraphQueryCreation(){
 		String query = entityToQueryConverter.getGraphQueryForResource(resource, testEntityType, MappingPolicyImpl.ALL_POLICY);
-		String[] expected = expectedQuery.replaceAll("\\{|\\}", " ").replaceAll("\\s+", " ").split(" \\. ");
+		String[] expected = expectedQueryUnion.replaceAll("\\{|\\}", " ").replaceAll("\\s+", " ").split(" \\. ");
 		String[] resultBindings = query.replaceAll("\\{|\\}", " ").replaceAll("\\s+", " ").split(" \\. ");
 		Arrays.sort(expected, comparator);
 		Arrays.sort(resultBindings, comparator);
@@ -116,7 +120,7 @@ public class TestEntityToQueryConverter {
 	
 	@Test
 	public void TestPatternCreationEagerLoad(){
-		String queryPattern = entityToQueryConverter.getPropertyPatterns(collectionResource, testCollectionType, new HashMap<String, Object>(), false, MappingPolicyImpl.ALL_POLICY);
+		String queryPattern = entityToQueryConverter.getPropertyPatterns(collectionResource, testCollectionType, new HashMap<String, Object>(), false, MappingPolicyImpl.ALL_POLICY, false);
 		String[] expected = expectedPatternEager.replaceAll("\\{|\\}", " ").replaceAll("\\s+", " ").split(" \\. ");
 		String[] resultPattern = queryPattern.replaceAll("\\{|\\}", " ").replaceAll("\\s+", " ").split(" \\. ");
 		Arrays.sort(expected, comparator);

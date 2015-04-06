@@ -41,8 +41,14 @@ public class PropertiesToPatternsHandler extends AbstractPropertiesToQueryHandle
 	private int depth;
 	private boolean isCount;
 	private boolean isDelete;
+    private boolean useUnions;
+    private boolean lastWasOptional = false;
 	private final MappingPolicy globalMappingPolicy;
-	
+
+    public PropertiesToPatternsHandler(StringBuilder sb, String binding, Map<String, Object> propertyToValue, SemanticMappingContext mappingContext, boolean isCount, boolean isDelete, MappingPolicy globalMappingPolicy, boolean useUnions){
+        this(sb, binding, propertyToValue, mappingContext, 0, isCount, isDelete, globalMappingPolicy);
+        this.useUnions = useUnions;
+    }
 	
 	public PropertiesToPatternsHandler(StringBuilder sb, String binding, Map<String, Object> propertyToValue, SemanticMappingContext mappingContext, boolean isCount, boolean isDelete, MappingPolicy globalMappingPolicy){
 		this(sb, binding, propertyToValue, mappingContext, 0, isCount, isDelete, globalMappingPolicy);
@@ -83,9 +89,21 @@ public class PropertiesToPatternsHandler extends AbstractPropertiesToQueryHandle
 		if(optional && isCount){
 			return;
 		}
-		if(optional){
-			sb.append("OPTIONAL { ");
-		}
+        if(useUnions){
+            if(optional){
+                if(!lastWasOptional){
+                    lastWasOptional = true;
+                    sb.append("{} ");
+                } else {
+                    lastWasOptional = false;
+                }
+                sb.append("UNION { ");
+            }
+        } else {
+            if (optional) {
+                sb.append("OPTIONAL { ");
+            }
+        }
 		handlePersistentProperty(persistentProperty);
 		if(persistentProperty.getMappingPolicy().combineWith(globalMappingPolicy).shouldCascade(Cascade.GET)){
 			SemanticPersistentEntity<?> associatedPersistentEntity = mappingContext.getPersistentEntity(persistentProperty.getActualType());
@@ -140,9 +158,22 @@ public class PropertiesToPatternsHandler extends AbstractPropertiesToQueryHandle
 	}
 	
 	private void addPattern(SemanticPersistentProperty persistentProperty, Boolean optional, String subj, String pred, String obj){
-		if(optional){
-			sb.append("OPTIONAL { ");
-		}
+		if(useUnions){
+            if(optional){
+                if(!lastWasOptional){
+                    lastWasOptional = true;
+                    sb.append("{} ");
+                } else {
+                    lastWasOptional = false;
+                }
+                sb.append("UNION ");
+            }
+            sb.append("{ ");
+        } else {
+            if (optional) {
+                sb.append("OPTIONAL { ");
+            }
+        }
 		if(persistentProperty.isAssociation()){
 			if(Direction.INCOMING.equals(persistentProperty.getDirection())){
 				SemanticPersistentProperty associatedProperty = persistentProperty.getInverseProperty();
@@ -161,7 +192,7 @@ public class PropertiesToPatternsHandler extends AbstractPropertiesToQueryHandle
 		else{
 			appendPattern(sb, subj, pred, obj);
 		}
-		if(optional){
+		if(optional || useUnions){
 			sb.append("} ");
 		}
 	}

@@ -104,9 +104,8 @@ public class EntityToQueryConverter {
 		sb.append(getPropertyBindings(uri, entity, propertyToValue, globalMappingPolicy, originalPredicates));
 		sb.append(" }\n");
 		sb.append("WHERE { ");
-		sb.append(getPropertyPatterns(uri, entity, propertyToValue, false, globalMappingPolicy));
+		sb.append(getPropertyPatterns(uri, entity, propertyToValue, false, globalMappingPolicy, true));
 		sb.append(" }");
-		
 		return sb.toString();
 	}
 	
@@ -119,10 +118,9 @@ public class EntityToQueryConverter {
 		StringBuilder sb = new StringBuilder();
 		String subjectBinding  = getSubjectBinding(null, entity);
 		sb.append("SELECT (COUNT (DISTINCT "+subjectBinding+") as ?count) WHERE { "+subjectBinding+" a <"+entity.getRDFType()+"> . ");
-		sb.append(getPropertyPatterns(null, entity, propertyToValue, true, MappingPolicyImpl.ALL_POLICY));
+		sb.append(getPropertyPatterns(null, entity, propertyToValue, true, MappingPolicyImpl.ALL_POLICY, false));
 		sb.append("}");
 		return sb.toString();
-		
 	}
 	
 	/**
@@ -157,7 +155,7 @@ public class EntityToQueryConverter {
 		sb.append(getPropertyBindings(null, entity, propertyToValue, MappingPolicyImpl.ALL_POLICY, false));
 		sb.append(" }\n");
 		sb.append("WHERE { ");
-		sb.append(getPropertyPatterns(null, entity, propertyToValue, false, MappingPolicyImpl.ALL_POLICY));
+		sb.append(getPropertyPatterns(null, entity, propertyToValue, false, MappingPolicyImpl.ALL_POLICY, false));
 		sb.append(" }");
 		
 		return sb.toString();
@@ -208,7 +206,7 @@ public class EntityToQueryConverter {
 		return sb.toString();
 	}
 	
-	protected String getPropertyPatterns(URI uri, SemanticPersistentEntity<?> entity, Map<String, Object> propertyToValue, boolean isCount, MappingPolicy globalMappingPolicy){
+	protected String getPropertyPatterns(URI uri, SemanticPersistentEntity<?> entity, Map<String, Object> propertyToValue, boolean isCount, MappingPolicy globalMappingPolicy, boolean useUnions){
 		StringBuilder sb = new StringBuilder();
 		/*SemanticPersistentProperty contextP = entity.getContextProperty();
 		if(contextP != null){
@@ -224,7 +222,7 @@ public class EntityToQueryConverter {
 			binding = "?"+entity.getRDFType().getLocalName();
 		}
 		AbstractPropertiesToQueryHandler.appendPattern(sb, binding, "<"+ValueUtils.RDF_TYPE_PREDICATE+">", "<"+entity.getRDFType()+">");
-		PropertiesToPatternsHandler handler = new PropertiesToPatternsHandler(sb, binding, propertyToValue, this.mappingContext, isCount, false, globalMappingPolicy);
+		PropertiesToPatternsHandler handler = new PropertiesToPatternsHandler(sb, binding, propertyToValue, this.mappingContext, isCount, false, globalMappingPolicy, useUnions);
 		entity.doWithProperties(handler);
 		entity.doWithAssociations(handler);
 		return sb.toString();
