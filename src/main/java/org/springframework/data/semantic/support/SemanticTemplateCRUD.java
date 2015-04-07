@@ -185,6 +185,7 @@ public class SemanticTemplateCRUD implements SemanticOperationsCRUD, Initializin
 	
 	@Override
 	public <T> T save(T entity) {
+		lazyInit();
 		@SuppressWarnings("unchecked")
 		SemanticPersistentEntity<T> persistentEntity = (SemanticPersistentEntity<T>) this.mappingContext.getPersistentEntity(entity.getClass());
 		URI id = persistentEntity.getResourceId(entity);
