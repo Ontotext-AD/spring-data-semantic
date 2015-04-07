@@ -221,8 +221,14 @@ public class EntityToQueryConverter {
 		else{
 			binding = "?"+entity.getRDFType().getLocalName();
 		}
+        if(useUnions){
+            sb.append("{ ");
+        }
 		AbstractPropertiesToQueryHandler.appendPattern(sb, binding, "<"+ValueUtils.RDF_TYPE_PREDICATE+">", "<"+entity.getRDFType()+">");
-		PropertiesToPatternsHandler handler = new PropertiesToPatternsHandler(sb, binding, propertyToValue, this.mappingContext, isCount, false, globalMappingPolicy, useUnions);
+		if(useUnions){
+            sb.append("} ");
+        }
+        PropertiesToPatternsHandler handler = new PropertiesToPatternsHandler(sb, binding, propertyToValue, this.mappingContext, isCount, false, globalMappingPolicy, useUnions);
 		entity.doWithProperties(handler);
 		entity.doWithAssociations(handler);
 		return sb.toString();

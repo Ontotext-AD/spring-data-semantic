@@ -164,7 +164,7 @@ public class PropertiesToPatternsHandler extends AbstractPropertiesToQueryHandle
             if(optional){
                 if(!lastWasOptional){
                     lastWasOptional = true;
-                    sb.append("{} ");
+                    //sb.append("{} ");
                 } else {
                     lastWasOptional = false;
                 }
