@@ -22,6 +22,8 @@ import org.openrdf.model.ValueFactory;
 import org.openrdf.model.impl.ValueFactoryImpl;
 import org.springframework.core.convert.converter.Converter;
 
+import javax.xml.datatype.XMLGregorianCalendar;
+
 /**
  * 
  * @author konstantin.pentchev
@@ -75,6 +77,9 @@ public class ObjectToLiteralConverter implements Converter<Object, Value> {
 		else if(source instanceof String){
 			return factory.createLiteral((String) source);
 		}
+        else if(source instanceof XMLGregorianCalendar){
+            return factory.createLiteral((XMLGregorianCalendar)source);
+        }
 		else {
 			return factory.createLiteral(source.toString());
 		}

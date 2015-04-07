@@ -13,48 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.data.semantic.model;
-
-import java.util.Date;
+package org.springframework.data.semantic.model.vocabulary;
 
 import org.openrdf.model.URI;
-import org.springframework.data.semantic.annotation.ResourceId;
-import org.springframework.data.semantic.annotation.SemanticEntity;
 
-@SemanticEntity
-public class DateEntity {
-	
-	@ResourceId
-	private URI id;
-	
-	private Date date;
+public class XMLCALENDAR_ENTITY extends VOCABULARY {
 
-	/**
-	 * @return the id
-	 */
-	public URI getId() {
-		return id;
-	}
+    public static final String NAMESPACE = "urn:spring-data-semantic:";
 
-	/**
-	 * @param id the id to set
-	 */
-	public void setId(URI id) {
-		this.id = id;
-	}
+    public static final URI DATE_ONE = create(NAMESPACE, "xmldate:1");
 
-	/**
-	 * @return the date
-	 */
-	public Date getDate() {
-		return date;
-	}
+    public static final URI YEAR_ONE = create(NAMESPACE, "xmlyear:1");
 
-	/**
-	 * @param date the date to set
-	 */
-	public void setDate(Date date) {
-		this.date = date;
-	}
-
+    public static final URI YEAR_MONTH_ONE = create(NAMESPACE, "xmlyearmonth:1");
 }

@@ -40,6 +40,8 @@ import org.springframework.data.semantic.mapping.SemanticPersistentProperty;
 import org.springframework.data.semantic.support.util.ValueUtils;
 import org.springframework.data.util.TypeInformation;
 
+import javax.xml.datatype.XMLGregorianCalendar;
+
 /**
  * 
  * @author konstantin.pentchev
@@ -53,6 +55,7 @@ public class SemanticMappingContext  extends AbstractMappingContext<SemanticPers
 		simpleTypes.add(Duration.class);
 		simpleTypes.add(Interval.class);
 		simpleTypes.add(Instant.class);
+        simpleTypes.add(XMLGregorianCalendar.class);
 	}
 	
 	private Namespace defaultNS;
