@@ -297,6 +297,13 @@ public class TestSemanticRepository {
 	}
 
     @Test
+    public void testXmlDateLoad(){
+        XMLGregorianCalendarEntity date = gregorianCalendarRepository.findOne(XMLCALENDAR_ENTITY.DATE_ONE);
+        assertNotNull(date);
+        assertNotNull(date.getDate());
+    }
+
+    @Test
     public void testXmlCalendarDateSave(){
         String xmlDate = "1922-12-14";
         String xmlYear = "-0429";
@@ -339,6 +346,8 @@ public class TestSemanticRepository {
         assertEquals(xmlCalYearMonth, xmlGregorianCalendarEntity3.getDate());
 
     }
+
+
 
     @Test
 	public void testDelete(){

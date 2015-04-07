@@ -19,7 +19,7 @@ import org.openrdf.model.datatypes.XMLDatatypeUtil;
 import org.springframework.core.convert.converter.Converter;
 import javax.xml.datatype.XMLGregorianCalendar;
 
-public class StringToXmlGregorianCalendarConverter implements Converter<String, XMLGregorianCalendar> {
+public class StringToXMLGregorianCalendarConverter implements Converter<String, XMLGregorianCalendar> {
 
     @Override
     public XMLGregorianCalendar convert(String s) {

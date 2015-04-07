@@ -54,7 +54,7 @@ public class SemanticConfigurationBeanDefinitionParser extends
 	}
 	
 	private void setupConfigurationClassPostProcessor(final ParserContext parserContext) {
-        BeanDefinitionRegistry beanDefinitionRegistry = parserContext.getRegistry();
+         BeanDefinitionRegistry beanDefinitionRegistry = parserContext.getRegistry();
 
         BeanDefinitionBuilder configurationClassPostProcessor = BeanDefinitionBuilder.rootBeanDefinition(ConfigurationClassPostProcessor.class);
         BeanNameGenerator beanNameGenerator = parserContext.getReaderContext().getReader().getBeanNameGenerator();
