@@ -46,7 +46,7 @@ public class TestEntityToQueryConverter {
 	private String expectedQueryEager = "CONSTRUCT { "+expectedBindingsEager+" } WHERE { "+expectedPatternEager+"}";
 
     private String expectedBindingsUnion = "<http://ontotext.com/resource/test> a <urn:spring-data-semantic:ModelEntity> . <http://ontotext.com/resource/test> <urn:modelentity:field:name> ?modelentity_name . <http://ontotext.com/resource/test> <urn:modelentity:field:synonyms> ?modelentity_synonyms . <http://ontotext.com/resource/test> <urn:modelentity:field:related> ?modelentity_related . ";
-    private String expectedPatternUnion = "<http://ontotext.com/resource/test> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <urn:spring-data-semantic:ModelEntity> . {} UNION { <http://ontotext.com/resource/test> <http://www.w3.org/2004/02/skos/core#prefLabel> ?modelentity_name . } UNION { <http://ontotext.com/resource/test> <http://www.w3.org/2004/02/skos/core#altLabel> ?modelentity_synonyms . } {} UNION { { <http://ontotext.com/resource/test> <urn:spring-data-semantic:related> ?modelentity_related . } } ";
+    private String expectedPatternUnion = "{ <http://ontotext.com/resource/test> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <urn:spring-data-semantic:ModelEntity> . } UNION { <http://ontotext.com/resource/test> <http://www.w3.org/2004/02/skos/core#prefLabel> ?modelentity_name . } UNION { <http://ontotext.com/resource/test> <http://www.w3.org/2004/02/skos/core#altLabel> ?modelentity_synonyms . } UNION { { <http://ontotext.com/resource/test> <urn:spring-data-semantic:related> ?modelentity_related . } } ";
     private String expectedQueryUnion = "CONSTRUCT { "+expectedBindingsUnion+" } WHERE { "+expectedPatternUnion+"}";
 
 

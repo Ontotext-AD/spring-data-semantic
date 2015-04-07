@@ -93,11 +93,13 @@ public class PropertiesToPatternsHandler extends AbstractPropertiesToQueryHandle
             if(optional){
                 if(!lastWasOptional){
                     lastWasOptional = true;
-                    sb.append("{} ");
+                    //sb.append("{} ");
                 } else {
                     lastWasOptional = false;
                 }
                 sb.append("UNION { ");
+            } else {
+                sb.append("{ ");
             }
         } else {
             if (optional) {
@@ -115,7 +117,7 @@ public class PropertiesToPatternsHandler extends AbstractPropertiesToQueryHandle
 				associatedPersistentEntity.doWithAssociations(associationHandler);
 			}
 		}
-		if(optional){
+		if(optional || useUnions){
 			sb.append("} ");
 		}
 	}
@@ -162,7 +164,7 @@ public class PropertiesToPatternsHandler extends AbstractPropertiesToQueryHandle
             if(optional){
                 if(!lastWasOptional){
                     lastWasOptional = true;
-                    sb.append("{} ");
+                    //sb.append("{} ");
                 } else {
                     lastWasOptional = false;
                 }
