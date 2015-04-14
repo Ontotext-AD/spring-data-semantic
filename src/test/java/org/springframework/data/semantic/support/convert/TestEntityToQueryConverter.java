@@ -93,8 +93,6 @@ public class TestEntityToQueryConverter {
 		String[] resultPattern = queryPattern.replaceAll("\\{|\\}", " ").replaceAll("\\s+", " ").split(" \\. ");
 		Arrays.sort(expected, comparator);
 		Arrays.sort(resultPattern, comparator);
-		System.out.println(Arrays.asList(expected));
-		System.out.println(Arrays.asList(resultPattern));
 		assertArrayEquals(expected, resultPattern);
 	}
 	
