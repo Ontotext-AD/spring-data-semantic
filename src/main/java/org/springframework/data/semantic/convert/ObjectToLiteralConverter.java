@@ -77,12 +77,11 @@ public class ObjectToLiteralConverter implements Converter<Object, Value> {
 		else if(source instanceof String){
 			return factory.createLiteral((String) source);
 		}
-        else if(source instanceof XMLGregorianCalendar){
-            return factory.createLiteral((XMLGregorianCalendar)source);
-        }
+		else if(source instanceof XMLGregorianCalendar){
+			return factory.createLiteral((XMLGregorianCalendar)source);
+		}
 		else {
 			return factory.createLiteral(source.toString());
 		}
 	}
-
 }

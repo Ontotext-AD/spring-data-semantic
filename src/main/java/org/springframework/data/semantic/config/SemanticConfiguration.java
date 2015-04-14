@@ -57,12 +57,12 @@ public class SemanticConfiguration {
 		conversionService.addConverter(new StringToDateConverter());
 		conversionService.addConverter(new StringToUriConverter());
 		conversionService.addConverter(new StringToSemanticResourceConverter());
-        conversionService.addConverter(new StringToXMLGregorianCalendarConverter());
+		conversionService.addConverter(new StringToXMLGregorianCalendarConverter());
 		return conversionService;
 	}
 	
 	@Bean
-    public PersistenceExceptionTranslator persistenceExceptionTranslator() {
+	public PersistenceExceptionTranslator persistenceExceptionTranslator() {
 		return new SemanticExceptionTranslator();
 	}
 }
