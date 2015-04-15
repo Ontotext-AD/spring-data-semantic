@@ -1,0 +1,2 @@
+<urn:spring-data-semantic:xmldate:1> a <urn:spring-data-semantic:XMLGregorianCalendarEntity> .
+<urn:spring-data-semantic:xmldate:1> <urn:spring-data-semantic:date> "2014-08-21"^^<http://www.w3.org/2001/XMLSchema#date> .

@@ -15,46 +15,33 @@
  */
 package org.springframework.data.semantic.model;
 
-import java.util.Date;
-
 import org.openrdf.model.URI;
 import org.springframework.data.semantic.annotation.ResourceId;
 import org.springframework.data.semantic.annotation.SemanticEntity;
 
+import javax.xml.datatype.XMLGregorianCalendar;
+
 @SemanticEntity
-public class DateEntity {
-	
-	@ResourceId
-	private URI id;
-	
-	private Date date;
+public class XMLGregorianCalendarEntity {
 
-	/**
-	 * @return the id
-	 */
-	public URI getId() {
-		return id;
-	}
+    @ResourceId
+    URI id;
 
-	/**
-	 * @param id the id to set
-	 */
-	public void setId(URI id) {
-		this.id = id;
-	}
+    XMLGregorianCalendar date;
 
-	/**
-	 * @return the date
-	 */
-	public Date getDate() {
-		return date;
-	}
+    public URI getId() {
+        return id;
+    }
 
-	/**
-	 * @param date the date to set
-	 */
-	public void setDate(Date date) {
-		this.date = date;
-	}
+    public void setId(URI id) {
+        this.id = id;
+    }
 
+    public XMLGregorianCalendar getDate() {
+        return date;
+    }
+
+    public void setDate(XMLGregorianCalendar date) {
+        this.date = date;
+    }
 }

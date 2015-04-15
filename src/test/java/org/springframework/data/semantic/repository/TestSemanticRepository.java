@@ -32,28 +32,21 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
+import org.openrdf.model.datatypes.XMLDatatypeUtil;
 import org.openrdf.repository.RepositoryException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.semantic.core.SemanticDatabase;
-import org.springframework.data.semantic.model.DateEntity;
-import org.springframework.data.semantic.model.DateEntityRepository;
-import org.springframework.data.semantic.model.ModelEntity;
-import org.springframework.data.semantic.model.ModelEntityCollector;
-import org.springframework.data.semantic.model.ModelEntityCollectorCascadeAll;
-import org.springframework.data.semantic.model.ModelEntityCollectorCascadeAllRepository;
-import org.springframework.data.semantic.model.ModelEntityCollectorRepository;
-import org.springframework.data.semantic.model.ModelEntityExtended;
-import org.springframework.data.semantic.model.ModelEntityExtendedRepository;
-import org.springframework.data.semantic.model.ModelEntityRepository;
-import org.springframework.data.semantic.model.WineBody;
-import org.springframework.data.semantic.model.WineBodyRepository;
+import org.springframework.data.semantic.model.*;
 import org.springframework.data.semantic.model.vocabulary.DATE_ENTITY;
 import org.springframework.data.semantic.model.vocabulary.MODEL_ENTITY;
 import org.springframework.data.semantic.model.vocabulary.WINE;
+import org.springframework.data.semantic.model.vocabulary.XMLCALENDAR_ENTITY;
 import org.springframework.data.semantic.testutils.Utils;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import javax.xml.datatype.XMLGregorianCalendar;
 
 @FixMethodOrder
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -72,12 +65,15 @@ public class TestSemanticRepository {
 	@Autowired
 	private ModelEntityCollectorCascadeAllRepository modelEntityCascadeAllRepository;
 
+    @Autowired
+    private XMLGregorianCalendarRepository gregorianCalendarRepository;
+
 	@Autowired
 	private SemanticDatabase sdb;
 	
 	@Autowired
 	private DateEntityRepository dateEntityRepository;
-	
+
 	@Autowired
 	private ModelEntityExtendedRepository modelEntityExtendedRepository;
 	
@@ -299,8 +295,61 @@ public class TestSemanticRepository {
 		assertNotNull(dateEntity);
 		assertEquals(date, dateEntity.getDate());
 	}
-	
-	@Test
+
+    @Test
+    public void testXmlDateLoad(){
+        XMLGregorianCalendarEntity date = gregorianCalendarRepository.findOne(XMLCALENDAR_ENTITY.DATE_ONE);
+        assertNotNull(date);
+        assertNotNull(date.getDate());
+    }
+
+    @Test
+    public void testXmlCalendarDateSave(){
+        String xmlDate = "1922-12-14";
+        String xmlYear = "-0429";
+        String xmlYearMonth = "1947-10";
+
+        XMLGregorianCalendar xmlCalDate = XMLDatatypeUtil.parseCalendar(xmlDate);
+        XMLGregorianCalendar xmlCalYear = XMLDatatypeUtil.parseCalendar(xmlYear);
+        XMLGregorianCalendar xmlCalYearMonth = XMLDatatypeUtil.parseCalendar(xmlYearMonth);
+
+        assertNotNull(xmlCalDate);
+        assertNotNull(xmlCalYear);
+        assertNotNull(xmlCalYearMonth);
+
+        XMLGregorianCalendarEntity xmlGregorianCalendarEntity1 = new XMLGregorianCalendarEntity();
+        xmlGregorianCalendarEntity1.setId(XMLCALENDAR_ENTITY.DATE_ONE);
+        xmlGregorianCalendarEntity1.setDate(xmlCalDate);
+
+        XMLGregorianCalendarEntity xmlGregorianCalendarEntity2 = new XMLGregorianCalendarEntity();
+        xmlGregorianCalendarEntity2.setId(XMLCALENDAR_ENTITY.YEAR_ONE);
+        xmlGregorianCalendarEntity2.setDate(xmlCalYear);
+
+        XMLGregorianCalendarEntity xmlGregorianCalendarEntity3 = new XMLGregorianCalendarEntity();
+        xmlGregorianCalendarEntity3.setId(XMLCALENDAR_ENTITY.YEAR_MONTH_ONE);
+        xmlGregorianCalendarEntity3.setDate(xmlCalYearMonth);
+
+        assertNotNull(gregorianCalendarRepository.save(xmlGregorianCalendarEntity1));
+        assertNotNull(gregorianCalendarRepository.save(xmlGregorianCalendarEntity2));
+        assertNotNull(gregorianCalendarRepository.save(xmlGregorianCalendarEntity3));
+
+        xmlGregorianCalendarEntity1 = gregorianCalendarRepository.findOne(XMLCALENDAR_ENTITY.DATE_ONE);
+        assertNotNull(xmlGregorianCalendarEntity1);
+        assertEquals(xmlCalDate, xmlGregorianCalendarEntity1.getDate());
+
+        xmlGregorianCalendarEntity2 = gregorianCalendarRepository.findOne(XMLCALENDAR_ENTITY.YEAR_ONE);
+        assertNotNull(xmlGregorianCalendarEntity2);
+        assertEquals(xmlCalYear, xmlGregorianCalendarEntity2.getDate());
+
+        xmlGregorianCalendarEntity3 = gregorianCalendarRepository.findOne(XMLCALENDAR_ENTITY.YEAR_MONTH_ONE);
+        assertNotNull(xmlGregorianCalendarEntity3);
+        assertEquals(xmlCalYearMonth, xmlGregorianCalendarEntity3.getDate());
+
+    }
+
+
+
+    @Test
 	public void testDelete(){
 		ModelEntity toDelete = new ModelEntity();
 		toDelete.setUri(MODEL_ENTITY.ENTITY_FIVE);

@@ -24,6 +24,7 @@ import org.springframework.dao.support.PersistenceExceptionTranslator;
 import org.springframework.data.semantic.convert.StringToDateConverter;
 import org.springframework.data.semantic.convert.StringToSemanticResourceConverter;
 import org.springframework.data.semantic.convert.StringToUriConverter;
+import org.springframework.data.semantic.convert.StringToXMLGregorianCalendarConverter;
 import org.springframework.data.semantic.core.SemanticDatabase;
 import org.springframework.data.semantic.core.SemanticExceptionTranslator;
 import org.springframework.data.semantic.support.SemanticTemplateCRUD;
@@ -56,11 +57,12 @@ public class SemanticConfiguration {
 		conversionService.addConverter(new StringToDateConverter());
 		conversionService.addConverter(new StringToUriConverter());
 		conversionService.addConverter(new StringToSemanticResourceConverter());
+		conversionService.addConverter(new StringToXMLGregorianCalendarConverter());
 		return conversionService;
 	}
 	
 	@Bean
-    public PersistenceExceptionTranslator persistenceExceptionTranslator() {
+	public PersistenceExceptionTranslator persistenceExceptionTranslator() {
 		return new SemanticExceptionTranslator();
 	}
 }

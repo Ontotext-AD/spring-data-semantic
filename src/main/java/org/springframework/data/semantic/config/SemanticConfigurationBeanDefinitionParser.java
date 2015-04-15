@@ -54,18 +54,18 @@ public class SemanticConfigurationBeanDefinitionParser extends
 	}
 	
 	private void setupConfigurationClassPostProcessor(final ParserContext parserContext) {
-        BeanDefinitionRegistry beanDefinitionRegistry = parserContext.getRegistry();
+		BeanDefinitionRegistry beanDefinitionRegistry = parserContext.getRegistry();
 
-        BeanDefinitionBuilder configurationClassPostProcessor = BeanDefinitionBuilder.rootBeanDefinition(ConfigurationClassPostProcessor.class);
-        BeanNameGenerator beanNameGenerator = parserContext.getReaderContext().getReader().getBeanNameGenerator();
-        AbstractBeanDefinition configurationClassPostProcessorBeanDefinition = configurationClassPostProcessor.getBeanDefinition();
-        String beanName = beanNameGenerator.generateBeanName(configurationClassPostProcessorBeanDefinition, beanDefinitionRegistry);
-        beanDefinitionRegistry.registerBeanDefinition(beanName, configurationClassPostProcessorBeanDefinition);
-    }
+		BeanDefinitionBuilder configurationClassPostProcessor = BeanDefinitionBuilder.rootBeanDefinition(ConfigurationClassPostProcessor.class);
+		BeanNameGenerator beanNameGenerator = parserContext.getReaderContext().getReader().getBeanNameGenerator();
+		AbstractBeanDefinition configurationClassPostProcessorBeanDefinition = configurationClassPostProcessor.getBeanDefinition();
+		String beanName = beanNameGenerator.generateBeanName(configurationClassPostProcessorBeanDefinition, beanDefinitionRegistry);
+		beanDefinitionRegistry.registerBeanDefinition(beanName, configurationClassPostProcessorBeanDefinition);
+	}
 
-    @Override
-    protected boolean shouldGenerateId() {
-        return true;
-    }
+	@Override
+	protected boolean shouldGenerateId() {
+		return true;
+	}
 
 }
