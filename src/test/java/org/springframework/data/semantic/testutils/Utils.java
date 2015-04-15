@@ -48,7 +48,7 @@ public class Utils {
 		String[] filesToLoad = new String[]{"wine.ttl", "model-data.n3", "date-data.n3", "xml-data.n3"};
 		for(String fileName : filesToLoad){
 			File sampleDataFile = getSampleDataFile(fileName);
-			if(sampleDataFile == null) return;		
+			if(sampleDataFile == null) return;
 			try {							
 				//populate with sample data			
 				sdb.addStatementsFromFile(sampleDataFile);
@@ -79,12 +79,12 @@ public class Utils {
 			throws QueryInterruptedException, RepositoryException, 
 			QueryCreationException, QueryEvaluationException, MalformedQueryException {
 		
-		String testQuery = "SELECT ?x {?x ?y ?z} LIMIT 1";
+		String testQuery = "SELECT ?x { ?x a <urn:spring-data-semantic:ModelEntity> } LIMIT 1";
 		List<BindingSet> result;
 		result = sdb.getQueryResults(testQuery);
 		if (!result.isEmpty()) {
 			return true;
-		}		
+		}
 		return false;
 	}
 }
