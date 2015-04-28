@@ -8,7 +8,8 @@
 
 
 	<context:annotation-config  />
-	<semantic:repositories base-package="org.springframework.data.semantic.model" />
+	<semantic:repositories base-package="org.springframework.data.semantic.modelfilter"
+                         factory-class="org.springframework.data.semantic.repository.FilteringSemanticRepositoryFactoryBean" />
 	<semantic:config semantic-database-ref="lcie" />
 	
 	<semantic:semantic-database id="lcie" url="target/repositories/data-test" configFile="classpath:META-INF/config/data-memory.ttl"/>

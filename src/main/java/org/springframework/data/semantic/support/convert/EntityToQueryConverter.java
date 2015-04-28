@@ -15,11 +15,13 @@
  */
 package org.springframework.data.semantic.support.convert;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
 import org.openrdf.model.URI;
+import org.springframework.data.semantic.filter.ValueFilter;
 import org.springframework.data.semantic.mapping.MappingPolicy;
 import org.springframework.data.semantic.mapping.SemanticPersistentEntity;
 import org.springframework.data.semantic.mapping.SemanticPersistentProperty;
@@ -74,8 +76,9 @@ public class EntityToQueryConverter {
 	 * @param entity - the container which holds the information about that entity
 	 * @return
 	 */
-	public String getGraphQueryForResourceWithOriginalPredicates(URI uri, SemanticPersistentEntity<?> entity, MappingPolicy globalMappingPolicy){
-		return getGraphQueryForResource(uri, entity, new HashMap<String, Object>(), globalMappingPolicy, true);
+	public String getGraphQueryForResourceWithOriginalPredicates(URI uri, SemanticPersistentEntity<?> entity,
+			MappingPolicy globalMappingPolicy, ValueFilter valueFilter){
+		return getGraphQueryForResource(uri, entity, new HashMap<String, Object>(), globalMappingPolicy, true, valueFilter);
 	}
 	
 	/**
@@ -85,8 +88,9 @@ public class EntityToQueryConverter {
 	 * @param entity - the container which holds the information about that entity
 	 * @return
 	 */
-	public String getGraphQueryForResource(URI uri, SemanticPersistentEntity<?> entity, MappingPolicy globalMappingPolicy){
-		return getGraphQueryForResource(uri, entity, new HashMap<String, Object>(), globalMappingPolicy, false);
+	public String getGraphQueryForResource(URI uri, SemanticPersistentEntity<?> entity,
+			MappingPolicy globalMappingPolicy, ValueFilter valueFilter){
+		return getGraphQueryForResource(uri, entity, new HashMap<String, Object>(), globalMappingPolicy, false, valueFilter);
 	}
 	
 	/**
@@ -94,17 +98,18 @@ public class EntityToQueryConverter {
 	 * Only 'retrievable' {@link #isRetrivableProperty(SemanticPersistentProperty)} properties will be fetched
 	 * @param uri - the uri of the entity
 	 * @param entity - the container which holds the information about that entity
-	 * @param propertiesToValues - the properties with their required values
+	 * @param propertyToValue - the properties with their required values
 	 * @return
 	 */
-	public String getGraphQueryForResource(URI uri, SemanticPersistentEntity<?> entity, Map<String, Object> propertyToValue, MappingPolicy globalMappingPolicy, Boolean originalPredicates){
+	public String getGraphQueryForResource(URI uri, SemanticPersistentEntity<?> entity,	Map<String, Object> propertyToValue,
+			MappingPolicy globalMappingPolicy, Boolean originalPredicates, ValueFilter valueFilter){
 		StringBuilder sb = new StringBuilder();
 		
 		sb.append("CONSTRUCT { ");
 		sb.append(getPropertyBindings(uri, entity, propertyToValue, globalMappingPolicy, originalPredicates));
 		sb.append(" }\n");
 		sb.append("WHERE { ");
-		sb.append(getPropertyPatterns(uri, entity, propertyToValue, false, globalMappingPolicy, true));
+		sb.append(getPropertyPatterns(uri, entity, propertyToValue, false, globalMappingPolicy, true, valueFilter));
 		sb.append(" }");
 		return sb.toString();
 	}
@@ -118,7 +123,7 @@ public class EntityToQueryConverter {
 		StringBuilder sb = new StringBuilder();
 		String subjectBinding  = getSubjectBinding(null, entity);
 		sb.append("SELECT (COUNT (DISTINCT "+subjectBinding+") as ?count) WHERE { "+subjectBinding+" a <"+entity.getRDFType()+"> . ");
-		sb.append(getPropertyPatterns(null, entity, propertyToValue, true, MappingPolicyImpl.ALL_POLICY, false));
+		sb.append(getPropertyPatterns(null, entity, propertyToValue, true, MappingPolicyImpl.ALL_POLICY, false, null));
 		sb.append("}");
 		return sb.toString();
 	}
@@ -145,17 +150,18 @@ public class EntityToQueryConverter {
 	}
 	
 	public String getGraphQueryForEntityClass(SemanticPersistentEntity<?> entity){
-		return getGraphQueryForEntityClass(entity, new HashMap<String, Object>());
+		return getGraphQueryForEntityClass(entity, Collections.EMPTY_MAP, null);
 	}
 	
-	public String getGraphQueryForEntityClass(SemanticPersistentEntity<?> entity, Map<String, Object> propertyToValue){
+	public String getGraphQueryForEntityClass(SemanticPersistentEntity<?> entity, Map<String, Object> propertyToValue,
+			ValueFilter valueFilter){
 		StringBuilder sb = new StringBuilder();
 		
 		sb.append("CONSTRUCT { ");
 		sb.append(getPropertyBindings(null, entity, propertyToValue, MappingPolicyImpl.ALL_POLICY, false));
 		sb.append(" }\n");
 		sb.append("WHERE { ");
-		sb.append(getPropertyPatterns(null, entity, propertyToValue, false, MappingPolicyImpl.ALL_POLICY, false));
+		sb.append(getPropertyPatterns(null, entity, propertyToValue, false, MappingPolicyImpl.ALL_POLICY, false, valueFilter));
 		sb.append(" }");
 		
 		return sb.toString();
@@ -206,7 +212,8 @@ public class EntityToQueryConverter {
 		return sb.toString();
 	}
 	
-	protected String getPropertyPatterns(URI uri, SemanticPersistentEntity<?> entity, Map<String, Object> propertyToValue, boolean isCount, MappingPolicy globalMappingPolicy, boolean useUnions){
+	protected String getPropertyPatterns(URI uri, SemanticPersistentEntity<?> entity, Map<String, Object> propertyToValue,
+			boolean isCount, MappingPolicy globalMappingPolicy, boolean useUnions, ValueFilter filter){
 		StringBuilder sb = new StringBuilder();
 		/*SemanticPersistentProperty contextP = entity.getContextProperty();
 		if(contextP != null){
@@ -228,7 +235,9 @@ public class EntityToQueryConverter {
 		if(useUnions){
             sb.append("} ");
         }
-        PropertiesToPatternsHandler handler = new PropertiesToPatternsHandler(sb, binding, propertyToValue, this.mappingContext, isCount, false, globalMappingPolicy, useUnions);
+        PropertiesToPatternsHandler handler = new PropertiesToPatternsHandler(sb, binding, propertyToValue, this.mappingContext,
+				isCount, false, globalMappingPolicy, useUnions);
+		handler.setValueFilter(filter);
 		entity.doWithProperties(handler);
 		entity.doWithAssociations(handler);
 		return sb.toString();

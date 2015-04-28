@@ -22,6 +22,7 @@ import java.util.Map;
 import org.openrdf.model.Model;
 import org.openrdf.model.URI;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.semantic.filter.ValueFilter;
 import org.springframework.data.semantic.support.mapping.SemanticMappingContext;
 
 public interface SemanticOperationsCRUD {
@@ -84,8 +85,15 @@ public interface SemanticOperationsCRUD {
      * @return
      */
     <T> T find(URI resourceId, Class<? extends T> clazz);
-    
-    /**
+
+	/**
+	 * Retrieves an entity of the given type T that is identified by the given {@link URI}.
+	 * @param resourceId
+	 * @return
+	 */
+	<T> T find(URI resourceId, Class<? extends T> clazz, ValueFilter valueFilter);
+
+	/**
      * Retrieve all entities of the given type T.
      * @param clazz
      * @return

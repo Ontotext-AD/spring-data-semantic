@@ -44,6 +44,7 @@ import org.springframework.data.semantic.convert.SemanticEntityRemover;
 import org.springframework.data.semantic.core.RDFState;
 import org.springframework.data.semantic.core.SemanticDatabase;
 import org.springframework.data.semantic.core.SemanticOperationsCRUD;
+import org.springframework.data.semantic.filter.ValueFilter;
 import org.springframework.data.semantic.mapping.SemanticPersistentEntity;
 import org.springframework.data.semantic.support.cache.EhCacheEntityCache;
 import org.springframework.data.semantic.support.cache.EmptyEntityCache;
@@ -189,7 +190,7 @@ public class SemanticTemplateCRUD implements SemanticOperationsCRUD, Initializin
 		@SuppressWarnings("unchecked")
 		SemanticPersistentEntity<T> persistentEntity = (SemanticPersistentEntity<T>) this.mappingContext.getPersistentEntity(entity.getClass());
 		URI id = persistentEntity.getResourceId(entity);
-		Model dbState = this.statementsCollector.getStatementsForResourceOriginalPredicates(id, entity.getClass(), MappingPolicyImpl.DEFAULT_POLICY);
+		Model dbState = this.statementsCollector.getStatementsForResourceOriginalPredicates(id, entity.getClass(), MappingPolicyImpl.DEFAULT_POLICY, null);
 		entity = this.entityPersister.persistEntity(entity, new RDFState(dbState));
 		entityCache.put(entity);
 		return entity;
@@ -203,7 +204,7 @@ public class SemanticTemplateCRUD implements SemanticOperationsCRUD, Initializin
 			@SuppressWarnings("unchecked")
 			SemanticPersistentEntity<T> persistentEntity = (SemanticPersistentEntity<T>) this.mappingContext.getPersistentEntity(entity.getClass());
 			URI id = persistentEntity.getResourceId(entity);
-			Model dbState = this.statementsCollector.getStatementsForResourceOriginalPredicates(id, entity.getClass(), MappingPolicyImpl.DEFAULT_POLICY);
+			Model dbState = this.statementsCollector.getStatementsForResourceOriginalPredicates(id, entity.getClass(), MappingPolicyImpl.DEFAULT_POLICY, null);
 			entityToExistingState.put(entity, new RDFState(dbState));
 		}
 		return this.entityPersister.persistEntities(entityToExistingState);
@@ -222,11 +223,16 @@ public class SemanticTemplateCRUD implements SemanticOperationsCRUD, Initializin
 
 	@Override
 	public <T> T find(URI resourceId, Class<? extends T> clazz) {
+		return find(resourceId, clazz, null);
+	}
+
+	@Override
+	public <T> T find(URI resourceId, Class<? extends T> clazz, ValueFilter valueFilter) {
 		lazyInit();
 		T entity = entityCache.get(resourceId, clazz);
 		if(entity == null){
 			try{
-				entity = createEntity(this.statementsCollector.getStatementsForResource(resourceId, clazz, MappingPolicyImpl.ALL_POLICY), clazz);
+				entity = createEntity(this.statementsCollector.getStatementsForResource(resourceId, clazz, MappingPolicyImpl.ALL_POLICY, valueFilter), clazz);
 				entityCache.put(entity);
 			} catch (DataAccessException e){
 				logger.error(e.getMessage(), e);

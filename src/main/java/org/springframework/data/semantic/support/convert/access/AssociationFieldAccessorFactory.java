@@ -97,7 +97,7 @@ public class AssociationFieldAccessorFactory implements FieldAccessorFactory {
 				Set<Resource> subjects = stIterator.subjects();
 				List<Object> result = new ArrayList<Object>(subjects.size());
 				for(Resource subject : subjects){
-					Model iterator = statementsCollector.getStatementsForResource((URI) subject, fieldType, MappingPolicyImpl.ALL_POLICY);
+					Model iterator = statementsCollector.getStatementsForResource((URI) subject, fieldType, MappingPolicyImpl.ALL_POLICY, null);
 					result.add(operations.createEntity(iterator, fieldType));
 				}
 				if(this.property.isArray()){
@@ -111,7 +111,7 @@ public class AssociationFieldAccessorFactory implements FieldAccessorFactory {
 				if(!stIterator.isEmpty()) {
 					
 					URI resource = (URI) stIterator.objects().iterator().next();
-					Model iterator = statementsCollector.getStatementsForResource(resource, fieldType, MappingPolicyImpl.ALL_POLICY);
+					Model iterator = statementsCollector.getStatementsForResource(resource, fieldType, MappingPolicyImpl.ALL_POLICY, null);
 					
 					return operations.createEntity(iterator, fieldType);
 				}

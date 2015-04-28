@@ -30,7 +30,7 @@ import org.springframework.data.semantic.support.repository.query.SemanticQueryM
 
 public class SemanticRepositoryFactory extends RepositoryFactorySupport{
 	
-	private final SemanticOperationsCRUD operations;
+	protected final SemanticOperationsCRUD operations;
 	
 	public SemanticRepositoryFactory(SemanticOperationsCRUD operations){
 		this.operations = operations;

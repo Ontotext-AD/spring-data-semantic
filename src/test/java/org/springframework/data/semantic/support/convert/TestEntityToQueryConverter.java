@@ -88,7 +88,8 @@ public class TestEntityToQueryConverter {
 
 	@Test
 	public void TestPatternCreation(){
-		String queryPattern = entityToQueryConverter.getPropertyPatterns(resource, testEntityType, new HashMap<String, Object>(), false, MappingPolicyImpl.ALL_POLICY, false);
+		String queryPattern = entityToQueryConverter.getPropertyPatterns(
+				resource, testEntityType, new HashMap<String, Object>(), false, MappingPolicyImpl.ALL_POLICY, false, null);
 		String[] expected = expectedPattern.replaceAll("\\{|\\}", " ").replaceAll("\\s+", " ").split(" \\. ");
 		String[] resultPattern = queryPattern.replaceAll("\\{|\\}", " ").replaceAll("\\s+", " ").split(" \\. ");
 		Arrays.sort(expected, comparator);
@@ -98,7 +99,7 @@ public class TestEntityToQueryConverter {
 	
 	@Test
 	public void TestGraphQueryCreation(){
-		String query = entityToQueryConverter.getGraphQueryForResource(resource, testEntityType, MappingPolicyImpl.ALL_POLICY);
+		String query = entityToQueryConverter.getGraphQueryForResource(resource, testEntityType, MappingPolicyImpl.ALL_POLICY, null);
 		String[] expected = expectedQueryUnion.replaceAll("\\{|\\}", " ").replaceAll("\\s+", " ").split(" \\. ");
 		String[] resultBindings = query.replaceAll("\\{|\\}", " ").replaceAll("\\s+", " ").split(" \\. ");
 		Arrays.sort(expected, comparator);
@@ -118,7 +119,8 @@ public class TestEntityToQueryConverter {
 	
 	@Test
 	public void TestPatternCreationEagerLoad(){
-		String queryPattern = entityToQueryConverter.getPropertyPatterns(collectionResource, testCollectionType, new HashMap<String, Object>(), false, MappingPolicyImpl.ALL_POLICY, false);
+		String queryPattern = entityToQueryConverter.getPropertyPatterns(
+				collectionResource, testCollectionType, new HashMap<String, Object>(), false, MappingPolicyImpl.ALL_POLICY, false, null);
 		String[] expected = expectedPatternEager.replaceAll("\\{|\\}", " ").replaceAll("\\s+", " ").split(" \\. ");
 		String[] resultPattern = queryPattern.replaceAll("\\{|\\}", " ").replaceAll("\\s+", " ").split(" \\. ");
 		Arrays.sort(expected, comparator);
@@ -128,7 +130,7 @@ public class TestEntityToQueryConverter {
 	
 	@Test
 	public void TestGraphQueryCreationEagerLoad(){
-		String query = entityToQueryConverter.getGraphQueryForResource(collectionResource, testCollectionType, MappingPolicyImpl.ALL_POLICY);
+		String query = entityToQueryConverter.getGraphQueryForResource(collectionResource, testCollectionType, MappingPolicyImpl.ALL_POLICY, null);
 		String[] expected = expectedQueryEager.replaceAll("\\{|\\}", " ").replaceAll("\\s+", " ").split(" \\. ");
 		String[] resultBindings = query.replaceAll("\\{|\\}", " ").replaceAll("\\s+", " ").split(" \\. ");
 		Arrays.sort(expected);

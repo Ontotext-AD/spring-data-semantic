@@ -24,6 +24,7 @@ import org.openrdf.model.URI;
 import org.openrdf.model.Value;
 import org.springframework.data.mapping.Association;
 import org.springframework.data.semantic.convert.ObjectToLiteralConverter;
+import org.springframework.data.semantic.filter.ValueFilter;
 import org.springframework.data.semantic.mapping.MappingPolicy;
 import org.springframework.data.semantic.mapping.SemanticPersistentEntity;
 import org.springframework.data.semantic.mapping.SemanticPersistentProperty;
@@ -44,6 +45,7 @@ public class PropertiesToPatternsHandler extends AbstractPropertiesToQueryHandle
     private boolean useUnions;
     private boolean lastWasOptional = false;
 	private final MappingPolicy globalMappingPolicy;
+	private ValueFilter valueFilter = null;
 
     public PropertiesToPatternsHandler(StringBuilder sb, String binding, Map<String, Object> propertyToValue, SemanticMappingContext mappingContext, boolean isCount, boolean isDelete, MappingPolicy globalMappingPolicy, boolean useUnions){
         this(sb, binding, propertyToValue, mappingContext, 0, isCount, isDelete, globalMappingPolicy);
@@ -193,9 +195,19 @@ public class PropertiesToPatternsHandler extends AbstractPropertiesToQueryHandle
 		}
 		else{
 			appendPattern(sb, subj, pred, obj);
+			if (valueFilter != null) {
+				String filterStr = valueFilter.toString(persistentProperty);
+				if (filterStr != null && filterStr.length() > 0) {
+					sb.append("FILTER(").append(filterStr).append(") .");
+				}
+			}
 		}
 		if(optional || useUnions){
 			sb.append("} ");
 		}
+	}
+
+	public void setValueFilter(ValueFilter valueFilter) {
+		this.valueFilter = valueFilter;
 	}
 }

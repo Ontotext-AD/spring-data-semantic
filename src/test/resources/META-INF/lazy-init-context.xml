@@ -8,7 +8,7 @@
 
 
   <context:annotation-config  />
-  <semantic:repositories base-package="org.springframework.data.semantic" />
+  <semantic:repositories base-package="org.springframework.data.semantic.model" />
   <semantic:config semantic-database-ref="lcie" />
 
   <semantic:semantic-database id="lcie" url="http://this.does.not.exist/repositories/foo" configFile="classpath:META-INF/config/data-memory.ttl"/>

@@ -36,6 +36,7 @@ import org.openrdf.repository.RepositoryException;
 import org.springframework.data.repository.query.QueryCreationException;
 import org.springframework.data.semantic.core.SemanticDatabase;
 import org.springframework.data.semantic.core.SemanticOperationsStatementsCollector;
+import org.springframework.data.semantic.filter.ValueFilter;
 import org.springframework.data.semantic.mapping.MappingPolicy;
 import org.springframework.data.semantic.mapping.SemanticPersistentEntity;
 import org.springframework.data.semantic.mapping.SemanticPersistentProperty;
@@ -79,20 +80,21 @@ public class SemanticTemplateStatementsCollector implements SemanticOperationsSt
 	}	
 	
 	@Override
-	public <T> Model getStatementsForResourceOriginalPredicates(URI resource, Class<? extends T> clazz, MappingPolicy globalMappingPolicy){
+	public <T> Model getStatementsForResourceOriginalPredicates(URI resource, Class<? extends T> clazz,
+			MappingPolicy globalMappingPolicy, ValueFilter valueFilter){
 		try {
 			return semanticDB.getGraphQueryResults(
-					entityToQueryConverter.getGraphQueryForResourceWithOriginalPredicates(resource, getPersistentEntity(clazz), globalMappingPolicy));
+					entityToQueryConverter.getGraphQueryForResourceWithOriginalPredicates(resource, getPersistentEntity(clazz), globalMappingPolicy, valueFilter));
 		} catch (Exception e) {
 			throw ExceptionTranslator.translateExceptionIfPossible(e);
 		}
 	}
 
 	@Override
-	public <T> Model getStatementsForResource(URI resource, Class<? extends T> clazz, MappingPolicy globalMappingPolicy) {
+	public <T> Model getStatementsForResource(URI resource, Class<? extends T> clazz, MappingPolicy globalMappingPolicy, ValueFilter valueFilter) {
 		try {
 			return semanticDB.getGraphQueryResults(
-					entityToQueryConverter.getGraphQueryForResource(resource, getPersistentEntity(clazz), globalMappingPolicy));
+					entityToQueryConverter.getGraphQueryForResource(resource, getPersistentEntity(clazz), globalMappingPolicy, valueFilter));
 		} catch (Exception e) {
 			throw ExceptionTranslator.translateExceptionIfPossible(e);
 		} 
@@ -120,7 +122,8 @@ public class SemanticTemplateStatementsCollector implements SemanticOperationsSt
 			Long offset, Long limit) {
 		try {
 			SemanticPersistentEntity<?> persistentEntity = mappingContext.getPersistentEntity(clazz);
-			Model results = semanticDB.getGraphQueryResults(entityToQueryConverter.getGraphQueryForEntityClass(persistentEntity, parameterToValue), offset, limit);
+			Model results = semanticDB.getGraphQueryResults(
+					entityToQueryConverter.getGraphQueryForEntityClass(persistentEntity, parameterToValue, null), offset, limit);
 			return assembleModels(persistentEntity.getRDFType(), results);
 		} catch (Exception e) {
 			throw ExceptionTranslator.translateExceptionIfPossible(e);
