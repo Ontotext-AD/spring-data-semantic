@@ -73,6 +73,7 @@ public class TestFilteringSemanticRepository {
 		Assert.assertFalse("There isn't a main label", StringUtils.isEmpty(lfe.getMainLabel()));
 		Assert.assertFalse("There isn't an optional label", StringUtils.isEmpty(lfe.getOptionalLabel()));
 		Assert.assertEquals("Not all optional labels retrieved", 3, lfe.getMultiLabel().size());
+		checkIgnoreLanguages(lfe);
 	}
 
 
@@ -96,8 +97,13 @@ public class TestFilteringSemanticRepository {
 		Assert.assertEquals("Unexpected optional label", "Optional " + langInData, lfe.getOptionalLabel());
 		final List<String> expectedMultiLabel = Collections.singletonList("Multi " + langInData);
 		Assert.assertEquals("Unexpected multi label", expectedMultiLabel, lfe.getMultiLabel());
+		checkIgnoreLanguages(lfe);
 	}
 
+	private void checkIgnoreLanguages(LangFilteredEntity lfe) {
+		final List<String> expectedIgnores = Arrays.asList("Ignore No Lang", "Ignore English", "Ignore Francias");
+		Assert.assertEquals("Unexpected ignore languages property value", expectedIgnores, lfe.getIgnoreLang());
+	}
 
 	@Test
 	public void multipleLanguages() {
@@ -107,6 +113,7 @@ public class TestFilteringSemanticRepository {
 		Assert.assertFalse("There isn't an optional label", StringUtils.isEmpty(lfe.getOptionalLabel()));
 		final List<String> expectedMultiLabel = Arrays.asList("Multi English", "Multi Francias");
 		Assert.assertEquals("Unexpected multi label", expectedMultiLabel, lfe.getMultiLabel());
+		checkIgnoreLanguages(lfe);
 	}
 
 

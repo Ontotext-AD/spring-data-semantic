@@ -2,5 +2,6 @@
     <urn:spring-data-semantic:mainLabel> "No Lang", "English"@en, "Francias"@fr ;
     <urn:spring-data-semantic:optionalLabel> "Optional No Lang", "Optional English"@en, "Optional Francias"@fr ;
     <urn:spring-data-semantic:multiLabel> "Multi No Lang", "Multi English"@en, "Multi Francias"@fr ;
-    <urn:spring-data-semantic:aUri> <urn:whatever> .
+    <urn:spring-data-semantic:aUri> <urn:whatever> ;
+    <urn:spring-data-semantic:ignoreLang> "Ignore No Lang", "Ignore English"@en, "Ignore Francias"@fr .
 

@@ -16,6 +16,7 @@
 package org.springframework.data.semantic.modelfilter;
 
 import org.openrdf.model.URI;
+import org.springframework.data.semantic.annotation.IgnoreLanguageFilter;
 import org.springframework.data.semantic.annotation.Optional;
 import org.springframework.data.semantic.annotation.ResourceId;
 import org.springframework.data.semantic.annotation.SemanticEntity;
@@ -32,6 +33,9 @@ public class LangFilteredEntity {
 	private String optionalLabel;
 	private List<String> multiLabel;
 	private URI aUri;
+
+	@IgnoreLanguageFilter
+	private List<String> ignoreLang;
 
 	public URI getUri() {
 		return uri;
@@ -71,5 +75,13 @@ public class LangFilteredEntity {
 
 	public void setaUri(URI aUri) {
 		this.aUri = aUri;
+	}
+
+	public List<String> getIgnoreLang() {
+		return ignoreLang;
+	}
+
+	public void setIgnoreLang(List<String> ignoreLang) {
+		this.ignoreLang = ignoreLang;
 	}
 }

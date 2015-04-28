@@ -16,6 +16,7 @@
 package org.springframework.data.semantic.filter;
 
 import org.openrdf.model.Literal;
+import org.springframework.data.semantic.annotation.IgnoreLanguageFilter;
 import org.springframework.data.semantic.mapping.SemanticPersistentProperty;
 
 /**
@@ -97,11 +98,13 @@ public final class ValueFilters {
 		}
 
 		@Override public String toString(SemanticPersistentProperty property) {
-			Class<?> ptype = property.isCollectionLike() ? property.getComponentType() : property.getType();
-			if (CharSequence.class.isAssignableFrom(ptype)
-					|| Literal.class.isAssignableFrom(ptype)) {
-				// we are expecting String or a Literal - the filter is applicable
-				return "lang(?" + property.getBindingName() + ") = \"" + lang + "\"";
+			if (!property.isAnnotationPresent(IgnoreLanguageFilter.class)) {
+				Class<?> ptype = property.isCollectionLike() ? property.getComponentType() : property.getType();
+				if (CharSequence.class.isAssignableFrom(ptype)
+						|| Literal.class.isAssignableFrom(ptype)) {
+					// we are expecting String or a Literal - the filter is applicable
+					return "lang(?" + property.getBindingName() + ") = \"" + lang + "\"";
+				}
 			}
 			return null;
 		}
