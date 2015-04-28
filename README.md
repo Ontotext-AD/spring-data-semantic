@@ -11,8 +11,7 @@ Two steps are needed to use the value filters:
 
 1. Make your repository interfaces extend `FilteringSemanticRepository<T>` instead of `SemanticRepository<T>`
 2. Add `factory-class="org.springframework.data.semantic.repository.FilteringSemanticRepositoryFactoryBean"` attribute to `<semantic:repositories>` in your
-application context. E.g.
-```
+application context. E.g.```
 <semantic:repositories base-package="com.example.repositories"
                        factory-class="org.springframework.data.semantic.repository.FilteringSemanticRepositoryFactoryBean" />
 ```
