@@ -15,12 +15,6 @@
  */
 package org.springframework.data.semantic.support.convert.state;
 
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
 import org.openrdf.model.Model;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
@@ -40,6 +34,12 @@ import org.springframework.data.semantic.support.convert.access.DelegatingFieldA
 import org.springframework.data.semantic.support.convert.access.DelegatingFieldAccessorProvider;
 import org.springframework.data.semantic.support.convert.access.listener.DelegatingFieldAccessListenerFactory;
 import org.springframework.data.semantic.support.convert.access.listener.DelegatingFieldAccessListenerProvider;
+
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 public class SemanticEntityState<T> implements
 		EntityState<T, RDFState> {
