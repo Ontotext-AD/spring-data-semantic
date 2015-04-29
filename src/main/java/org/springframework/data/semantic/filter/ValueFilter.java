@@ -15,6 +15,7 @@
  */
 package org.springframework.data.semantic.filter;
 
+import org.openrdf.model.Statement;
 import org.springframework.data.semantic.mapping.SemanticPersistentProperty;
 
 /**
@@ -29,4 +30,12 @@ public interface ValueFilter {
 	 * means there will be no filter
 	 */
 	String toString(SemanticPersistentProperty property);
+
+	/**
+	 * Compare two statements depending on filter's implementation
+	 * @param statement1
+	 * @param statement2
+	 * @return
+	 */
+	int compare(Statement statement1, Statement statement2);
 }

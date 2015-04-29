@@ -15,17 +15,11 @@
  */
 package org.springframework.data.semantic.support;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
 import net.sf.ehcache.CacheManager;
-
 import org.openrdf.model.Model;
+import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
+import org.openrdf.model.impl.LinkedHashModel;
 import org.openrdf.repository.RepositoryException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,17 +42,13 @@ import org.springframework.data.semantic.filter.ValueFilter;
 import org.springframework.data.semantic.mapping.SemanticPersistentEntity;
 import org.springframework.data.semantic.support.cache.EhCacheEntityCache;
 import org.springframework.data.semantic.support.cache.EmptyEntityCache;
-import org.springframework.data.semantic.support.convert.EntityToQueryConverter;
-import org.springframework.data.semantic.support.convert.EntityToStatementsConverter;
-import org.springframework.data.semantic.support.convert.SemanticEntityConverterImpl;
-import org.springframework.data.semantic.support.convert.SemanticEntityInstantiatorImpl;
-import org.springframework.data.semantic.support.convert.SemanticEntityPersisterImpl;
-import org.springframework.data.semantic.support.convert.SemanticEntityRemoverImpl;
-import org.springframework.data.semantic.support.convert.SemanticSourceStateTransmitter;
+import org.springframework.data.semantic.support.convert.*;
 import org.springframework.data.semantic.support.convert.access.DelegatingFieldAccessorFactory;
 import org.springframework.data.semantic.support.convert.access.listener.DelegatingFieldAccessListenerFactory;
 import org.springframework.data.semantic.support.convert.state.SemanticEntityStateFactory;
 import org.springframework.data.semantic.support.mapping.SemanticMappingContext;
+
+import java.util.*;
 
 public class SemanticTemplateCRUD implements SemanticOperationsCRUD, InitializingBean, ApplicationContextAware {
 	//private static final Logger LOGGER = LoggerFactory.getLogger(SemanticTemplate.class);
@@ -232,13 +222,38 @@ public class SemanticTemplateCRUD implements SemanticOperationsCRUD, Initializin
 		T entity = entityCache.get(resourceId, clazz);
 		if(entity == null){
 			try{
-				entity = createEntity(this.statementsCollector.getStatementsForResource(resourceId, clazz, MappingPolicyImpl.ALL_POLICY, valueFilter), clazz);
+				Model model = this.statementsCollector.getStatementsForResource(resourceId, clazz, MappingPolicyImpl.ALL_POLICY, valueFilter);
+				model = getSortedModel(model, valueFilter);
+
+				entity = createEntity(model, clazz);
 				entityCache.put(entity);
 			} catch (DataAccessException e){
 				logger.error(e.getMessage(), e);
 			}
 		}
 		return entity;
+	}
+
+	private Model getSortedModel(Model model, final ValueFilter valueFilter) {
+		Model m = new LinkedHashModel();
+		m.getNamespaces().addAll(model.getNamespaces());
+
+		List<Statement> stlist = new ArrayList<Statement>();
+		Iterator<Statement> it = model.iterator();
+		while(it.hasNext()){
+			stlist.add(it.next());
+		}
+
+		Collections.sort(stlist, new Comparator<Statement>() {
+			@Override
+			public int compare(Statement o1, Statement o2) {
+				return valueFilter.compare(o1,o2);
+			}
+		});
+
+		m.addAll(stlist);
+
+		return m;
 	}
 
 	

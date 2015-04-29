@@ -16,6 +16,7 @@
 package org.springframework.data.semantic.filter;
 
 import org.openrdf.model.Literal;
+import org.openrdf.model.Statement;
 import org.springframework.data.semantic.annotation.IgnoreLanguageFilter;
 import org.springframework.data.semantic.mapping.SemanticPersistentProperty;
 
@@ -81,12 +82,32 @@ public final class ValueFilters {
 		protected AnyValueFilter(ValueFilter[] filters) {
 			super(filters, " || ");
 		}
+
+		@Override
+		public int compare(Statement statement1, Statement statement2) {
+			for(ValueFilter f : super.filters){
+				int c = f.compare(statement1,statement2);
+				if(c!=0)
+					return c;
+			}
+			return 0;
+		}
 	}
 
 
 	private static final class AllValueFilter extends JoinableMultipleValueFilter {
 		protected AllValueFilter(ValueFilter[] filters) {
 			super(filters, " && ");
+		}
+
+		@Override
+		public int compare(Statement statement1, Statement statement2) {
+			for(ValueFilter f : super.filters){
+				int c = f.compare(statement1,statement2);
+				if(c!=0)
+					return c;
+			}
+			return 0;
 		}
 	}
 
@@ -107,6 +128,30 @@ public final class ValueFilters {
 				}
 			}
 			return null;
+		}
+
+		@Override
+		public int compare(Statement o1, Statement o2) {
+			//Compare by language tag
+			if((o1.getObject() instanceof Literal) && (o2.getObject() instanceof Literal)){
+				Literal l1 = (Literal)o1.getObject();
+				Literal l2 = (Literal)o2.getObject();
+				//For this filter we are only interested in language order, nothing else matters;
+				int i1=0,i2=0;
+
+				if(lang.equals("")){
+					i1 = l1.getLanguage()==null ? -1 : 0;
+					i2 = l2.getLanguage()==null ? 1 : 0;
+				} else {
+					i1 = lang.equals(l1.getLanguage()) ? -1 : 0;
+					i2 = lang.equals(l2.getLanguage()) ? 1 : 0;
+				}
+
+
+				return i1+i2;
+			} else {
+				return 0;
+			}
 		}
 	}
 }

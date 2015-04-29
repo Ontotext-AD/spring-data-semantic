@@ -107,13 +107,38 @@ public class TestFilteringSemanticRepository {
 
 	@Test
 	public void multipleLanguages() {
-		LangFilteredEntity lfe = langFilteredRepository.findOne(ENTITY_ID, any(hasLang("en"), hasLang("fr")));
-		Assert.assertNotNull(lfe);
-		Assert.assertFalse("There isn't a main label", StringUtils.isEmpty(lfe.getMainLabel()));
-		Assert.assertFalse("There isn't an optional label", StringUtils.isEmpty(lfe.getOptionalLabel()));
-		final List<String> expectedMultiLabel = Arrays.asList("Multi English", "Multi Francias");
-		Assert.assertEquals("Unexpected multi label", expectedMultiLabel, lfe.getMultiLabel());
-		checkIgnoreLanguages(lfe);
+
+
+		//The english one
+		LangFilteredEntity lfe1 = langFilteredRepository.findOne(ENTITY_ID, any(hasLang("en"), hasLang("fr")));
+		Assert.assertNotNull(lfe1);
+		Assert.assertFalse("There isn't a main label", StringUtils.isEmpty(lfe1.getMainLabel()));
+		Assert.assertTrue("Main label is not correct", "English".equals(lfe1.getMainLabel()));
+		Assert.assertFalse("There isn't an optional label", StringUtils.isEmpty(lfe1.getOptionalLabel()));
+		final List<String> expectedMultiLabel1 = Arrays.asList("Multi English", "Multi Francias");
+		Assert.assertEquals("Unexpected multi label", expectedMultiLabel1, lfe1.getMultiLabel());
+		checkIgnoreLanguages(lfe1);
+
+		//The french one
+		LangFilteredEntity lfe2 = langFilteredRepository.findOne(ENTITY_ID, any(hasLang("fr"), hasLang("en")));
+		Assert.assertNotNull(lfe2);
+		Assert.assertFalse("There isn't a main label", StringUtils.isEmpty(lfe2.getMainLabel()));
+		Assert.assertTrue("Main label is not correct", "Francias".equals(lfe2.getMainLabel()));
+		Assert.assertFalse("There isn't an optional label", StringUtils.isEmpty(lfe2.getOptionalLabel()));
+		final List<String> expectedMultiLabel2 = Arrays.asList("Multi Francias", "Multi English");
+		Assert.assertEquals("Unexpected multi label", expectedMultiLabel2, lfe2.getMultiLabel());
+		checkIgnoreLanguages(lfe2);
+
+
+		//No lang preferred
+		LangFilteredEntity lfe3 = langFilteredRepository.findOne(ENTITY_ID, any(hasLang(""), hasLang("en")));
+		Assert.assertNotNull(lfe3);
+		Assert.assertFalse("There isn't a main label", StringUtils.isEmpty(lfe3.getMainLabel()));
+		Assert.assertTrue("Main label is not correct", "No Lang".equals(lfe3.getMainLabel()));
+		Assert.assertFalse("There isn't an optional label", StringUtils.isEmpty(lfe3.getOptionalLabel()));
+		final List<String> expectedMultiLabel3 = Arrays.asList("Multi No Lang", "Multi English");
+		Assert.assertEquals("Unexpected multi label", expectedMultiLabel3, lfe3.getMultiLabel());
+		checkIgnoreLanguages(lfe3);
 	}
 
 
