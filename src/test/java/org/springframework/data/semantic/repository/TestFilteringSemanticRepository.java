@@ -25,17 +25,15 @@ import org.openrdf.model.impl.URIImpl;
 import org.openrdf.repository.RepositoryException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.semantic.core.SemanticDatabase;
+import org.springframework.data.semantic.model.vocabulary.MODEL_ENTITY;
 import org.springframework.data.semantic.modelfilter.LangFilteredEntity;
 import org.springframework.data.semantic.modelfilter.LangFilteredRepository;
-import org.springframework.data.semantic.model.vocabulary.MODEL_ENTITY;
 import org.springframework.data.semantic.testutils.Utils;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.util.StringUtils;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import static org.springframework.data.semantic.filter.ValueFilters.any;
 import static org.springframework.data.semantic.filter.ValueFilters.hasLang;
@@ -101,8 +99,8 @@ public class TestFilteringSemanticRepository {
 	}
 
 	private void checkIgnoreLanguages(LangFilteredEntity lfe) {
-		final List<String> expectedIgnores = Arrays.asList("Ignore No Lang", "Ignore English", "Ignore Francias");
-		Assert.assertEquals("Unexpected ignore languages property value", expectedIgnores, lfe.getIgnoreLang());
+		final Set<String> expectedIgnores = new HashSet<String>(Arrays.asList("Ignore No Lang", "Ignore English", "Ignore Francias"));
+		Assert.assertEquals("Unexpected ignore languages property value", expectedIgnores, new HashSet<String>(lfe.getIgnoreLang()));
 	}
 
 	@Test

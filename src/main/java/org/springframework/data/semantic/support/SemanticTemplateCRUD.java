@@ -223,8 +223,9 @@ public class SemanticTemplateCRUD implements SemanticOperationsCRUD, Initializin
 		if(entity == null){
 			try{
 				Model model = this.statementsCollector.getStatementsForResource(resourceId, clazz, MappingPolicyImpl.ALL_POLICY, valueFilter);
-				model = getSortedModel(model, valueFilter);
-
+				if(valueFilter!=null) {
+					model = getSortedModel(model, valueFilter);
+				}
 				entity = createEntity(model, clazz);
 				entityCache.put(entity);
 			} catch (DataAccessException e){
@@ -238,11 +239,7 @@ public class SemanticTemplateCRUD implements SemanticOperationsCRUD, Initializin
 		Model m = new LinkedHashModel();
 		m.getNamespaces().addAll(model.getNamespaces());
 
-		List<Statement> stlist = new ArrayList<Statement>();
-		Iterator<Statement> it = model.iterator();
-		while(it.hasNext()){
-			stlist.add(it.next());
-		}
+		List<Statement> stlist = new ArrayList<Statement>(model);
 
 		Collections.sort(stlist, new Comparator<Statement>() {
 			@Override
