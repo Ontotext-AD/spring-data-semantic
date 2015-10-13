@@ -18,6 +18,7 @@ package org.springframework.data.semantic.support.mapping;
 import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -27,6 +28,7 @@ import java.util.Map;
 
 import org.openrdf.model.URI;
 import org.openrdf.model.impl.URIImpl;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.mapping.Association;
 import org.springframework.data.mapping.PersistentEntity;
 import org.springframework.data.mapping.model.AbstractPersistentProperty;
@@ -284,5 +286,8 @@ public class SemanticPersistentPropertyImpl extends
 		}
 	}
 
-	
+	@Override
+	public boolean isTransient() {
+		return isAnnotationPresent(Transient.class) || (field == null ? false : Modifier.isTransient(field.getModifiers()));
+	}
 }

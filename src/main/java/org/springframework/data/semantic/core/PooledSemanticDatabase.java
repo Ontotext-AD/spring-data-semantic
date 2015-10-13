@@ -386,7 +386,7 @@ public class PooledSemanticDatabase implements SemanticDatabase{
 	@Override
 	public Model getGraphQueryResults(String graphQuery, Long offset, Long limit) throws RepositoryException, QueryCreationException,
 			QueryEvaluationException, QueryInterruptedException, MalformedQueryException {
-		logger.debug("Executing query \""+graphQuery+"\"");
+		logger.info("Executing query \""+graphQuery+"\"");
 		RepositoryConnection con = connectionPool.getConnection();		
 		try{
 			GraphSparqlQuery query = new GraphSparqlQuery(graphQuery, con);

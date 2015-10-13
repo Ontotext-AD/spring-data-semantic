@@ -21,6 +21,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -76,6 +77,9 @@ public class TestSemanticRepository {
 
 	@Autowired
 	private ModelEntityExtendedRepository modelEntityExtendedRepository;
+	
+	@Autowired
+	private TransientEntityRepository transientEntityRepository;
 	
 	@Before
 	public void initRepo() throws RepositoryException {
@@ -474,4 +478,16 @@ public class TestSemanticRepository {
 		assertNotNull(me);
 	}
 	
+	@Test
+	public void testTransientEntity(){
+		TransientEntity entity = new TransientEntity();
+		entity.setUri(MODEL_ENTITY.ENTITY_TRANSIENT);
+		entity.setTestProperty(new SimpleDateFormat("YYYY"));
+		
+		entity = transientEntityRepository.save(entity);
+		assertNotNull(entity);
+		TransientEntity search = transientEntityRepository.findOne(MODEL_ENTITY.ENTITY_TRANSIENT);
+		assertNotNull(search);
+		assertNull(search.getTestProperty());
+	}
 }
